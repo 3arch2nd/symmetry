@@ -840,7 +840,7 @@
             if (selectedDifficulty == 2) {
                 isSlantedAxis = Math.random() < 0.5;
                 if (isSlantedAxis) {
-                    nVertices = 4;
+                    nVertices = getRandomInt(3, 4);
                     minCoord = 3;
                     maxCoord = 17;
                     axisDirection = 'slanted';
@@ -852,7 +852,7 @@
                 }
             } else {
                 isSlantedAxis = false;
-                nVertices = getRandomInt(3, 4);
+                nVertices = 4; // Difficulty 1 fixed to 4 vertices
                 minCoord = 3;
                 maxCoord = 17;
                 axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
@@ -967,7 +967,7 @@
             } else {
                 
                 if (axisDirection === 'vertical') {
-                    const pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                    const pointCount = nVertices;
                     let nonAxisPoints = [];
 
                     const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) };
@@ -1030,7 +1030,7 @@
                     };
 
                 } else { // horizontal
-                    const pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                    const pointCount = nVertices;
                     let nonAxisPoints = [];
                     
                     const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT };
@@ -1122,7 +1122,7 @@
                 let newV;
                 let success = false;
                 let attemptCount = 0;
-                while(!success && attemptCount < MAX_POINT_GEN_ATTEMPTS) {
+                while(!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
                     let x, y;
                     if(isHorizontalAxis) {
                         x = getRandomInt(MIN_COORD, MAX_COORD);
@@ -1203,7 +1203,6 @@
         }
         return null;
     }
-
 
     // 1. 설정 및 시작
     function initializeSetupListeners() {
