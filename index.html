@@ -1312,10 +1312,10 @@
         
         if (hoveredLine) {
             ctx.save();
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
-            ctx.lineWidth = 6;
-            ctx.shadowColor = 'red';
-            ctx.shadowBlur = 8;
+            ctx.strokeStyle = 'rgba(234, 153, 153, 0.5)';
+            ctx.lineWidth = 8;
+            ctx.shadowColor = 'rgba(234, 153, 153, 0.7)';
+            ctx.shadowBlur = 10;
             ctx.beginPath();
             ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
             ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE);
