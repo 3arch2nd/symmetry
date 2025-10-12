@@ -8,440 +8,481 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
-        /* 기본 스타일 */
-        body {
-            font-family: 'Gowun Dodum', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f4f7f6;
-            color: #333;
-            text-align: center;
-        }
+    /* 기본 스타일 */
+    body {
+        font-family: 'Gowun Dodum', sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #f4f7f6;
+        color: #333;
+        text-align: center;
+    }
+    .container {
+        position: relative;
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 800px;
+        text-align: center;
+        margin: 20px auto;
+        box-sizing: border-box; /* *** 화면 넘침 방지를 위해 추가 *** */
+    }
+    h1 {
+        color: #4b8134;
+        margin-bottom: 20px;
+        font-size: 2em;
+    }
+    h2 {
+        margin-bottom: 5px;
+    }
+    small {
+        display: block;
+        font-size: 18px;
+        color: #6c757d;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    button {
+        font-family: 'Gowun Dodum', sans-serif;
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s, transform 0.1s;
+    }
+    button:hover {
+        transform: translateY(-1px);
+    }
+    .primary-btn {
+        background-color: #28a745;
+        color: white;
+    }
+    .primary-btn:hover {
+        background-color: #218838;
+    }
+    .secondary-btn {
+        background-color: #e9e9e9;
+        color: #333;
+        border: none;
+    }
+    .secondary-btn:hover {
+        background-color: #d9d9d9;
+    }
+    #clear-canvas-btn {
+        background-color: #ea9999;
+        color: white;
+    }
+    #clear-canvas-btn:hover {
+        background-color: #e06666;
+    }
+    .mode-btn-active {
+        background-color: #ffc107;
+        color: #333;
+        font-weight: bold;
+    }
+    #setup-page, #problem-page, #final-result-page {
+        display: none;
+    }
+    #setup-page {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .setting-group {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        flex-grow: 1;
+    }
+    .option-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 10px;
+    }
+    .option-buttons button {
+        flex-grow: 1;
+        padding: 10px 20px;
+    }
+    .option-buttons button.selected {
+        background-color: #ffc107;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .canvas-wrapper {
+        position: relative;
+        display: block;
+        margin: 0 auto 20px auto;
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        border: 2px solid #333;
+        box-sizing: border-box;
+    }
+    #grid-canvas {
+        background-color: white;
+        cursor: crosshair;
+        width: 100%;
+        height: 100%;
+        display: block;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .user-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        box-shadow: 0 0 3px rgba(0,0,0,0.5);
+        z-index: 10;
+    }
+    .problem-dot, .line-dot {
+        width: 8px;
+        height: 8px;
+        background-color: black;
+        border-radius: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        box-shadow: 0 0 3px rgba(0,0,0,0.5);
+        z-index: 10;
+    }
+    .selected-line-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #ff0000;
+        border-radius: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        box-shadow: 0 0 5px rgba(255,0,0,0.8);
+        z-index: 11;
+    }
+    .canvas-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .correct, .incorrect {
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    .correct { color: #28a745; }
+    .incorrect { color: #dc3545; }
+
+    #quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    #quantity-control button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        padding: 0;
+        margin: 0;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 30px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        color: #333;
+    }
+    #quantity-control button:hover {
+        background-color: #e0e0e0;
+    }
+    .quantity-display {
+        display: inline-block;
+        width: auto;
+        min-width: 40px;
+        height: auto;
+        background-color: transparent;
+        border-radius: 0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        box-shadow: none;
+        vertical-align: baseline;
+        margin: 0;
+        text-align: center;
+    }
+    
+    .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #ccc;
+        text-align: center;
+    }
+
+    .main-layout {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        width: 100%;
+        max-width: 800px;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+    .main-layout h3 {
+        text-align: center;
+    }
+    .left-panel {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .right-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .right-panel .setting-group, .left-panel .setting-group {
+        flex-grow: 1;
+    }
+    
+    #start-quiz-btn {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        font-size: 20px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        flex-shrink: 0;
+    }
+    
+    .setting-group.start-btn-container {
+        border: none;
+        background-color: transparent;
+    }
+    
+    .problem-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .home-button {
+        background-color: #e9e9e9;
+        color: #333;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    .home-button:hover {
+        background-color: #d9d9d9;
+    }
+    #problem-number {
+        flex-grow: 1;
+        text-align: center;
+        margin: 0;
+    }
+    
+    .problem-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        margin-top: 20px;
+    }
+    
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+    }
+    .popup-box {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        width: 80%;
+        max-width: 450px;
+        text-align: center;
+    }
+    .popup-box .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    .popup-box .close-btn:hover { color: #6c757d; }
+
+    .result-popup #popup-main-message {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+    .result-popup #popup-detail-message { display: none; }
+    .result-popup #popup-next-btn { margin-top: 20px; }
+    
+    .final-result-layout {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        margin: 30px 0;
+        gap: 20px;
+    }
+    .result-left, .result-right {
+        flex: 1;
+        padding: 20px;
+    }
+    .result-left {
+        border-right: 1px solid #ddd;
+    }
+    .result-right p {
+        font-size: 1.1em;
+        margin: 15px 0;
+    }
+    #final-accuracy {
+        font-size: 4em;
+        font-weight: bold;
+        color: #4b8134;
+        margin-top: 10px;
+    }
+    
+    #qr-code-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px 10px;
+        font-size: 14px;
+        z-index: 20;
+    }
+    #qr-popup-overlay { background-color: rgba(255, 255, 255, 0.4); }
+    .popup-qr img { max-width: 200px; height: auto; }
+    
+    #hof-popup-overlay { background-color: rgba(0, 0, 0, 0.2); }
+    .hof-input-group { margin: 20px 0; }
+    .hof-input-group input {
+        font-family: 'Gowun Dodum', sans-serif;
+        font-size: 18px;
+        padding: 8px;
+        width: 80px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 10px;
+        text-transform: uppercase;
+    }
+    .hof-table-container { max-height: 300px; overflow-y: auto; margin-top: 20px;}
+    #hof-table { width: 100%; border-collapse: collapse; }
+    #hof-table th, #hof-table td { padding: 8px; border-bottom: 1px solid #eee; }
+    #hof-table th { background-color: #f8f9fa; }
+    
+    .mobile-title, .mobile-home { display: none; }
+
+    @media (max-width: 768px) {
+        .main-layout { flex-direction: column; }
+        .left-panel, .right-panel { width: 100%; margin-top: 20px; }
+        .option-buttons { flex-direction: column; }
+        .problem-footer { justify-content: center; }
+        .final-result-layout { flex-direction: column; }
+        .result-left { border-right: none; border-bottom: 1px solid #ddd; width: 100%; }
+    }
+    
+    @media (max-width: 480px) {
         .container {
-            position: relative;
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            text-align: center;
-            margin: 20px auto;
-            box-sizing: border-box; /* *** 화면 넘침 방지를 위해 추가 *** */
+            padding: 15px; /* *** 모바일에서 내부 여백 축소 *** */
         }
-        h1 {
-            color: #4b8134;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-        h2 {
-            margin-bottom: 5px;
-        }
-        small {
-            display: block;
-            font-size: 18px;
-            color: #6c757d;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        button {
-            font-family: 'Gowun Dodum', sans-serif;
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, transform 0.1s;
-        }
-        button:hover {
-            transform: translateY(-1px);
-        }
-        .primary-btn {
-            background-color: #28a745;
-            color: white;
-        }
-        .primary-btn:hover {
-            background-color: #218838;
-        }
-        .secondary-btn {
-            background-color: #e9e9e9;
-            color: #333;
-            border: none;
-        }
-        .secondary-btn:hover {
-            background-color: #d9d9d9;
-        }
-        #clear-canvas-btn {
-            background-color: #ea9999;
-            color: white;
-        }
-        #clear-canvas-btn:hover {
-            background-color: #e06666;
-        }
-        .mode-btn-active {
-            background-color: #ffc107;
-            color: #333;
-            font-weight: bold;
-        }
-        #setup-page, #problem-page, #final-result-page {
-            display: none;
-        }
-        #setup-page {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .setting-group {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-            flex-grow: 1;
-        }
-        .option-buttons {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        .option-buttons button {
-            flex-grow: 1;
-            padding: 10px 20px;
-        }
-        .option-buttons button.selected {
-            background-color: #ffc107;
-            color: #333;
-            font-weight: bold;
-        }
-        
-        .canvas-wrapper {
-            position: relative;
-            display: block;
-            margin: 0 auto 20px auto;
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            aspect-ratio: 1 / 1;
-            border: 2px solid #333;
-            box-sizing: border-box;
-        }
-        #grid-canvas {
-            background-color: white;
-            cursor: crosshair;
-            width: 100%;
-            height: 100%;
-            display: block;
-            -webkit-tap-highlight-color: transparent;
-        }
+        .desktop-title { display: none; }
+        .mobile-title { display: inline; }
+        .desktop-home { display: none; }
+        .mobile-home { display: inline; }
+        .home-button { padding: 8px 10px; }
+    }
 
-        .user-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #dc3545;
-            border-radius: 50%;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            box-shadow: 0 0 3px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-        .problem-dot, .line-dot {
-            width: 8px;
-            height: 8px;
-            background-color: black;
-            border-radius: 50%;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            box-shadow: 0 0 3px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-        .selected-line-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #ff0000;
-            border-radius: 50%;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            box-shadow: 0 0 5px rgba(255,0,0,0.8);
-            z-index: 11;
-        }
-        .canvas-controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .correct, .incorrect {
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .correct { color: #28a745; }
-        .incorrect { color: #dc3545; }
+    /* --- ✨ 명예의 전당 순위 스타일 (추가된 부분) --- */
+    .rank-1, .rank-2, .rank-3 {
+        color: black !important; /* 글자색을 검정으로 강제 지정 */
+        font-weight: bold; /* 글자를 살짝 두껍게 */
+    }
 
-        #quantity-control {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        #quantity-control button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            padding: 0;
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-            line-height: 30px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            color: #333;
-        }
-        #quantity-control button:hover {
-             background-color: #e0e0e0;
-        }
-        .quantity-display {
-            display: inline-block;
-            width: auto;
-            min-width: 40px;
-            height: auto;
-            background-color: transparent;
-            border-radius: 0;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            box-shadow: none;
-            vertical-align: baseline;
-            margin: 0;
-            text-align: center;
-        }
-        
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #ccc;
-            text-align: center;
-        }
+    .rank-1 {
+        /* 1등: 금색 글로우 */
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.9);
+    }
 
-        .main-layout {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            width: 100%;
-            max-width: 800px;
-            align-items: stretch;
-            flex-wrap: wrap;
-        }
-        .main-layout h3 {
-            text-align: center;
-        }
-        .left-panel {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .right-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .right-panel .setting-group, .left-panel .setting-group {
-             flex-grow: 1;
-        }
-        
-        #start-quiz-btn {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            font-size: 20px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            flex-shrink: 0;
-        }
-        
-        .setting-group.start-btn-container {
-            border: none;
-            background-color: transparent;
-        }
-        
-        .problem-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-        .home-button {
-            background-color: #e9e9e9;
-            color: #333;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .home-button:hover {
-            background-color: #d9d9d9;
-        }
-        #problem-number {
-            flex-grow: 1;
-            text-align: center;
-            margin: 0;
-        }
-        
-        .problem-footer {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            width: 100%;
-            margin-top: 20px;
-        }
-        
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        .popup-box {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
-            width: 80%;
-            max-width: 450px;
-            text-align: center;
-        }
-        .popup-box .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-        .popup-box .close-btn:hover { color: #6c757d; }
+    .rank-2 {
+        /* 2등: 은색 글로우 */
+        text-shadow: 0 0 8px rgba(192, 192, 192, 0.9);
+    }
 
-        .result-popup #popup-main-message {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 0;
-            line-height: 1.5;
-        }
-        .result-popup #popup-detail-message { display: none; }
-        .result-popup #popup-next-btn { margin-top: 20px; }
-        
-        .final-result-layout {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            align-items: center;
-            margin: 30px 0;
-            gap: 20px;
-        }
-        .result-left, .result-right {
-            flex: 1;
-            padding: 20px;
-        }
-        .result-left {
-            border-right: 1px solid #ddd;
-        }
-        .result-right p {
-            font-size: 1.1em;
-            margin: 15px 0;
-        }
-        #final-accuracy {
-            font-size: 4em;
-            font-weight: bold;
-            color: #4b8134;
-            margin-top: 10px;
-        }
-        
-        #qr-code-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 5px 10px;
-            font-size: 14px;
-            z-index: 20;
-        }
-        #qr-popup-overlay { background-color: rgba(255, 255, 255, 0.4); }
-        .popup-qr img { max-width: 200px; height: auto; }
-        
-        #hof-popup-overlay { background-color: rgba(0, 0, 0, 0.2); }
-        .hof-input-group { margin: 20px 0; }
-        .hof-input-group input {
-            font-family: 'Gowun Dodum', sans-serif;
-            font-size: 18px;
-            padding: 8px;
-            width: 80px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
-            text-transform: uppercase;
-        }
-        .hof-table-container { max-height: 300px; overflow-y: auto; margin-top: 20px;}
-        #hof-table { width: 100%; border-collapse: collapse; }
-        #hof-table th, #hof-table td { padding: 8px; border-bottom: 1px solid #eee; }
-        #hof-table th { background-color: #f8f9fa; }
-        
-        .mobile-title, .mobile-home { display: none; }
+    .rank-3 {
+        /* 3등: 동색 글로우 */
+        text-shadow: 0 0 8px rgba(205, 127, 50, 0.9);
+    }
+    
+    /* 순위별 메달 아이콘 추가 */
+    .rank-1::before {
+        content: "🥇";
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
 
-        @media (max-width: 768px) {
-            .main-layout { flex-direction: column; }
-            .left-panel, .right-panel { width: 100%; margin-top: 20px; }
-            .option-buttons { flex-direction: column; }
-            .problem-footer { justify-content: center; }
-            .final-result-layout { flex-direction: column; }
-            .result-left { border-right: none; border-bottom: 1px solid #ddd; width: 100%; }
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 15px; /* *** 모바일에서 내부 여백 축소 *** */
-            }
-            .desktop-title { display: none; }
-            .mobile-title { display: inline; }
-            .desktop-home { display: none; }
-            .mobile-home { display: inline; }
-            .home-button { padding: 8px 10px; }
-        }
-    </style>
+    .rank-2::before {
+        content: "🥈";
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+
+    .rank-3::before {
+        content: "🥉";
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+
+</style>
 </head>
 <body>
 
@@ -575,7 +616,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
@@ -585,108 +626,6 @@
     // *** Cloudflare Worker URL을 여기에 붙여넣으세요! ***
     const webAppUrl = 'https://soft-wood-cf8e.bbglara.workers.dev/';
 
-    // --- 이하 스크립트 코드는 여기에 전체 붙여넣기 ---
-    let finalAccuracyValue = 0;
-
-    function showQrPopup() {
-        document.getElementById('qr-popup-overlay').style.display = 'flex';
-    }
-
-    function closeQrPopup() {
-        document.getElementById('qr-popup-overlay').style.display = 'none';
-    }
-    
-    function showHofPopup() {
-        const tableBody = document.querySelector('#hof-table tbody');
-        const messageEl = document.getElementById('hof-message');
-        tableBody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
-        messageEl.textContent = '';
-        document.getElementById('hof-initial').value = '';
-        document.getElementById('hof-submit-btn').disabled = false;
-        
-        document.getElementById('hof-popup-overlay').style.display = 'flex';
-
-        fetch(webAppUrl)
-            .then(response => response.json())
-            .then(data => {
-                tableBody.innerHTML = ''; 
-                if (data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="3">아직 등록된 기록이 없습니다.</td></tr>';
-                } else {
-                    data.forEach(item => {
-                        let initialStyle = '';
-                        if (item.rank === 1) initialStyle = 'style="color: #FFD700; font-weight: bold; text-shadow: 0 0 3px #c9a900;"'; // Gold
-                        if (item.rank === 2) initialStyle = 'style="color: #C0C0C0; font-weight: bold; text-shadow: 0 0 3px #888;"'; // Silver
-                        if (item.rank === 3) initialStyle = 'style="color: #CD7F32; font-weight: bold; text-shadow: 0 0 3px #8b5721;"'; // Bronze
-                        
-                        const row = `<tr>
-                            <td>${item.rank}</td>
-                            <td ${initialStyle}>${item.initial}</td>
-                            <td>${item.score}</td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    });
-                }
-            })
-            .catch(error => {
-                tableBody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
-                console.error('Error fetching leaderboard:', error);
-            });
-    }
-
-    function closeHofPopup() {
-        document.getElementById('hof-popup-overlay').style.display = 'none';
-    }
-
-    function submitScore() {
-        const initialInput = document.getElementById('hof-initial');
-        const initial = initialInput.value;
-        const submitBtn = document.getElementById('hof-submit-btn');
-        const messageEl = document.getElementById('hof-message');
-
-        if (!/^[A-Z]{3}$/.test(initial)) {
-            messageEl.textContent = '이니셜은 영어 대문자 3글자로 입력해주세요.';
-            messageEl.style.color = 'red';
-            return;
-        }
-
-        submitBtn.disabled = true;
-        messageEl.textContent = '등록 중...';
-        messageEl.style.color = '#333';
-
-        const data = {
-            initial: initial,
-            problems: totalProblems,
-            accuracy: finalAccuracyValue,
-            difficulty: selectedDifficulty
-        };
-
-        fetch(webAppUrl, {
-            method: 'POST',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.result === 'success') {
-                messageEl.textContent = '성공적으로 등록되었습니다!';
-                messageEl.style.color = 'green';
-                setTimeout(showHofPopup, 1500);
-            } else {
-                throw new Error(result.message || '알 수 없는 오류');
-            }
-        })
-        .catch(error => {
-            messageEl.textContent = '등록에 실패했습니다. 다시 시도해주세요.';
-            messageEl.style.color = 'red';
-            submitBtn.disabled = false;
-            console.error('Error submitting score:', error);
-        });
-    }
-
     // 전역 변수 설정
     let selectedType = 'line';
     let totalProblems = 5;
@@ -694,6 +633,8 @@
     let canvasMode = 'vertex';
     let score = { correct: 0, retried: 0, totalAttempted: 0, isFirstAttempt: true };
     let selectedDifficulty = 1;
+    let finalAccuracyValue = 0;
+    let hasSubmittedScore = false;
     
     const canvas = document.getElementById('grid-canvas');
     const ctx = canvas.getContext('2d');
@@ -706,19 +647,17 @@
     const MAX_COORD = 17;
     const MIN_DIST = 2;
     
-    const COLLINEARITY_THRESHOLD = 0.1; 
+    const COLLINEARITY_THRESHOLD = 1.0;
     const MIN_ANGLE_COSINE = Math.cos(30 * Math.PI / 180);
     const MAX_ANGLE_COSINE = Math.cos(150 * Math.PI / 180);
     const MIN_SLOPE_DIFF = 2.0;
 
-    // 현재 문제 상태
     let problemVertices = [];
     let problemLines = [];
     let userVertices = [];
     let userLines = [];
     let tempLineStart = null;
     let hoveredLine = null;
-
     let problemList = [];
 
     // 헬퍼 함수
@@ -850,7 +789,7 @@
             } else if (axisDirection === 'horizontal') {
                 symX = v.x;
                 symY = 2 * C - v.y;
-            } else { // 'vertical'
+            } else { 
                 symX = 2 * C - v.x;
                 symY = v.y;
             }
@@ -930,8 +869,6 @@
         return [p1, ...belowAxis, p2, ...aboveAxis];
     }
 
-
-    // 랜덤 문제 생성 로직
     function generateRandomProblem(type) {
         const MAX_ATTEMPTS_PER_POINT = 100;
         const MAX_PROBLEM_ATTEMPTS = 100;
@@ -1198,7 +1135,7 @@
                 }
             }
 
-        } else if (type === 'point') { // *** 롤백된 안정적인 점대칭 로직 ***
+        } else if (type === 'point') { 
             const numPoints = (selectedDifficulty == 1) ? getRandomInt(3, 4) : getRandomInt(5, 6);
             let initialPoints = [];
             const MAX_POINT_GEN_ATTEMPTS = 50;
@@ -1379,6 +1316,7 @@
         
         currentProblem = 0;
         score.isFirstAttempt = true;
+        hasSubmittedScore = false; // 새 게임 시작 시 등록 플래그 초기화
         
         document.getElementById('setup-page').style.display = 'none';
         document.getElementById('problem-page').style.display = 'block';
@@ -1602,7 +1540,6 @@
         document.getElementById('result-popup-overlay').style.display = 'none';
     }
 
-    // 3. 정답 확인 및 결과
     function checkAnswer() {
         const currentP = problemList[currentProblem];
         const problemType = currentP.type;
@@ -1885,11 +1822,20 @@
     function showHofPopup() {
         const tableBody = document.querySelector('#hof-table tbody');
         const messageEl = document.getElementById('hof-message');
-        tableBody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
-        messageEl.textContent = '';
-        document.getElementById('hof-initial').value = '';
-        document.getElementById('hof-submit-btn').disabled = false;
+        const inputGroup = document.querySelector('.hof-input-group');
+
+        if (hasSubmittedScore) {
+            inputGroup.style.display = 'none';
+            messageEl.textContent = '이번 학습 기록은 이미 등록되었습니다.';
+            messageEl.style.color = 'blue';
+        } else {
+            inputGroup.style.display = 'block';
+            messageEl.textContent = '';
+            document.getElementById('hof-initial').value = '';
+            document.getElementById('hof-submit-btn').disabled = false;
+        }
         
+        tableBody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
         document.getElementById('hof-popup-overlay').style.display = 'flex';
 
         fetch(webAppUrl)
@@ -1901,13 +1847,13 @@
                 } else {
                     data.forEach(item => {
                         let initialStyle = '';
-                        if (item.rank === 1) initialStyle = 'style="color: #FFD700; font-weight: bold; text-shadow: 0 0 3px #c9a900;"'; // Gold
-                        if (item.rank === 2) initialStyle = 'style="color: #C0C0C0; font-weight: bold; text-shadow: 0 0 3px #888;"'; // Silver
-                        if (item.rank === 3) initialStyle = 'style="color: #CD7F32; font-weight: bold; text-shadow: 0 0 3px #8b5721;"'; // Bronze
+                        if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"'; 
+                        if (item.rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
+                        if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 3px #fff;"'; 
                         
                         const row = `<tr>
                             <td>${item.rank}</td>
-                            <td ${initialStyle}>${item.initial}</td>
+                            <td ${initialStyle}>${item.initial} ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : ''}</td>
                             <td>${item.score}</td>
                         </tr>`;
                         tableBody.innerHTML += row;
@@ -1958,8 +1904,10 @@
         .then(response => response.json())
         .then(result => {
             if (result.result === 'success') {
+                hasSubmittedScore = true;
                 messageEl.textContent = '성공적으로 등록되었습니다!';
                 messageEl.style.color = 'green';
+                document.querySelector('.hof-input-group').style.display = 'none';
                 setTimeout(showHofPopup, 1500);
             } else {
                 throw new Error(result.message || '알 수 없는 오류');
