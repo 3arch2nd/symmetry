@@ -31,6 +31,7 @@
             max-width: 800px;
             text-align: center;
             margin: 20px auto;
+            box-sizing: border-box; /* *** 화면 넘침 방지를 위해 추가 *** */
         }
         h1 {
             color: #4b8134;
@@ -431,6 +432,9 @@
         }
         
         @media (max-width: 480px) {
+            .container {
+                padding: 15px; /* *** 모바일에서 내부 여백 축소 *** */
+            }
             .desktop-title { display: none; }
             .mobile-title { display: inline; }
             .desktop-home { display: none; }
