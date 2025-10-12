@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>대칭 도형 완성하기 학습 V111 (선대칭 난이도 로직 개선)</title>
+    <title>선대칭/점대칭도형 완전 정복</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
         /* 기본 스타일 */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Gowun Dodum', sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             background-color: #f4f7f6;
             color: #333;
+            text-align: center;
         }
         .container {
             background-color: white;
@@ -27,11 +32,22 @@
             margin: 20px auto;
         }
         h1 {
-            color: #007bff;
+            color: #4b8134;
             margin-bottom: 20px;
             font-size: 2em;
         }
+        h2 {
+            margin-bottom: 5px;
+        }
+        small {
+            display: block;
+            font-size: 18px;
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
         button {
+            font-family: 'Gowun Dodum', sans-serif;
             padding: 10px 20px;
             margin: 5px;
             border: none;
@@ -51,11 +67,12 @@
             background-color: #218838;
         }
         .secondary-btn {
-            background-color: #6c757d;
-            color: white;
+            background-color: #e9e9e9;
+            color: #333;
+            border: none;
         }
         .secondary-btn:hover {
-            background-color: #5a6268;
+            background-color: #d9d9d9;
         }
         .mode-btn-active {
             background-color: #ffc107;
@@ -74,7 +91,24 @@
             border: 1px solid #ddd;
             padding: 15px;
             border-radius: 8px;
-            text-align: left;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+        .option-buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .option-buttons button {
+            flex-grow: 1;
+            padding: 10px 20px;
         }
         .option-buttons button.selected {
             background-color: #ffc107;
@@ -127,6 +161,8 @@
             position: relative;
             display: inline-block;
             width: 100%;
+            max-width: 400px;
+            height: 400px;
         }
         .canvas-controls {
             display: flex;
@@ -144,22 +180,194 @@
         }
         .correct { color: #28a745; border-color: #28a745; }
         .incorrect { color: #dc3545; border-color: #dc3545; }
+
+        /* UI 개선을 위한 추가 스타일 */
+        .quantity-display {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background-color: #ffc107;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #ccc;
+            text-align: center;
+        }
+
+        /* 메인 레이아웃 변경 */
+        .main-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+        .main-layout h3 {
+            text-align: center;
+        }
+        .left-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .right-panel .setting-group, .left-panel .setting-group {
+             flex-grow: 1;
+        }
+        
+        #start-quiz-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        
+        /* 시작 버튼 컨테이너 스타일 */
+        .setting-group.start-btn-container {
+            border: none;
+            background-color: transparent;
+        }
+        
+        /* 문제 페이지 헤더 스타일 */
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .home-button {
+            background-color: #e9e9e9;
+            color: #333;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .home-button:hover {
+            background-color: #d9d9d9;
+        }
+        #problem-number {
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+        }
+        
+        /* 문제 페이지 푸터 스타일 (정답 확인 및 다음 문제 버튼) */
+        .problem-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        /* 결과 메시지 팝업 스타일 */
+        .result-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .result-popup {
+            background-color: rgba(255, 255, 255, 1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .result-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            line-height: 20px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+        .result-popup .close-btn:hover {
+            color: #6c757d;
+        }
+        .result-popup .popup-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .result-popup #popup-main-message {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+        .result-popup #popup-detail-message {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #dc3545;
+            display: none;
+        }
+        .result-popup #popup-next-btn {
+            margin-top: 20px;
+            align-self: center;
+        }
         
         /* 반응형 디자인 */
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
+            .main-layout {
+                flex-direction: column;
             }
-            h1 {
-                font-size: 1.5em;
+            .left-panel, .right-panel {
+                width: 100%;
+                margin-top: 20px;
             }
-            button {
-                font-size: 14px;
-                padding: 8px 16px;
+            .option-buttons {
+                flex-direction: column;
             }
-            .canvas-controls button {
-                flex-grow: 1;
-                max-width: none;
+            .problem-footer {
+                justify-content: center;
             }
         }
     </style>
@@ -167,43 +375,53 @@
 <body>
 
 <div class="container">
-    <h1>대칭 도형 완성하기 학습</h1>
-
     <div id="setup-page">
-        <h2>문제 유형 및 개수 설정</h2>
-        
-        <div class="setting-group">
-            <h3>1) 문제 유형 선택</h3>
-            <div id="type-select" class="option-buttons">
-                <button data-type="line">선대칭도형</button>
-                <button data-type="point">점대칭도형</button>
-                <button data-type="both" class="selected">둘 다</button>
-            </div>
-        </div>
+        <h1>선대칭/점대칭도형 완전 정복</h1>
+        <h2 style="text-align: center;">문제 유형 및 개수 설정</h2>
+        <small>무작위로 생성되는 새로운 문제를 원하는 만큼 연습할 수 있습니다.</small>
 
-        <div class="setting-group">
-            <h3>2) 난이도 선택</h3>
-            <div id="difficulty-select" class="option-buttons">
-                <button data-difficulty="1" class="selected">1단계</button>
-                <button data-difficulty="2">2단계</button>
-            </div>
-        </div>
+        <div class="main-layout">
+            <div class="left-panel">
+                <div class="setting-group">
+                    <h3>문제 유형 선택</h3>
+                    <div id="type-select" class="option-buttons">
+                        <button data-type="line" class="selected">선대칭도형</button>
+                        <button data-type="point">점대칭도형</button>
+                        <button data-type="both">둘 다 할래요</button>
+                    </div>
+                </div>
 
-        <div class="setting-group">
-            <h3>3) 문제 개수 설정</h3>
-            <div id="quantity-control">
-                <button id="quantity-minus-5">-5</button>
-                <span id="problem-quantity">10</span>
-                <button id="quantity-plus-5">+5</button>
+                <div class="setting-group">
+                    <h3>난이도 선택</h3>
+                    <div id="difficulty-select" class="option-buttons">
+                        <button data-difficulty="1" class="selected">★</button>
+                        <button data-difficulty="2">★★</button>
+                    </div>
+                </div>
             </div>
-            <small>무작위로 생성되는 새로운 문제를 원하는 만큼 연습할 수 있습니다.</small>
+
+            <div class="right-panel">
+                <div class="setting-group">
+                    <h3>문제 개수 설정</h3>
+                    <div id="quantity-control">
+                        <button id="quantity-minus-5">-5</button>
+                        <span id="problem-quantity" class="quantity-display">5</span>
+                        <button id="quantity-plus-5">+5</button>
+                    </div>
+                </div>
+                <div class="setting-group start-btn-container">
+                    <button id="start-quiz-btn" class="primary-btn">시작!</button>
+                </div>
+            </div>
         </div>
-        
-        <button id="start-quiz-btn" class="primary-btn">적용하기 및 시작</button>
     </div>
     
     <div id="problem-page">
-        <h2 id="problem-number">1번째 문제</h2>
+        <div class="problem-header">
+            <button class="home-button" onclick="location.reload()">🏠 첫 페이지로</button>
+            <h2 id="problem-number">1번째 문제</h2>
+            <div style="width: 120px;"></div>
+        </div>
         <p id="problem-instruction">아래 도형은 선대칭도형입니다. 나머지 부분을 완성해 주세요.</p>
         
         <div class="canvas-wrapper">
@@ -213,15 +431,13 @@
         <div class="canvas-controls">
             <button id="mode-vertex" class="secondary-btn mode-btn-active" onclick="setCanvasMode('vertex')">1단계: 꼭짓점 찍기</button>
             <button id="mode-line" class="secondary-btn" onclick="setCanvasMode('line')" disabled>2단계: 선분 잇기</button>
-            <button id="clear-canvas-btn" class="secondary-btn">초기화</button>
+            <button id="clear-canvas-btn" class="secondary-btn">다시 풀기 (초기화)</button>
         </div>
 
-        <div id="result-message" style="display: none;"></div>
-        
-        <button id="check-answer-btn" class="primary-btn" onclick="checkAnswer()">정답 확인하기</button>
-        
-        <button id="next-problem-btn" class="primary-btn" style="display: none;">다음 문제 도전하기</button>
-        <button id="reset-drawing-btn" class="secondary-btn" style="display: none;">다시 풀기 (초기화)</button>
+        <div class="problem-footer">
+            <button id="check-answer-btn" class="primary-btn" onclick="checkAnswer()">정답 확인하기</button>
+            <button id="next-problem-btn" class="primary-btn" style="display: none;">다음 문제 도전하기</button>
+        </div>
     </div>
 
     <div id="final-result-page">
@@ -235,11 +451,25 @@
         <p><button class="primary-btn" onclick="location.reload()">새로운 학습 시작하기</button></p>
     </div>
 </div>
+<div class="footer">
+    휴르쌤
+</div>
+
+<div id="result-popup-overlay" class="result-popup-overlay" style="display: none;">
+    <div id="result-popup" class="result-popup">
+        <button class="close-btn" onclick="closePopup()">&times;</button>
+        <div class="popup-content">
+            <p id="popup-main-message"></p>
+            <p id="popup-detail-message"></p>
+            <button id="popup-next-btn" class="primary-btn" onclick="nextProblem()" style="display: none;">다음 문제 도전하기</button>
+        </div>
+    </div>
+</div>
 
 <script>
     // 전역 변수 설정
-    let selectedType = 'both';
-    let totalProblems = 10;
+    let selectedType = 'line';
+    let totalProblems = 5;
     let currentProblem = 0;
     let canvasMode = 'vertex';
     let score = { correct: 0, retried: 0, totalAttempted: 0, isFirstAttempt: true };
@@ -289,6 +519,7 @@
     }
 
     function nextProblem() {
+        closePopup();
         currentProblem++;
         loadProblem();
     }
@@ -385,7 +616,7 @@
         return (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2;
     }
     
-    function calculateSymmetricPoint(v, type, isSlantedAxis = false) {
+    function calculateSymmetricPoint(v, type, isSlantedAxis = false, axisDirection = 'vertical') {
         let symX, symY;
         const C = HALF_COUNT;
 
@@ -393,7 +624,10 @@
             if (isSlantedAxis) {
                 symX = v.y;
                 symY = v.x;
-            } else {
+            } else if (axisDirection === 'horizontal') {
+                symX = v.x;
+                symY = 2 * C - v.y;
+            } else { // 'vertical'
                 symX = 2 * C - v.x;
                 symY = v.y;
             }
@@ -422,7 +656,6 @@
         return lines;
     }
     
-    // V104: 점대칭 도형 꼭짓점 정렬 로직 개선
     function findPointSymmetricBoundary(points) {
         if (points.length < 3) return points;
         const C = CENTER_POINT;
@@ -477,364 +710,367 @@
 
     // 랜덤 문제 생성 로직
     function generateRandomProblem(type) {
-        let nVertices, minCoord, maxCoord;
-        const isSlantedAxis = (type === 'line' && selectedDifficulty == 2);
-        
-        if (selectedDifficulty == 1) {
-            nVertices = getRandomInt(3, 4); // V111: 선대칭 1단계 점 개수 3~4개로 변경
-            minCoord = 3;
-            maxCoord = 17;
-        } else { // 난이도 2
-            nVertices = getRandomInt(5, 6);
-            minCoord = 2;
-            maxCoord = 18;
-        }
-        
         const MAX_ATTEMPTS_PER_POINT = 100;
         const MAX_PROBLEM_ATTEMPTS = 100;
-        let problemAttempt = 0;
-
-        while (problemList.length < totalProblems && problemAttempt < MAX_PROBLEM_ATTEMPTS) {
-            let tempVertices = [];
-
-            if (type === 'line') {
-                // V111: 선대칭 2단계 문제에서 축 방향을 랜덤으로 선택
-                const isSlantedAxis = selectedDifficulty == 2 && Math.random() < 0.5;
-
+        
+        if (type === 'line') {
+            let nVertices, minCoord, maxCoord;
+            let isSlantedAxis = false;
+            let axisDirection = 'vertical';
+            
+            if (selectedDifficulty == 2) {
+                isSlantedAxis = Math.random() < 0.5;
                 if (isSlantedAxis) {
-                    // V111: 대각선 축일 때 점 개수 3~4개
-                    const nVertices_slanted = getRandomInt(3, 4);
-                    const axisMidPoint = { x: HALF_COUNT, y: HALF_COUNT };
-                    let axisPoints = [];
-                    const axisLength = getRandomInt(3, 7);
-                    
-                    const p1 = {x: axisMidPoint.x - axisLength, y: axisMidPoint.y - axisLength};
-                    const p2 = {x: axisMidPoint.x + axisLength, y: axisMidPoint.y + axisLength};
-                    
-                    axisPoints.push(p1);
-                    axisPoints.push(p2);
-                    
-                    tempVertices.push(axisPoints[0]);
-
-                    for (let i = 0; i < nVertices_slanted - 2; i++) {
-                        let newV;
-                        let success = false;
-                        let attemptCount = 0;
-                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                            let x = getRandomInt(minCoord, maxCoord);
-                            let y = getRandomInt(minCoord, x - 1);
-                            
-                            newV = { x: x, y: y };
-
-                            if (
-                                !isTooClose(newV, tempVertices) &&
-                                !isProblemTooLinear(tempVertices, newV) &&
-                                !isProblemTooSharp(tempVertices, newV)
-                            ) {
-                                tempVertices.push(newV);
-                                success = true;
-                            }
-                            attemptCount++;
-                        }
-                    }
-                    tempVertices.push(axisPoints[1]);
-                    
-                    let allVertices = [...tempVertices];
-                    
-                    if (allVertices.length < 3) {
-                        problemAttempt++;
-                        continue;
-                    }
-                    
-                    const lastV = allVertices[allVertices.length - 1];
-                    const secondLastV = allVertices[allVertices.length - 2];
-                    const firstV = allVertices[0];
-
-                    if (isTooLinear(secondLastV, lastV, firstV) || isTooSharpAngle(secondLastV, lastV, firstV)) {
-                        problemAttempt++;
-                        continue;
-                    }
-
-                    let allVerticesSorted = sortSlantedAxisVertices(allVertices);
-                    
-                    const allLines = createSequentialLines(allVerticesSorted, false);
-
-                    const initialLines = allLines.filter(line => {
-                        const midPoint = {x: (line.p1.x + line.p2.x)/2, y: (line.p1.y + line.p2.y)/2};
-                        return midPoint.y < midPoint.x;
-                    });
-                    
-                    let initialVertices = initialLines.reduce((acc, line) => {
-                        if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1);
-                        if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2);
-                        return acc;
-                    }, []);
-                    
-                    const axisPointsInInitial = initialVertices.filter(v => v.x === v.y);
-                    if(axisPointsInInitial.length < 2) {
-                        problemAttempt++;
-                        continue;
-                    }
-                    
-                    allVertices = allVerticesSorted;
-
-                    return {
-                        type: 'line',
-                        isSlantedAxis: true,
-                        initialVertices: initialVertices,
-                        initialLines: initialLines,
-                        allVertices: allVertices,
-                        allLines: allLines
-                    };
-
+                    nVertices = getRandomInt(3, 4);
+                    minCoord = 3;
+                    maxCoord = 17;
+                    axisDirection = 'slanted';
                 } else {
-                    // V111: x 또는 y축일 때 점 개수 5~6개
-                    const nVertices_axis = selectedDifficulty == 1 ? getRandomInt(3,4) : getRandomInt(5,6);
-                    let y1, y2;
-                    const axisMaxHalfLength = 6;
-                    let halfL, midY;
+                    nVertices = getRandomInt(5, 6);
+                    minCoord = 2;
+                    maxCoord = 18;
+                    axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+                }
+            } else {
+                isSlantedAxis = false;
+                nVertices = getRandomInt(3, 4);
+                minCoord = 3;
+                maxCoord = 17;
+                axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+            }
+            
+            let tempVertices = [];
+            
+            if (isSlantedAxis) {
+                const axisMidPoint = { x: HALF_COUNT, y: HALF_COUNT };
+                let axisPoints = [];
+                const axisLength = getRandomInt(3, 7);
+                
+                const p1 = {x: axisMidPoint.x - axisLength, y: axisMidPoint.y - axisLength};
+                const p2 = {x: axisMidPoint.x + axisLength, y: axisMidPoint.y + axisLength};
+                
+                axisPoints.push(p1);
+                axisPoints.push(p2);
+                
+                tempVertices.push(axisPoints[0]);
+
+                for (let i = 0; i < nVertices - 2; i++) {
+                    let newV;
+                    let success = false;
                     let attemptCount = 0;
-                    
-                    do {
-                        midY = getRandomInt(8, 12);
-                        halfL = getRandomInt(3, axisMaxHalfLength);
-                        y1 = midY - halfL;
-                        y2 = midY + halfL;
-                        attemptCount++;
-                    } while (y1 < minCoord || y2 > maxCoord || Math.abs(y1 - y2) < 3 || attemptCount > MAX_ATTEMPTS_PER_POINT);
-                    
-                    if (attemptCount === MAX_ATTEMPTS_PER_POINT) {
-                        problemAttempt++;
-                        continue;
-                    }
-
-                    let axisPoint1 = { x: HALF_COUNT, y: y1 };
-                    let axisPoint2 = { x: HALF_COUNT, y: y2 };
-                    
-                    tempVertices.push(axisPoint1);
-
-                    for (let i = 0; i < nVertices_axis - 2; i++) {
-                        let newV;
-                        let success = false;
-                        attemptCount = 0;
+                    while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                        let x = getRandomInt(minCoord, maxCoord);
+                        let y = getRandomInt(minCoord, x - 1);
                         
-                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                            let x = getRandomInt(minCoord, HALF_COUNT - 2);
-                            let y = getRandomInt(axisPoint1.y + 1, axisPoint2.y - 1);
-                            
-                            if (y <= axisPoint1.y || y >= axisPoint2.y) {
-                                y = getRandomInt(axisPoint1.y + 1, axisPoint2.y - 1);
-                            }
-                            
-                            newV = { x: x, y: y };
+                        newV = { x: x, y: y };
 
-                            if (tempVertices.length > 0 && isTooWeakSlope(tempVertices[tempVertices.length - 1], newV)) {
-                                attemptCount++;
-                                continue;
+                        let isValid = true;
+                        if (tempVertices.length >= 2) {
+                            if(isTooSharpAngle(tempVertices[tempVertices.length-2], tempVertices[tempVertices.length-1], newV)) {
+                                isValid = false;
                             }
-
-                            let prevV = tempVertices[tempVertices.length - 1];
-                            if (tempVertices.length >= 2) {
-                                let prevPrevV = tempVertices[tempVertices.length - 2];
-                                let dx1 = Math.abs(prevV.x - prevPrevV.x);
-                                let dy1 = Math.abs(prevV.y - prevPrevV.y);
-                                let dx2 = Math.abs(newV.x - prevV.x);
-                                let dy2 = Math.abs(newV.y - prevV.y);
-
-                                if (dx1 === dx2 && dy1 === dy2 && dx1 > 0 && dy1 > 0) {
-                                    attemptCount++;
-                                    continue;
-                                }
-                            }
-
-                            if (
-                                !isTooClose(newV, tempVertices) &&
-                                !isProblemTooLinear(tempVertices, newV) &&
-                                !isProblemTooSharp(tempVertices, newV)
-                            ) {
-                                tempVertices.push(newV);
-                                success = true;
-                            }
-                            attemptCount++;
                         }
+                        if (tempVertices.length > 0) {
+                            let symV = calculateSymmetricPoint(newV, 'line', true);
+                            if (isTooSharpAngle(tempVertices[tempVertices.length - 1], newV, symV)) {
+                                isValid = false;
+                            }
+                        }
+                        
+                        if (
+                            isValid &&
+                            !isTooClose(newV, tempVertices) &&
+                            !isProblemTooLinear(tempVertices, newV)
+                        ) {
+                            tempVertices.push(newV);
+                            success = true;
+                        }
+                        attemptCount++;
                     }
-                    tempVertices.push(axisPoint2);
-                    
-                    if(tempVertices.length < 3) {
-                        problemAttempt++;
-                        continue;
-                    }
+                }
+                tempVertices.push(axisPoints[1]);
+                
+                let allVertices = [...tempVertices];
+                
+                if (allVertices.length < 3) {
+                    return null;
+                }
+                
+                const lastV = allVertices[allVertices.length - 1];
+                const secondLastV = allVertices[allVertices.length - 2];
+                const firstV = allVertices[0];
 
-                    const nonAxisPoints_Y = tempVertices.filter(v => v.x !== HALF_COUNT);
-                    nonAxisPoints_Y.sort((a, b) => a.y - b.y);
-
-                    let finalVertices = [axisPoint1, ...nonAxisPoints_Y, axisPoint2];
-                    finalVertices = finalVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
-                    
-                    if(finalVertices.length < 3) {
-                        problemAttempt++;
-                        continue;
-                    }
-
-                    const lastV = finalVertices[finalVertices.length - 1];
-                    const secondLastV = finalVertices[finalVertices.length - 2];
-                    const firstV = finalVertices[0];
-
-                    if (isTooLinear(secondLastV, lastV, firstV) || isTooSharpAngle(secondLastV, lastV, firstV)) {
-                        problemAttempt++;
-                        continue;
-                    }
-
-                    const lines = createSequentialLines(finalVertices, false);
-                    
-                    const initialLines = lines.filter(line =>
-                        line.p1.x <= HALF_COUNT && line.p2.x <= HALF_COUNT
-                    );
-                    
-                    let initialVertices = [];
-                    initialLines.forEach(line => {
-                        if (!initialVertices.some(v => isSamePoint(v, line.p1))) initialVertices.push(line.p1);
-                        if (!initialVertices.some(v => isSamePoint(v, line.p2))) initialVertices.push(line.p2);
-                    });
-                    
-                    if (!initialVertices.some(v => isSamePoint(v, axisPoint1))) initialVertices.push(axisPoint1);
-                    if (!initialVertices.some(v => isSamePoint(v, axisPoint2))) initialVertices.push(axisPoint2);
-                    
-                    if(initialVertices.length < 2 || initialLines.length < 1) {
-                        problemAttempt++;
-                        continue;
-                    }
-                    
-                    return {
-                        type: 'line',
-                        isSlantedAxis: false,
-                        initialVertices: initialVertices,
-                        initialLines: initialLines,
-                        allVertices: finalVertices,
-                        allLines: createSequentialLines(finalVertices, true)
-                    };
+                if (isTooLinear(secondLastV, lastV, firstV) || isTooSharpAngle(secondLastV, lastV, firstV)) {
+                    return null;
                 }
 
-            } else if (type === 'point') {
-                const nPoints = (selectedDifficulty == 1) ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                let allVerticesSorted = sortSlantedAxisVertices(allVertices);
                 
-                let initialPoints = [];
-                const isHorizontalAxis = Math.random() < 0.5;
-                
-                let endPoint1, endPoint2;
-                if(isHorizontalAxis) {
-                    const y = HALF_COUNT;
-                    const halfLength = getRandomInt(3, 7);
-                    endPoint1 = {x: HALF_COUNT - halfLength, y: y};
-                    endPoint2 = {x: HALF_COUNT + halfLength, y: y};
-                } else {
-                    const x = HALF_COUNT;
-                    const halfLength = getRandomInt(3, 7);
-                    endPoint1 = {x: x, y: HALF_COUNT - halfLength};
-                    endPoint2 = {x: x, y: HALF_COUNT + halfLength};
-                }
+                const allLines = createSequentialLines(allVerticesSorted, false);
 
-                const numInnerPoints = nPoints - 2;
-                if (numInnerPoints > 0) {
-                     for (let i = 0; i < numInnerPoints; i++) {
+                const initialLines = allLines.filter(line => {
+                    const midPoint = {x: (line.p1.x + line.p2.x)/2, y: (line.p1.y + line.p2.y)/2};
+                    return midPoint.y < midPoint.x;
+                });
+                
+                let initialVertices = initialLines.reduce((acc, line) => {
+                    if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1);
+                    if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2);
+                    return acc;
+                }, []);
+                
+                const axisPointsInInitial = initialVertices.filter(v => v.x === v.y);
+                if(axisPointsInInitial.length < 2) {
+                    return null;
+                }
+                
+                allVertices = allVerticesSorted;
+
+                return {
+                    type: 'line',
+                    isSlantedAxis: true,
+                    axisDirection: 'slanted',
+                    initialVertices: initialVertices,
+                    initialLines: initialLines,
+                    allVertices: allVertices,
+                    allLines: allLines
+                };
+
+            } else {
+                 
+                 if (axisDirection === 'vertical') {
+                     let axisPoint1, axisPoint2;
+                     let nonAxisPoints = [];
+                     let pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                     
+                     axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 1) };
+                     axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 1, maxCoord) };
+                     
+                     // Y축에 점을 찍는 경우
+                     if (Math.random() < 0.2) {
+                         const y = getRandomInt(axisPoint1.y, axisPoint2.y);
+                         const axisPoint = { x: HALF_COUNT, y: y };
+                         tempVertices.push(axisPoint);
+                     }
+                     
+                     // Y축 외부에 점을 찍는 경우
+                     for (let i = 0; i < pointCount - (tempVertices.length > 0 ? 1 : 0); i++) {
                          let newV;
                          let success = false;
                          let attemptCount = 0;
-                         
                          while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                             let x, y;
-                             if(isHorizontalAxis) {
-                                 x = getRandomInt(minCoord, HALF_COUNT - 1);
-                                 y = getRandomInt(minCoord, maxCoord);
-                             } else {
-                                 x = getRandomInt(minCoord, maxCoord);
-                                 y = getRandomInt(minCoord, HALF_COUNT - 1);
-                             }
-                             
+                             let x = getRandomInt(minCoord, HALF_COUNT - 1); // HALF_COUNT 포함
+                             let y = getRandomInt(minCoord, maxCoord);
                              newV = { x: x, y: y };
 
-                             if (
-                                 !isTooClose(newV, initialPoints) &&
-                                 !isSamePoint(newV, CENTER_POINT)
-                             ) {
-                                 initialPoints.push(newV);
+                             let isValid = !isTooClose(newV, nonAxisPoints);
+                             if (newV.x === HALF_COUNT) {
+                                 isValid = !isTooClose(newV, nonAxisPoints);
+                             }
+                             if (nonAxisPoints.length > 0) {
+                                 let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
+                                 if (isTooWeakSlope(lastPoint, newV)) {
+                                     isValid = false;
+                                 }
+                             }
+                             if (isValid) {
+                                 nonAxisPoints.push(newV);
                                  success = true;
                              }
                              attemptCount++;
                          }
                      }
-                }
-                
-                initialPoints.unshift(endPoint1);
-                initialPoints.push(endPoint2);
-                
-                if (initialPoints.length < 3) {
-                    problemAttempt++;
-                    continue;
-                }
-                
-                let allVertices = [];
-                let checkedPoints = new Set();
-                initialPoints.forEach(p => {
-                    const key = `${p.x},${p.y}`;
-                    if (!checkedPoints.has(key)) {
-                        allVertices.push(p);
-                        checkedPoints.add(key);
-                        const sym = calculateSymmetricPoint(p, 'point');
-                        allVertices.push(sym);
-                        checkedPoints.add(`${sym.x},${sym.y}`);
+                     nonAxisPoints.sort((a, b) => a.y - b.y);
+
+                     let initialVertices = [...nonAxisPoints];
+                     if (tempVertices.length > 0) {
+                         initialVertices.unshift(tempVertices[0]);
+                     }
+                     
+                     if (initialVertices.length < 3) return null;
+
+                     let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)));
+                     allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
+                     allVertices.sort((a, b) => a.y - b.y);
+                     
+                     let initialLines = createSequentialLines(initialVertices, false);
+                     
+                     return {
+                         type: 'line',
+                         isSlantedAxis: false,
+                         axisDirection: axisDirection,
+                         initialVertices: initialVertices,
+                         initialLines: initialLines,
+                         allVertices: allVertices,
+                         allLines: createSequentialLines(allVertices, true)
+                     };
+
+                 } else { // horizontal
+                     let axisPoint1, axisPoint2;
+                     let nonAxisPoints = [];
+                     let pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                     
+                     axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 1), y: HALF_COUNT };
+                     axisPoint2 = { x: getRandomInt(HALF_COUNT + 1, maxCoord), y: HALF_COUNT };
+
+                     tempVertices.push(axisPoint1);
+
+                     for (let i = 0; i < pointCount - 2; i++) {
+                         let newV;
+                         let success = false;
+                         let attemptCount = 0;
+                         while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                             let x = getRandomInt(minCoord, maxCoord);
+                             let y = getRandomInt(minCoord, HALF_COUNT - 2);
+                             newV = { x: x, y: y };
+                             
+                             let isValid = !isTooClose(newV, nonAxisPoints);
+                             if (nonAxisPoints.length > 0) {
+                                 let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
+                                 if (isTooWeakSlope(lastPoint, newV)) {
+                                     isValid = false;
+                                 }
+                             }
+                             
+                             if (isValid) {
+                                 nonAxisPoints.push(newV);
+                                 success = true;
+                             }
+                             attemptCount++;
+                         }
+                     }
+                     nonAxisPoints.sort((a, b) => a.x - b.x);
+
+                     let initialVertices = [...nonAxisPoints];
+                     initialVertices.unshift(axisPoint1);
+                     initialVertices.push(axisPoint2);
+                     
+                     if (initialVertices.length < 3) return null;
+                     
+                     let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)));
+                     allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
+                     allVertices.sort((a, b) => a.x - b.y);
+
+                     let initialLines = createSequentialLines(initialVertices, false);
+
+                     return {
+                         type: 'line',
+                         isSlantedAxis: false,
+                         axisDirection: axisDirection,
+                         initialVertices: initialVertices,
+                         initialLines: initialLines,
+                         allVertices: allVertices,
+                         allLines: createSequentialLines(allVertices, true)
+                     };
+                 }
+            }
+
+        } else if (type === 'point') {
+            const numPoints = (selectedDifficulty == 1) ? getRandomInt(3, 4) : getRandomInt(5, 6);
+            let initialPoints = [];
+            const MAX_POINT_GEN_ATTEMPTS = 50;
+            let currentAttempts = 0;
+
+            const isHorizontalAxis = Math.random() < 0.5;
+            let lineStart, lineEnd;
+
+            if(isHorizontalAxis) {
+                const y = CENTER_POINT.y;
+                const halfLength = getRandomInt(3, 7);
+                lineStart = {x: CENTER_POINT.x - halfLength, y: y};
+                lineEnd = {x: CENTER_POINT.x + halfLength, y: y};
+            } else {
+                const x = CENTER_POINT.x;
+                const halfLength = getRandomInt(3, 7);
+                lineStart = {x: x, y: CENTER_POINT.y - halfLength};
+                lineEnd = {x: x, y: CENTER_POINT.y + halfLength};
+            }
+            initialPoints.push(lineStart);
+            
+            const numInnerPoints = numPoints - 2;
+            let halfVertices = [];
+            for(let i = 0; i < numInnerPoints; i++) {
+                let newV;
+                let success = false;
+                let attemptCount = 0;
+                while(!success && attemptCount < MAX_POINT_GEN_ATTEMPTS) {
+                    let x, y;
+                    if(isHorizontalAxis) {
+                        x = getRandomInt(MIN_COORD, MAX_COORD);
+                        y = getRandomInt(MIN_COORD, CENTER_POINT.y - 1);
+                    } else {
+                        x = getRandomInt(MIN_COORD, CENTER_POINT.x - 1);
+                        y = getRandomInt(MIN_COORD, MAX_COORD);
                     }
-                });
-                
-                allVertices = findPointSymmetricBoundary(allVertices);
-                
-                let isProblemValid = true;
+                    newV = {x: x, y: y};
+                    
+                    if(!isTooClose(newV, [...initialPoints, ...halfVertices])) {
+                        halfVertices.push(newV);
+                        success = true;
+                    }
+                    attemptCount++;
+                }
+                if(!success) return null;
+            }
+            halfVertices.sort((a, b) => {
+                const angleA = Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x);
+                const angleB = Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x);
+                return angleA - angleB;
+            });
+            initialPoints = initialPoints.concat(halfVertices);
+            initialPoints.push(lineEnd);
+
+            let allVertices = [];
+            let processed = new Set();
+            initialPoints.forEach(p => {
+                const key = `${p.x},${p.y}`;
+                if (!processed.has(key)) {
+                    allVertices.push(p);
+                    processed.add(key);
+                    const symV = calculateSymmetricPoint(p, 'point');
+                    const symKey = `${symV.x},${symV.y}`;
+                    if (!processed.has(symKey)) {
+                         allVertices.push(symV);
+                         processed.add(symKey);
+                    }
+                }
+            });
+
+            allVertices = findPointSymmetricBoundary(allVertices);
+
+            let isProblemValid = true;
+            if (allVertices.length >= 3) {
                 for (let i = 0; i < allVertices.length; i++) {
                     const len = allVertices.length;
                     const p1 = allVertices[(i - 1 + len) % len];
                     const p2 = allVertices[i];
                     const p3 = allVertices[(i + 1) % len];
                     
-                    if (isTooLinear(p1, p2, p3) || isTooSharpAngle(p1, p2, p3) || (i > 0 && isTooWeakSlope(p1, p2))) {
+                    if (isTooLinear(p1, p2, p3) || isTooSharpAngle(p1, p2, p3)) {
                         isProblemValid = false;
                         break;
                     }
                 }
-                
-                if (!isProblemValid) {
-                    problemAttempt++;
-                    continue;
-                }
-
-                const allLines = createSequentialLines(allVertices, true);
-
-                const initialLines = allLines.filter(line => {
-                    const midPoint = {
-                        x: (line.p1.x + line.p2.x) / 2,
-                        y: (line.p1.y + line.p2.y) / 2
-                    };
-                    return (isHorizontalAxis && midPoint.y < HALF_COUNT) || (!isHorizontalAxis && midPoint.x < HALF_COUNT);
-                });
-                
-                const initialVertices = initialLines.reduce((acc, line) => {
-                    if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1);
-                    if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2);
-                    return acc;
-                }, []);
-                
-                if(initialVertices.length < 2 || initialLines.length < 1) {
-                    problemAttempt++;
-                    continue;
-                }
-                
-                return {
-                    type: 'point',
-                    initialVertices: initialVertices,
-                    initialLines: initialLines,
-                    allVertices: allVertices,
-                    allLines: allLines
-                };
             }
+            if(!isProblemValid) return null;
+            
+            const allLines = createSequentialLines(allVertices, true);
+
+            const initialLines = [];
+            const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`));
+            allLines.forEach(line => {
+                if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) {
+                    initialLines.push(line);
+                }
+            });
+            
+            return {
+                type: 'point',
+                initialVertices: initialPoints,
+                initialLines: initialLines,
+                allVertices: allVertices,
+                allLines: allLines
+            };
         }
         return null;
     }
@@ -848,6 +1084,8 @@
         document.querySelectorAll('#difficulty-select button').forEach(button => {
             button.addEventListener('click', handleDifficultySelect);
         });
+        document.getElementById('quantity-minus-5').addEventListener('click', () => changeQuantity(-5));
+        document.getElementById('quantity-plus-5').addEventListener('click', () => changeQuantity(5));
     }
 
     function handleTypeSelect(event) {
@@ -885,24 +1123,26 @@
             } else {
                 type = selectedType;
             }
-
+            
             const newProblem = generateRandomProblem(type);
             
-            if (!newProblem || newProblem.initialVertices.length < 2) {
-                attempt++;
-                continue;
-            }
-            
-            const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
-
-            if (!generatedVertexStrings.has(vertexString)) {
-                problemList.push(newProblem);
-                generatedVertexStrings.add(vertexString);
+            if (newProblem && newProblem.initialVertices.length >= 2) {
+                const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
+                if (!generatedVertexStrings.has(vertexString)) {
+                    problemList.push(newProblem);
+                    generatedVertexStrings.add(vertexString);
+                }
             }
             attempt++;
         }
         
         totalProblems = problemList.length;
+        
+        if (totalProblems === 0) {
+            alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
+            location.reload();
+            return;
+        }
         
         currentProblem = 0;
         score.isFirstAttempt = true;
@@ -922,16 +1162,15 @@
         const currentP = problemList[currentProblem];
         const pType = currentP.type === 'line' ? '선대칭' : '점대칭';
         
-        document.getElementById('problem-number').textContent = currentProblem + 1 + '번째 문제 (랜덤)';
-        document.getElementById('problem-instruction').innerHTML = '아래 도형은 ' + pType + '도형입니다. 나머지 부분을 완성해 주세요.';
+        document.getElementById('problem-number').textContent = `${currentProblem + 1}번째 문제 (${pType})`;
+        document.getElementById('problem-instruction').innerHTML = `아래 도형은 ${pType}도형입니다. 나머지 부분을 완성해 주세요.`;
         
-        document.getElementById('check-answer-btn').style.display = 'block';
-        document.getElementById('next-problem-btn').style.display = 'none';
-        document.getElementById('reset-drawing-btn').style.display = 'none';
-        
-        const resultDiv = document.getElementById('result-message');
-        resultDiv.style.display = 'none';
-        resultDiv.textContent = '';
+        const checkBtn = document.getElementById('check-answer-btn');
+        const nextBtn = document.getElementById('next-problem-btn');
+        checkBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
+
+        closePopup();
         
         score.isFirstAttempt = true;
 
@@ -947,28 +1186,23 @@
     }
 
     function clearCanvas(clearUserDrawing) {
-        document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.problem-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.line-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.selected-line-dot').forEach(dot => dot.remove());
-
-
         if (clearUserDrawing) {
             userVertices = [];
             userLines = [];
             tempLineStart = null;
-            redrawCanvas();
-            setCanvasMode('vertex');
-            
-            const resultDiv = document.getElementById('result-message');
-            resultDiv.style.display = 'none';
-            resultDiv.textContent = '';
-            
-            return;
         }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // HTML 점 요소를 제거
+        document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
+        
         redrawCanvas();
+        setCanvasMode('vertex');
+        closePopup();
+        
+        // 버튼 상태를 정답 확인하기로 리셋
+        const checkBtn = document.getElementById('check-answer-btn');
+        const nextBtn = document.getElementById('next-problem-btn');
+        checkBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
     }
     
     // 2. 캔버스 그리기 및 모드 제어
@@ -1008,11 +1242,17 @@
                     ctx.moveTo(0, 0);
                     ctx.lineTo(canvas.width, canvas.height);
                     ctx.stroke();
-                } else {
+                } else if (currentP.axisDirection === 'vertical') {
                     const centerX = canvas.width / 2;
                     ctx.beginPath();
                     ctx.moveTo(centerX, 0);
                     ctx.lineTo(centerX, canvas.height);
+                    ctx.stroke();
+                } else if (currentP.axisDirection === 'horizontal') {
+                    const centerY = canvas.height / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, centerY);
+                    ctx.lineTo(canvas.width, centerY);
                     ctx.stroke();
                 }
             } else if (currentP.type === 'point') {
@@ -1086,12 +1326,40 @@
     function isVertexOnProblemBoundary(v) {
         return problemVertices.some(pv => isSamePoint(pv, v));
     }
+    
+    function showPopup(mainMessage, detailMessage, isCorrect) {
+        const popupOverlay = document.getElementById('result-popup-overlay');
+        const popupMainMessage = document.getElementById('popup-main-message');
+        const popupDetailMessage = document.getElementById('popup-detail-message');
+        const popupNextBtn = document.getElementById('popup-next-btn');
+        const checkBtn = document.getElementById('check-answer-btn');
+
+        popupMainMessage.textContent = mainMessage;
+        
+        if (isCorrect) {
+            popupDetailMessage.style.display = 'none';
+            popupMainMessage.className = 'correct';
+            popupNextBtn.style.display = 'block';
+        } else {
+            popupDetailMessage.textContent = detailMessage;
+            popupDetailMessage.style.display = 'block';
+            popupDetailMessage.className = 'incorrect';
+            popupMainMessage.className = 'incorrect';
+            popupNextBtn.style.display = 'none';
+        }
+        
+        popupOverlay.style.display = 'flex';
+    }
+
+    function closePopup() {
+        const popupOverlay = document.getElementById('result-popup-overlay');
+        popupOverlay.style.display = 'none';
+    }
 
     // 3. 정답 확인 및 결과
     function checkAnswer() {
         const currentP = problemList[currentProblem];
         const problemType = currentP.type;
-        const resultDiv = document.getElementById('result-message');
         
         let verticesAreCorrect = checkVerticesSymmetry(problemType);
         let isLinesCorrect = false;
@@ -1105,37 +1373,32 @@
         }
         
         if (verticesAreCorrect && isLinesCorrect) {
-            resultDiv.textContent = '정답입니다! 도형을 완벽하게 완성했어요!';
-            resultDiv.className = 'correct';
+            showPopup('정답입니다🎉', '', true);
             
             if (score.isFirstAttempt) { score.correct++; } else { score.retried++; }
             score.totalAttempted++;
-
+            
+            // 정답 시 메인 화면의 버튼을 '다음 문제 도전하기'로 변경
             document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
-            document.getElementById('reset-drawing-btn').style.display = 'none';
 
         } else {
-            let failReason = '다시 생각해 볼까요? ';
+            let detailMessage;
             
             if (!verticesAreCorrect) {
-                failReason += '꼭짓점의 위치나 개수가 잘못되었어요. 모든 꼭짓점이 대칭 짝을 이루는지 확인해 주세요.';
+                detailMessage = '꼭짓점의 위치나 개수가 잘못되었어요.';
             } else if (!isLinesCorrect) {
-                failReason += '선분 잇기(2단계)를 통해 완성된 도형이 대칭을 이루지 않거나 필요한 모든 선분을 빠뜨렸어요. 선분 연결 오류를 확인해 주세요.';
+                detailMessage = '도형이 대칭을 이루지 않거나 빠뜨린 선분이 있어요.';
             } else {
-                failReason += '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
+                detailMessage = '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
             }
 
-            resultDiv.textContent = ' ' + failReason;
-            resultDiv.className = 'incorrect';
+            showPopup('다시 생각해 볼까요?', detailMessage, false);
             score.isFirstAttempt = false;
             
             document.getElementById('check-answer-btn').style.display = 'block';
             document.getElementById('next-problem-btn').style.display = 'none';
-            document.getElementById('reset-drawing-btn').style.display = 'block';
         }
-        
-        resultDiv.style.display = 'block';
     }
 
     function checkVerticesSymmetry(problemType) {
@@ -1152,28 +1415,38 @@
         const finalVertices = Array.from(allProblemAndUserVerticesSet.values());
         
         const numVertices = finalVertices.length;
-        const includesCenter = finalVertices.some(v => isSamePoint(v, CENTER_POINT));
         
         if (problemType === 'line') {
-            const boundaryVerticesCount = isSlantedAxis
-                ? finalVertices.filter(v => v.x === v.y).length
-                : finalVertices.filter(v => v.x === HALF_COUNT).length;
-            if (numVertices % 2 !== 0 && boundaryVerticesCount < 2) return false;
-        } else if (problemType === 'point') {
-             if (includesCenter) {
-                 if (numVertices % 2 === 0) return false;
-            } else {
-                if (numVertices % 2 !== 0) return false;
+            const axisDirection = currentP.axisDirection;
+            let boundaryVerticesCount;
+
+            if (isSlantedAxis) {
+                boundaryVerticesCount = finalVertices.filter(v => v.x === v.y).length;
+            } else if (axisDirection === 'vertical') {
+                boundaryVerticesCount = finalVertices.filter(v => v.x === HALF_COUNT).length;
+            } else if (axisDirection === 'horizontal') {
+                boundaryVerticesCount = finalVertices.filter(v => v.y === HALF_COUNT).length;
+            }
+            
+            const nonBoundaryCount = numVertices - boundaryVerticesCount;
+
+            if (nonBoundaryCount % 2 !== 0) {
+                return false;
             }
         }
         
         let symmetricPairs = new Map();
         for (const v of finalVertices) {
-            if (isSamePoint(v, CENTER_POINT)) continue;
             const key = `${v.x},${v.y}`;
             if (symmetricPairs.has(key)) continue;
 
-            const symmetricV = calculateSymmetricPoint(v, problemType, isSlantedAxis);
+            const symmetricV = calculateSymmetricPoint(v, problemType, isSlantedAxis, currentP.axisDirection);
+            
+            if (isSamePoint(v, symmetricV)) {
+                symmetricPairs.set(key, true);
+                continue;
+            }
+
             const symmetricExists = finalVertices.some(av => isSamePoint(av, symmetricV));
 
             if (!symmetricExists) return false;
@@ -1186,8 +1459,8 @@
     
     function checkLineSymmetryLines(currentP) {
         const correctSymmetricLines = currentP.initialLines.map(line => ({
-            p1: calculateSymmetricPoint(line.p1, 'line', currentP.isSlantedAxis),
-            p2: calculateSymmetricPoint(line.p2, 'line', currentP.isSlantedAxis)
+            p1: calculateSymmetricPoint(line.p1, 'line', currentP.isSlantedAxis, currentP.axisDirection),
+            p2: calculateSymmetricPoint(line.p2, 'line', currentP.isSlantedAxis, currentP.axisDirection)
         }));
         
         if (userLines.length !== correctSymmetricLines.length) {
@@ -1381,7 +1654,6 @@
         document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
         document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
         
-        document.getElementById('reset-drawing-btn').addEventListener('click', () => clearCanvas(true));
         document.getElementById('clear-canvas-btn').addEventListener('click', () => clearCanvas(true));
 
         document.getElementById('quantity-minus-5').addEventListener('click', () => changeQuantity(-5));
