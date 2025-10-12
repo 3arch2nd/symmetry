@@ -526,12 +526,12 @@
     const CENTER_POINT = { x: HALF_COUNT, y: HALF_COUNT };
     const MIN_COORD = 3;
     const MAX_COORD = 17;
-    const MIN_DIST = 2;
+    const MIN_DIST = 2; // 최소 점 간격 (그리드 단위)
     
-    const COLLINEARITY_THRESHOLD = 2.0;
-    const MIN_ANGLE_COSINE = Math.cos(30 * Math.PI / 180);
-    const MAX_ANGLE_COSINE = Math.cos(150 * Math.PI / 180);
-    const MIN_SLOPE_DIFF = 2.0;
+    const COLLINEARITY_THRESHOLD_SQ = 0.5 * 0.5; // (0.5 그리드 단위) 3점의 거리가 이 값 이하이면 일직선으로 간주.
+    const MIN_ANGLE_COSINE = Math.cos(35 * Math.PI / 180); // 35도 이하의 좁은 각도 방지
+    const MAX_ANGLE_COSINE = Math.cos(145 * Math.PI / 180); // 145도 이상의 둔각 방지 (거의 일직선)
+    const MIN_SLOPE_MAGNITUDE_DIFF = 1.0; // 기울기 변화의 최소 크기 (x, y 변화량)
 
     // 현재 문제 상태
     let problemVertices = [];
@@ -586,11 +586,15 @@
         return false;
     }
 
+    // 세 점이 거의 일직선상에 있는지 확인
     function isTooLinear(p1, p2, p3) {
+        // 벡터 (p1->p2)와 (p2->p3)의 외적 크기를 이용
         const crossProduct = (p2.y - p1.y) * (p3.x - p2.x) - (p3.y - p2.y) * (p2.x - p1.x);
-        return Math.abs(crossProduct) < COLLINEARITY_THRESHOLD;
+        // 세 점으로 이루어진 삼각형의 넓이가 매우 작으면 일직선으로 간주
+        return Math.abs(crossProduct) < COLLINEARITY_THRESHOLD_SQ;
     }
     
+    // 특정 각도 제한을 벗어나는지 확인 (너무 뾰족하거나 너무 둔각)
     function isTooSharpAngle(p1, p2, p3) {
         const v1x = p1.x - p2.x;
         const v1y = p1.y - p2.y;
@@ -602,7 +606,7 @@
         const mag1 = Math.sqrt(v1x * v1x + v1y * v1y);
         const mag2 = Math.sqrt(v2x * v2x + v2y * v2y);
         
-        if (mag1 === 0 || mag2 === 0) return true;
+        if (mag1 === 0 || mag2 === 0) return true; // 같은 점이거나 너무 가까운 경우
 
         const cosine = dotProduct / (mag1 * mag2);
         
@@ -611,12 +615,15 @@
         return false;
     }
     
+    // 선대칭에서 축에 가까운 점들이 너무 미약한 기울기를 가지는지 확인 (직선 형태 방지)
     function isTooWeakSlope(p1, p2) {
         const dx = Math.abs(p2.x - p1.x);
         const dy = Math.abs(p2.y - p1.y);
-        return (dx <= MIN_SLOPE_DIFF || dy <= MIN_SLOPE_DIFF) || (dx > 0 && dy > 0 && Math.abs(dy / dx) < 1);
+        // x, y 변화량이 너무 작거나, 둘 중 하나만 너무 작아서 거의 직선에 가까운 형태 방지
+        return (dx < MIN_SLOPE_MAGNITUDE_DIFF && dy < MIN_SLOPE_MAGNITUDE_DIFF) || (dx < MIN_SLOPE_MAGNITUDE_DIFF && dy > 0) || (dy < MIN_SLOPE_MAGNITUDE_DIFF && dx > 0);
     }
     
+    // 기존 문제의 점들과 새 점이 일직선이 되는지 확인 (점 추가 시)
     function isProblemTooLinear(vertices, newV) {
         const len = vertices.length;
         if (len >= 2) {
@@ -624,11 +631,6 @@
             const p2 = vertices[len - 1];
             const p3 = newV;
             
-            for (let i = 0; i < len - 1; i++) {
-                if (isTooLinear(vertices[i], p2, p3)) {
-                    return true;
-                }
-            }
             if (isTooLinear(p1, p2, p3)) {
                 return true;
             }
@@ -636,20 +638,19 @@
         return false;
     }
     
+    // 기존 문제의 점들과 새 점이 뾰족한 각을 이루는지 확인 (점 추가 시)
     function isProblemTooSharp(vertices, newV) {
         const len = vertices.length;
         if (len >= 2) {
             const p1 = vertices[len - 2];
             const p2 = vertices[len - 1];
             const p3 = newV;
-            const isAxisPoint = (p) => p.x === HALF_COUNT || p.y === HALF_COUNT || (p.x === p.y);
+            
+            // 대칭축 위의 점들은 각도 제한에서 제외 (대칭축을 이루는 선분은 허용)
+            const isAxisPoint = (p) => p.x === HALF_COUNT || p.y === HALF_COUNT || (p.x === p.y && p.y > 0 && p.y < GRID_COUNT);
             
             if (isAxisPoint(p1) && isAxisPoint(p2) && isAxisPoint(p3)) {
                 return false;
-            }
-            
-            for(let i=1; i<len; i++) {
-                if(isTooSharpAngle(vertices[i-1], vertices[i], newV)) return true;
             }
             
             return isTooSharpAngle(p1, p2, p3);
@@ -708,6 +709,7 @@
         const centerPoint = points.find(p => isSamePoint(p, C));
         const nonCenterPoints = points.filter(p => !isSamePoint(p, C));
         
+        // 중심을 기준으로 각도 정렬
         nonCenterPoints.sort((a, b) => {
             const angleA = Math.atan2(a.y - C.y, a.x - C.x);
             const angleB = Math.atan2(b.y - C.y, b.x - C.x);
@@ -729,24 +731,26 @@
         const axisPoints = vertices.filter(v => v.x === v.y).sort((a, b) => a.y - b.y);
         const nonAxisPoints = vertices.filter(v => v.x !== v.y);
         
-        const center = {x: 10, y: 10};
-        
-        const p1 = axisPoints[0];
-        const p2 = axisPoints[1];
+        if (axisPoints.length < 2) return vertices; // 최소 두 개의 축 점이 없으면 정렬 불가
 
-        const belowAxis = nonAxisPoints.filter(p => p.y < p.x);
-        const aboveAxis = nonAxisPoints.filter(p => p.y > p.x);
+        const p1 = axisPoints[0]; // 대칭축의 시작점
+        const p2 = axisPoints[1]; // 대칭축의 끝점
+
+        const belowAxis = nonAxisPoints.filter(p => p.y < p.x); // y = x 선 아래
+        const aboveAxis = nonAxisPoints.filter(p => p.y > p.x); // y = x 선 위
         
         belowAxis.sort((a,b) => {
+            // p1을 기준으로 각도 정렬
             const angleA = Math.atan2(a.y - p1.y, a.x - p1.x);
             const angleB = Math.atan2(b.y - p1.y, b.x - p1.x);
             return angleA - angleB;
         });
 
         aboveAxis.sort((a,b) => {
+            // p2를 기준으로 각도 정렬 (반대 방향)
             const angleA = Math.atan2(a.y - p2.y, a.x - p2.x);
             const angleB = Math.atan2(b.y - p2.y, b.x - p2.x);
-            return angleB - angleA;
+            return angleB - angleA; // 역순으로 정렬하여 시계방향 연결
         });
         
         return [p1, ...belowAxis, p2, ...aboveAxis];
@@ -756,7 +760,6 @@
     // 랜덤 문제 생성 로직
     function generateRandomProblem(type) {
         const MAX_ATTEMPTS_PER_POINT = 100;
-        const MAX_PROBLEM_ATTEMPTS = 100;
         
         if (type === 'line') {
             let nVertices, minCoord, maxCoord;
@@ -776,7 +779,7 @@
                     maxCoord = 18;
                     axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
                 }
-            } else {
+            } else { // 난이도 1
                 isSlantedAxis = false;
                 nVertices = getRandomInt(3, 4);
                 minCoord = 3;
@@ -788,52 +791,50 @@
             
             if (isSlantedAxis) {
                 const axisMidPoint = { x: HALF_COUNT, y: HALF_COUNT };
-                let axisPoints = [];
-                const axisLength = getRandomInt(3, 7);
+                
+                const axisLength = getRandomInt(3, 7); // 대칭축 길이
                 
                 const p1 = {x: axisMidPoint.x - axisLength, y: axisMidPoint.y - axisLength};
                 const p2 = {x: axisMidPoint.x + axisLength, y: axisMidPoint.y + axisLength};
                 
-                axisPoints.push(p1);
-                axisPoints.push(p2);
-                
-                tempVertices.push(axisPoints[0]);
+                tempVertices.push(p1); // 첫 번째 축 점 추가
 
-                for (let i = 0; i < nVertices - 2; i++) {
+                for (let i = 0; i < nVertices - 2; i++) { // 나머지 비축 점들 생성
                     let newV;
                     let success = false;
                     let attemptCount = 0;
                     while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
                         let x = getRandomInt(minCoord, maxCoord);
-                        let y = getRandomInt(minCoord, x - 1);
+                        let y = getRandomInt(minCoord, x - 1); // y < x (y=x 축 아래)
                         
                         newV = { x: x, y: y };
 
                         let isValid = true;
+                        
+                        // 기존 점들과 너무 가까운지 확인
+                        if (isTooClose(newV, tempVertices)) { isValid = false; }
+                        
+                        // 일직선 또는 뾰족한/둔각 각도 확인
                         if (tempVertices.length >= 2) {
-                            if(isTooSharpAngle(tempVertices[tempVertices.length-2], tempVertices[tempVertices.length-1], newV)) {
+                            if(isProblemTooLinear(tempVertices, newV) || isProblemTooSharp(tempVertices, newV)) {
                                 isValid = false;
                             }
                         }
-                        if (tempVertices.length > 0) {
-                            let symV = calculateSymmetricPoint(newV, 'line', true);
-                            if (isTooSharpAngle(tempVertices[tempVertices.length - 1], newV, symV)) {
-                                isValid = false;
-                            }
+                        // 대칭점과의 관계도 확인
+                        let symV = calculateSymmetricPoint(newV, 'line', true);
+                        if (tempVertices.length > 0 && isProblemTooSharp(tempVertices.concat(newV), symV)) {
+                            isValid = false;
                         }
                         
-                        if (
-                            isValid &&
-                            !isTooClose(newV, tempVertices) &&
-                            !isProblemTooLinear(tempVertices, newV)
-                        ) {
+                        if (isValid) {
                             tempVertices.push(newV);
                             success = true;
                         }
                         attemptCount++;
                     }
+                    if (!success) return null; // 점 생성 실패 시 문제 생성 취소
                 }
-                tempVertices.push(axisPoints[1]);
+                tempVertices.push(p2); // 두 번째 축 점 추가
                 
                 let allVertices = [...tempVertices];
                 
@@ -841,6 +842,7 @@
                     return null;
                 }
                 
+                // 최종 도형이 닫힐 때의 유효성 검사 (첫 점과 끝 점 연결)
                 const lastV = allVertices[allVertices.length - 1];
                 const secondLastV = allVertices[allVertices.length - 2];
                 const firstV = allVertices[0];
@@ -849,27 +851,30 @@
                     return null;
                 }
 
-                let allVerticesSorted = sortSlantedAxisVertices(allVertices);
+                let allVerticesSorted = sortSlantedAxisVertices(allVertices); // 대칭축 기준으로 정렬
                 
                 const allLines = createSequentialLines(allVerticesSorted, false);
 
+                // y < x 영역에 있는 선분만 초기 도형으로 사용 (대칭축 아래)
                 const initialLines = allLines.filter(line => {
                     const midPoint = {x: (line.p1.x + line.p2.x)/2, y: (line.p1.y + line.p2.y)/2};
                     return midPoint.y < midPoint.x;
                 });
                 
+                // 초기 선분에서 꼭짓점 추출
                 let initialVertices = initialLines.reduce((acc, line) => {
                     if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1);
                     if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2);
                     return acc;
                 }, []);
                 
+                // 초기 도형이 대칭축의 두 점을 포함하는지 확인
                 const axisPointsInInitial = initialVertices.filter(v => v.x === v.y);
                 if(axisPointsInInitial.length < 2) {
                     return null;
                 }
                 
-                allVertices = allVerticesSorted;
+                allVertices = allVerticesSorted; // 최종 정렬된 꼭짓점
 
                 return {
                     type: 'line',
@@ -881,12 +886,13 @@
                     allLines: allLines
                 };
 
-            } else {
+            } else { // 수직 또는 수평 대칭축
                 
                 if (axisDirection === 'vertical') {
                     const pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
                     let nonAxisPoints = [];
 
+                    // 대칭축 위의 시작점과 끝점
                     const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) };
                     const axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 2, maxCoord) };
                     
@@ -895,33 +901,45 @@
                         let success = false;
                         let attemptCount = 0;
                         while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                            let x = getRandomInt(minCoord, HALF_COUNT - 1);
+                            let x = getRandomInt(minCoord, HALF_COUNT - 1); // 대칭축의 왼쪽
                             let y = getRandomInt(axisPoint1.y, axisPoint2.y);
                             newV = { x: x, y: y };
 
-                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            let isValid = true;
+                            // 기존 점들과 너무 가까운지 확인
+                            if (isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2])) { isValid = false; }
                             
+                            // 기울기가 너무 미약한 선분 방지
                             if (nonAxisPoints.length > 0) {
                                 let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
                                 if (isTooWeakSlope(lastPoint, newV)) {
                                     isValid = false;
                                 }
                             }
+                            // 일직선 또는 뾰족한/둔각 각도 확인
+                            if (nonAxisPoints.length >= 2) {
+                                if(isProblemTooLinear(nonAxisPoints, newV) || isProblemTooSharp(nonAxisPoints, newV)) {
+                                    isValid = false;
+                                }
+                            }
+                            
                             if (isValid) {
                                 nonAxisPoints.push(newV);
                                 success = true;
                             }
                             attemptCount++;
                         }
+                        if (!success) return null;
                     }
-                    nonAxisPoints.sort((a, b) => a.y - b.y);
+                    nonAxisPoints.sort((a, b) => a.y - b.y); // y축 기준으로 정렬하여 순차적인 도형 생성
 
                     let initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
                     
                     if (initialVertices.length < 2) return null;
 
+                    // 전체 꼭짓점 (대칭점 포함)
                     let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse());
-                    allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
+                    allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v))); // 중복 제거
                     
                     let initialLines = createSequentialLines(initialVertices, false);
                     
@@ -939,6 +957,7 @@
                     const pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
                     let nonAxisPoints = [];
                     
+                    // 대칭축 위의 시작점과 끝점
                     const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT };
                     const axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT };
 
@@ -948,13 +967,20 @@
                         let attemptCount = 0;
                         while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
                             let x = getRandomInt(axisPoint1.x, axisPoint2.x);
-                            let y = getRandomInt(minCoord, HALF_COUNT - 1);
+                            let y = getRandomInt(minCoord, HALF_COUNT - 1); // 대칭축의 위쪽
                             newV = { x: x, y: y };
                             
-                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            let isValid = true;
+                            if (isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2])) { isValid = false; }
+                            
                             if (nonAxisPoints.length > 0) {
                                 let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
                                 if (isTooWeakSlope(lastPoint, newV)) {
+                                    isValid = false;
+                                }
+                            }
+                            if (nonAxisPoints.length >= 2) {
+                                if(isProblemTooLinear(nonAxisPoints, newV) || isProblemTooSharp(nonAxisPoints, newV)) {
                                     isValid = false;
                                 }
                             }
@@ -965,8 +991,9 @@
                             }
                             attemptCount++;
                         }
+                        if (!success) return null;
                     }
-                    nonAxisPoints.sort((a, b) => a.x - b.x);
+                    nonAxisPoints.sort((a, b) => a.x - b.x); // x축 기준으로 정렬하여 순차적인 도형 생성
 
                     let initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
                     
@@ -993,42 +1020,40 @@
             const numPoints = (selectedDifficulty == 1) ? getRandomInt(3, 4) : getRandomInt(5, 6);
             let initialPoints = [];
             const MAX_POINT_GEN_ATTEMPTS = 50;
-            let currentAttempts = 0;
 
-            const isHorizontalAxis = Math.random() < 0.5;
-            let lineStart, lineEnd;
-
-            if(isHorizontalAxis) {
-                const y = CENTER_POINT.y;
-                const halfLength = getRandomInt(3, 7);
-                lineStart = {x: CENTER_POINT.x - halfLength, y: y};
-                lineEnd = {x: CENTER_POINT.x + halfLength, y: y};
-            } else {
-                const x = CENTER_POINT.x;
-                const halfLength = getRandomInt(3, 7);
-                lineStart = {x: x, y: CENTER_POINT.y - halfLength};
-                lineEnd = {x: x, y: CENTER_POINT.y + halfLength};
-            }
-            initialPoints.push(lineStart);
-            
-            const numInnerPoints = numPoints - 2;
             let halfVertices = [];
-            for(let i = 0; i < numInnerPoints; i++) {
+            // 대칭의 중심을 포함할 수도 있고 아닐 수도 있음
+            const hasCenter = Math.random() < 0.3; 
+            
+            // 초기 도형의 시작점을 중심축에서 벗어나도록 생성하여 단순한 직선 방지
+            let startPoint;
+            let attemptCount = 0;
+            while(attemptCount < MAX_POINT_GEN_ATTEMPTS) {
+                const x = getRandomInt(MIN_COORD, MAX_COORD);
+                const y = getRandomInt(MIN_COORD, MAX_COORD);
+                startPoint = {x: x, y: y};
+                if (!isSamePoint(startPoint, CENTER_POINT) && !isTooClose(startPoint, [])) {
+                    initialPoints.push(startPoint);
+                    break;
+                }
+                attemptCount++;
+            }
+            if(initialPoints.length === 0) return null;
+
+            for(let i = 0; i < numPoints - 1; i++) { // 첫 점을 제외한 나머지 점들
                 let newV;
                 let success = false;
-                let attemptCount = 0;
+                attemptCount = 0;
                 while(!success && attemptCount < MAX_POINT_GEN_ATTEMPTS) {
-                    let x, y;
-                    if(isHorizontalAxis) {
-                        x = getRandomInt(MIN_COORD, MAX_COORD);
-                        y = getRandomInt(MIN_COORD, CENTER_POINT.y - 1);
-                    } else {
-                        x = getRandomInt(MIN_COORD, CENTER_POINT.x - 1);
-                        y = getRandomInt(MIN_COORD, MAX_COORD);
-                    }
+                    let x = getRandomInt(MIN_COORD, MAX_COORD);
+                    let y = getRandomInt(MIN_COORD, MAX_COORD);
                     newV = {x: x, y: y};
                     
-                    if(!isTooClose(newV, [...initialPoints, ...halfVertices])) {
+                    if (!isSamePoint(newV, CENTER_POINT) && // 중심점과 동일하지 않고
+                        !isTooClose(newV, [...initialPoints, ...halfVertices]) && // 다른 점들과 가깝지 않으며
+                        !isProblemTooLinear(initialPoints.concat(halfVertices), newV) && // 일직선상에 있지 않고
+                        !isProblemTooSharp(initialPoints.concat(halfVertices), newV)) { // 뾰족한 각을 이루지 않는지 확인
+                        
                         halfVertices.push(newV);
                         success = true;
                     }
@@ -1036,16 +1061,25 @@
                 }
                 if(!success) return null;
             }
+            
+            // 중심 기준으로 각도 정렬 (볼록 다각형 형태 유지)
             halfVertices.sort((a, b) => {
                 const angleA = Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x);
                 const angleB = Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x);
                 return angleA - angleB;
             });
             initialPoints = initialPoints.concat(halfVertices);
-            initialPoints.push(lineEnd);
 
             let allVertices = [];
             let processed = new Set();
+            
+            // 중심점을 포함하는 경우
+            if (hasCenter) {
+                allVertices.push(CENTER_POINT);
+                processed.add(`${CENTER_POINT.x},${CENTER_POINT.y}`);
+            }
+
+            // 모든 점과 대칭점을 포함
             initialPoints.forEach(p => {
                 const key = `${p.x},${p.y}`;
                 if (!processed.has(key)) {
@@ -1053,15 +1087,17 @@
                     processed.add(key);
                     const symV = calculateSymmetricPoint(p, 'point');
                     const symKey = `${symV.x},${symV.y}`;
-                    if (!processed.has(symKey)) {
+                    if (!processed.has(symKey) && !isSamePoint(p, symV)) { // 점과 대칭점이 다를 경우에만 추가
                         allVertices.push(symV);
                         processed.add(symKey);
                     }
                 }
             });
 
+            // 최종 꼭짓점을 대칭 중심으로 정렬하여 다각형 순서 정의
             allVertices = findPointSymmetricBoundary(allVertices);
 
+            // 생성된 도형의 모든 꼭짓점이 유효한지 최종 검사
             let isProblemValid = true;
             if (allVertices.length >= 3) {
                 for (let i = 0; i < allVertices.length; i++) {
@@ -1138,7 +1174,7 @@
         problemList = [];
         let generatedVertexStrings = new Set();
         let attempt = 0;
-        const MAX_ATTEMPTS = problemsToGenerate * 20;
+        const MAX_ATTEMPTS = problemsToGenerate * 20; // 문제 생성 시도 횟수 제한
 
         while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
             let type;
@@ -1151,6 +1187,7 @@
             const newProblem = generateRandomProblem(type);
             
             if (newProblem && newProblem.initialVertices.length >= 2) {
+                // 문제의 고유성을 위해 초기 꼭짓점 배열을 정규화하여 비교
                 const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
                 if (!generatedVertexStrings.has(vertexString)) {
                     problemList.push(newProblem);
@@ -1160,7 +1197,7 @@
             attempt++;
         }
         
-        totalProblems = problemList.length;
+        totalProblems = problemList.length; // 실제로 생성된 문제 개수로 업데이트
         
         if (totalProblems === 0) {
             alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
@@ -1247,7 +1284,7 @@
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 0.5;
         
-        ctx.setLineDash([1, 4]);
+        ctx.setLineDash([1, 4]); // 점선
         
         for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
@@ -1256,32 +1293,33 @@
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
         }
         
-        ctx.setLineDash([]);
+        ctx.setLineDash([]); // 다시 실선
 
+        // 대칭축 그리기
         if (problemList.length > currentProblem) {
             const currentP = problemList[currentProblem];
             ctx.strokeStyle = '#ff0000';
             ctx.lineWidth = 2;
             if (currentP.type === 'line') {
-                if (currentP.isSlantedAxis) {
+                if (currentP.isSlantedAxis) { // 기울어진 대칭축 (y=x)
                     ctx.beginPath();
                     ctx.moveTo(0, 0);
                     ctx.lineTo(canvas.width, canvas.height);
                     ctx.stroke();
-                } else if (currentP.axisDirection === 'vertical') {
+                } else if (currentP.axisDirection === 'vertical') { // 수직 대칭축
                     const centerX = canvas.width / 2;
                     ctx.beginPath();
                     ctx.moveTo(centerX, 0);
                     ctx.lineTo(centerX, canvas.height);
                     ctx.stroke();
-                } else if (currentP.axisDirection === 'horizontal') {
+                } else if (currentP.axisDirection === 'horizontal') { // 수평 대칭축
                     const centerY = canvas.height / 2;
                     ctx.beginPath();
                     ctx.moveTo(0, centerY);
                     ctx.lineTo(canvas.width, centerY);
                     ctx.stroke();
                 }
-            } else if (currentP.type === 'point') {
+            } else if (currentP.type === 'point') { // 점대칭의 중심점
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
                 ctx.beginPath();
@@ -1312,9 +1350,9 @@
         
         if (hoveredLine) {
             ctx.save();
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+            ctx.strokeStyle = 'rgba(234, 153, 153, 0.7)'; // 요청하신 #ea9999 색상
             ctx.lineWidth = 6;
-            ctx.shadowColor = 'red';
+            ctx.shadowColor = '#ea9999'; // 붉은 글로우
             ctx.shadowBlur = 8;
             ctx.beginPath();
             ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
@@ -1333,10 +1371,12 @@
     }
 
     function renderPointsForLineMode() {
+        // 기존 점들 제거
         document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
         document.querySelectorAll('.line-dot').forEach(dot => dot.remove());
         document.querySelectorAll('.selected-line-dot').forEach(dot => dot.remove());
 
+        // 문제 점 + 사용자 점 모두 표시
         const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
         
         allPoints.forEach((v) => {
@@ -1349,6 +1389,7 @@
     }
 
     function renderUserVertices() {
+        // 기존 점들 제거
         document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
         document.querySelectorAll('.line-dot').forEach(dot => dot.remove());
         document.querySelectorAll('.selected-line-dot').forEach(dot => dot.remove());
@@ -1441,6 +1482,7 @@
         const currentP = problemList[currentProblem];
         const isSlantedAxis = (currentP.type === 'line' && currentP.isSlantedAxis);
         
+        // 문제 점과 사용자 점을 합쳐서 최종 꼭짓점 목록 생성
         const allProblemAndUserVerticesSet = new Map();
         [...problemVertices, ...userVertices].forEach(v => {
             const key = `${Math.round(v.x)},${Math.round(v.y)}`;
@@ -1452,6 +1494,7 @@
         
         const numVertices = finalVertices.length;
         
+        // 선대칭 도형의 경우 대칭축 위의 점 개수 확인
         if (problemType === 'line') {
             const axisDirection = currentP.axisDirection;
             let boundaryVerticesCount;
@@ -1466,6 +1509,7 @@
             
             const nonBoundaryCount = numVertices - boundaryVerticesCount;
 
+            // 대칭축 위에 있지 않은 점은 항상 짝수여야 함
             if (nonBoundaryCount % 2 !== 0) {
                 return false;
             }
@@ -1474,26 +1518,28 @@
         let symmetricPairs = new Map();
         for (const v of finalVertices) {
             const key = `${v.x},${v.y}`;
-            if (symmetricPairs.has(key)) continue;
+            if (symmetricPairs.has(key)) continue; // 이미 대칭쌍을 찾은 점은 건너뛰기
 
             const symmetricV = calculateSymmetricPoint(v, problemType, isSlantedAxis, currentP.axisDirection);
             
-            if (isSamePoint(v, symmetricV)) {
+            if (isSamePoint(v, symmetricV)) { // 점 자체가 대칭축/중심에 있는 경우
                 symmetricPairs.set(key, true);
                 continue;
             }
 
+            // 대칭점이 최종 꼭짓점 목록에 있는지 확인
             const symmetricExists = finalVertices.some(av => isSamePoint(av, symmetricV));
 
-            if (!symmetricExists) return false;
+            if (!symmetricExists) return false; // 대칭점이 없으면 오답
             
             symmetricPairs.set(key, true);
-            symmetricPairs.set(`${symmetricV.x},${symmetricV.y}`, true);
+            symmetricPairs.set(`${symmetricV.x},${symmetricV.y}`, true); // 대칭쌍으로 표시
         }
         return true;
     }
     
     function checkLineSymmetryLines(currentP) {
+        // 초기 도형의 대칭 선분들을 계산
         const correctSymmetricLines = currentP.initialLines.map(line => ({
             p1: calculateSymmetricPoint(line.p1, 'line', currentP.isSlantedAxis, currentP.axisDirection),
             p2: calculateSymmetricPoint(line.p2, 'line', currentP.isSlantedAxis, currentP.axisDirection)
@@ -1503,6 +1549,7 @@
             return false;
         }
 
+        // 사용자 선분이 모두 정답 대칭 선분들과 일치하는지 확인
         for (const userLine of userLines) {
             const match = correctSymmetricLines.some(correctLine => isSameLine(userLine, correctLine));
             if (!match) {
@@ -1514,29 +1561,29 @@
     }
     
     function checkPointSymmetryLines(currentP) {
-        const correctVertices = currentP.allVertices.map(v => `${v.x},${v.y}`).sort().join(';');
-        
+        // 모든 점(문제 점 + 사용자 점)을 취합하여 점대칭 도형의 최종 경계선을 생성
         const allUserVertices = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
-        const userVerticesSorted = findPointSymmetricBoundary(allUserVertices);
-        const userLinesGenerated = createSequentialLines(userVerticesSorted, true);
+        const userVerticesSorted = findPointSymmetricBoundary(allUserVertices); // 중심 기준으로 정렬
+        const userLinesGenerated = createSequentialLines(userVerticesSorted, true); // 닫힌 도형 선분 생성
         
-        const correctLines = currentP.allLines;
+        const correctLines = currentP.allLines; // 문제에서 정의한 정답 선분들
         
         if (userLinesGenerated.length !== correctLines.length) {
             return false;
         }
         
+        // 생성된 사용자 선분들이 정답 선분들과 일치하는지 확인
         const correctLinesCopy = [...correctLines];
         
         for (const userLine of userLinesGenerated) {
             const matchIndex = correctLinesCopy.findIndex(correctLine => isSameLine(userLine, correctLine));
             if (matchIndex === -1) {
-                return false;
+                return false; // 일치하는 선분이 없으면 오답
             }
-            correctLinesCopy.splice(matchIndex, 1);
+            correctLinesCopy.splice(matchIndex, 1); // 일치하는 선분 제거 (중복 검사 방지)
         }
         
-        return correctLinesCopy.length === 0;
+        return correctLinesCopy.length === 0; // 모든 정답 선분이 매칭되었는지 확인
     }
     
     function findClosestValidLinePoint(v) {
@@ -1546,7 +1593,7 @@
         ];
         
         if (problemList.length > currentProblem && problemList[currentProblem].type === 'point') {
-            allTargetVertices.push(CENTER_POINT);
+            allTargetVertices.push(CENTER_POINT); // 점대칭의 경우 중심점도 선분 연결 대상으로 포함
         }
 
         let closestPoint = null;
@@ -1577,10 +1624,10 @@
             tempLineStart = null;
         } else { // 'line' mode
             lineBtn.classList.add('mode-btn-active');
-            vertexBtn.disabled = false;
+            vertexBtn.disabled = false; // 선 잇기 모드에서도 꼭짓점 찍기 모드로 돌아갈 수 있도록 활성화
         }
         
-        document.getElementById('mode-line').disabled = !canStartLineDrawing;
+        document.getElementById('mode-line').disabled = !canStartLineDrawing; // 선 잇기 모드 활성화 조건
         redrawCanvas();
     }
     
@@ -1611,7 +1658,8 @@
     }
 
     function handleCanvasMouseMove(event) {
-        if (document.getElementById('check-answer-btn').style.display === 'none') {
+        // 정답 확인 후 다음 문제 버튼이 활성화된 상태에서는 선분 삭제 기능 비활성화
+        if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') {
             if (hoveredLine) {
                 hoveredLine = null;
                 canvas.style.cursor = 'default';
@@ -1626,7 +1674,7 @@
         const mousePoint = { x: x / GRID_SIZE, y: y / GRID_SIZE };
 
         let bestLine = null;
-        let minDistSq = 0.25; // Hover sensitivity (0.5 grid units)
+        let minDistSq = 0.25; // 호버 감도 (0.5 그리드 단위)
 
         for (const line of userLines) {
             const p1 = line.p1;
@@ -1635,9 +1683,11 @@
 
             if (lineLengthSq === 0) continue;
 
+            // 마우스 위치에서 선분까지의 최단 거리 계산
             let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq;
             
-            // 0.2 < t < 0.8 ensures we are in the middle 60% of the line
+            // 0.2 < t < 0.8 Ensures we are in the middle 60% of the line
+            // 점과 너무 가까운 부분에서는 글로우가 생기지 않도록 중간 60% 영역에서만 감지
             if (t > 0.2 && t < 0.8) {
                 const closestPointOnLine = {
                     x: p1.x + t * (p2.x - p1.x),
@@ -1651,17 +1701,17 @@
             }
         }
         
-        if (!isSameLine(hoveredLine, bestLine)) {
+        if (!isSameLine(hoveredLine, bestLine)) { // 호버 상태가 변경되었을 경우만 다시 그리기
             hoveredLine = bestLine;
             redrawCanvas();
         }
 
         if (hoveredLine) {
-            canvas.style.cursor = 'pointer';
+            canvas.style.cursor = 'pointer'; // 선분 위에 있으면 포인터
         } else if (canvasMode === 'line') {
-            canvas.style.cursor = 'pointer';
+            canvas.style.cursor = 'pointer'; // 선 잇기 모드에서는 항상 포인터
         } else {
-            canvas.style.cursor = 'crosshair';
+            canvas.style.cursor = 'crosshair'; // 기본 크로스헤어
         }
     }
 
@@ -1680,18 +1730,20 @@
                 hoveredLine = null;
                 redrawCanvas();
             }
+            canvas.style.cursor = 'default'; // 캔버스 밖으로 나가면 기본 커서
         });
 
         canvas.addEventListener('click', (event) => {
-            if (hoveredLine) {
+            // 정답 확인 후 다음 문제 버튼이 활성화된 상태에서는 클릭 비활성화
+            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
+
+            if (hoveredLine) { // 선분이 호버된 상태에서 클릭하면 삭제
                 userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
                 hoveredLine = null;
-                handleCanvasMouseMove(event); // Update hover state immediately
+                handleCanvasMouseMove(event); // 호버 상태 즉시 업데이트
                 redrawCanvas();
                 return;
             }
-
-            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
 
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
@@ -1705,41 +1757,42 @@
 
             if (canvasMode === 'vertex') {
                 if (isVertexOnProblemBoundary(clickedGridPoint)) {
-                    return;
+                    return; // 문제로 주어진 점은 삭제하거나 옮길 수 없음
                 }
 
                 const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
-                if (existingIndex > -1) {
+                if (existingIndex > -1) { // 이미 찍힌 점이면 제거
                     userVertices.splice(existingIndex, 1);
+                    // 점 삭제 시 해당 점을 포함하는 선분도 모두 제거
                     userLines = userLines.filter(line =>
                         !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
                     );
-                } else {
+                } else { // 새로운 점이면 추가
                     userVertices.push(clickedGridPoint);
                 }
                 redrawCanvas();
 
             } else if (canvasMode === 'line') {
-                const targetPoint = findClosestValidLinePoint(clickedGridPoint);
+                const targetPoint = findClosestValidLinePoint(clickedGridPoint); // 가장 가까운 유효한 점 찾기
 
                 if (!targetPoint) {
-                    return;
+                    return; // 연결할 점이 없으면 아무것도 안 함
                 }
 
-                if (!tempLineStart) {
+                if (!tempLineStart) { // 선분 시작점 선택
                     tempLineStart = targetPoint;
                     redrawCanvas();
-                } else {
-                    if (isSamePoint(tempLineStart, targetPoint)) {
+                } else { // 선분 끝점 선택 (선분 연결)
+                    if (isSamePoint(tempLineStart, targetPoint)) { // 시작점과 같은 점을 다시 클릭하면 선택 취소
                         tempLineStart = null;
                     } else {
                         const newLine = { p1: tempLineStart, p2: targetPoint };
-                        if (!isLineExists(newLine)) {
+                        if (!isLineExists(newLine)) { // 이미 존재하는 선분이면 추가하지 않음
                             userLines.push(newLine);
-                        } else {
+                        } else { // 존재하는 선분이면 삭제
                             userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
                         }
-                        tempLineStart = null;
+                        tempLineStart = null; // 선분 연결 후 시작점 초기화
                     }
                     redrawCanvas();
                 }
