@@ -123,15 +123,27 @@
             color: #333;
             font-weight: bold;
         }
-        #grid-canvas {
-            border: 2px solid #333;
-            background-color: white;
-            cursor: crosshair;
-            margin-bottom: 20px;
+        
+        /* --- 반응형 그리드 스타일 수정 --- */
+        .canvas-wrapper {
+            position: relative;
+            display: block;
+            margin: 0 auto 20px auto; /* 가운데 정렬 및 하단 여백 */
             width: 100%;
             max-width: 400px;
             height: auto;
+            aspect-ratio: 1 / 1;
+            border: 2px solid #333; /* 테두리를 캔버스가 아닌 이곳으로 이동 */
+            box-sizing: border-box;
         }
+        #grid-canvas {
+            background-color: white;
+            cursor: crosshair;
+            width: 100%;
+            height: 100%; /* 부모 요소를 꽉 채우도록 변경 */
+            display: block;
+        }
+
         .user-dot {
             width: 8px;
             height: 8px;
@@ -164,13 +176,6 @@
             pointer-events: none;
             box-shadow: 0 0 5px rgba(255,0,0,0.8);
             z-index: 11;
-        }
-        .canvas-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            max-width: 400px;
-            height: 400px;
         }
         .canvas-controls {
             display: flex;
@@ -400,7 +405,6 @@
             margin-top: 10px;
         }
         
-        /* --- QR 코드 팝업 스타일 --- */
         #qr-code-btn {
             position: absolute;
             top: 15px;
@@ -415,7 +419,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.4); /* 불투명 40% 하양 */
+            background-color: rgba(255, 255, 255, 0.4);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -579,7 +583,6 @@
     <div class="popup-qr">
         <button class="close-btn-qr" onclick="closeQrPopup()">&times;</button>
         <img src="https://i.imgur.com/g4yS8yx.png" alt="QR Code">
-        <p>학생들에게 QR코드를 보여주세요!</p>
     </div>
 </div>
 
@@ -1064,24 +1067,45 @@
                 }
             }
 
-        } else if (type === 'point') {
+        } else if (type === 'point') { // *** 롤백된 안정적인 점대칭 로직 ***
             const numPoints = (selectedDifficulty == 1) ? getRandomInt(3, 4) : getRandomInt(5, 6);
-            let halfVertices = [];
+            let initialPoints = [];
+            const MAX_POINT_GEN_ATTEMPTS = 50;
+
+            const isHorizontalAxis = Math.random() < 0.5;
+            let lineStart, lineEnd;
+
+            if(isHorizontalAxis) {
+                const y = CENTER_POINT.y;
+                const halfLength = getRandomInt(3, 7);
+                lineStart = {x: CENTER_POINT.x - halfLength, y: y};
+                lineEnd = {x: CENTER_POINT.x + halfLength, y: y};
+            } else {
+                const x = CENTER_POINT.x;
+                const halfLength = getRandomInt(3, 7);
+                lineStart = {x: x, y: CENTER_POINT.y - halfLength};
+                lineEnd = {x: x, y: CENTER_POINT.y + halfLength};
+            }
+            initialPoints.push(lineStart);
             
-            for(let i = 0; i < numPoints; i++) {
+            const numInnerPoints = numPoints - 2;
+            let halfVertices = [];
+            for(let i = 0; i < numInnerPoints; i++) {
                 let newV;
                 let success = false;
                 let attemptCount = 0;
-                while(!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                    let x = getRandomInt(MIN_COORD, MAX_COORD);
-                    let y = getRandomInt(MIN_COORD, MAX_COORD);
+                while(!success && attemptCount < MAX_POINT_GEN_ATTEMPTS) {
+                    let x, y;
+                    if(isHorizontalAxis) {
+                        x = getRandomInt(MIN_COORD, MAX_COORD);
+                        y = getRandomInt(MIN_COORD, CENTER_POINT.y - 1);
+                    } else {
+                        x = getRandomInt(MIN_COORD, CENTER_POINT.x - 1);
+                        y = getRandomInt(MIN_COORD, MAX_COORD);
+                    }
                     newV = {x: x, y: y};
                     
-                    if (!isSamePoint(newV, CENTER_POINT) && 
-                        !isTooClose(newV, halfVertices) &&
-                        !isProblemTooLinear(halfVertices, newV) && 
-                        !isProblemTooSharp(halfVertices, newV)) { 
-                        
+                    if(!isTooClose(newV, [...initialPoints, ...halfVertices])) {
                         halfVertices.push(newV);
                         success = true;
                     }
@@ -1089,15 +1113,13 @@
                 }
                 if(!success) return null;
             }
-            
             halfVertices.sort((a, b) => {
                 const angleA = Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x);
                 const angleB = Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x);
                 return angleA - angleB;
             });
-            
-            const initialPoints = halfVertices;
-            const initialLines = createSequentialLines(initialPoints, false);
+            initialPoints = initialPoints.concat(halfVertices);
+            initialPoints.push(lineEnd);
 
             let allVertices = [];
             let processed = new Set();
@@ -1134,6 +1156,14 @@
             if(!isProblemValid) return null;
             
             const allLines = createSequentialLines(allVertices, true);
+
+            const initialLines = [];
+            const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`));
+            allLines.forEach(line => {
+                if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) {
+                    initialLines.push(line);
+                }
+            });
             
             return {
                 type: 'point',
@@ -1284,8 +1314,8 @@
         problemVertices.forEach((v) => {
             const dot = document.createElement('div');
             dot.className = 'problem-dot';
-            dot.style.left = `${v.x * GRID_SIZE}px`;
-            dot.style.top = `${v.y * GRID_SIZE}px`;
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
             canvasWrapper.appendChild(dot);
         });
     }
@@ -1380,31 +1410,27 @@
     }
 
     function renderPointsForLineMode() {
-        document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.line-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.selected-line-dot').forEach(dot => dot.remove());
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
 
         const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
         
         allPoints.forEach((v) => {
             const dot = document.createElement('div');
             dot.className = (tempLineStart && isSamePoint(v, tempLineStart)) ? 'selected-line-dot' : 'line-dot';
-            dot.style.left = `${v.x * GRID_SIZE}px`;
-            dot.style.top = `${v.y * GRID_SIZE}px`;
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
             canvasWrapper.appendChild(dot);
         });
     }
 
     function renderUserVertices() {
-        document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.line-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.selected-line-dot').forEach(dot => dot.remove());
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
 
         userVertices.forEach((v) => {
             const dot = document.createElement('div');
             dot.className = 'user-dot';
-            dot.style.left = `${v.x * GRID_SIZE}px`;
-            dot.style.top = `${v.y * GRID_SIZE}px`;
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
             canvasWrapper.appendChild(dot);
         });
     }
@@ -1461,7 +1487,6 @@
             if (score.isFirstAttempt) { score.correct++; } else { score.retried++; }
             score.totalAttempted++;
             
-            // 정답 시 메인 화면의 버튼을 '다음 문제 도전하기'로 변경
             document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
 
@@ -1632,15 +1657,13 @@
     }
     
     function renderUserVertices() {
-        document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.line-dot').forEach(dot => dot.remove());
-        document.querySelectorAll('.selected-line-dot').forEach(dot => dot.remove());
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
 
         userVertices.forEach((v) => {
             const dot = document.createElement('div');
             dot.className = 'user-dot';
-            dot.style.left = `${v.x * GRID_SIZE}px`;
-            dot.style.top = `${v.y * GRID_SIZE}px`;
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
             canvasWrapper.appendChild(dot);
         });
     }
@@ -1668,12 +1691,14 @@
         }
         
         const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const mousePoint = { x: x / GRID_SIZE, y: y / GRID_SIZE };
+        const mouseXRatio = (event.clientX - rect.left) / rect.width;
+        const mouseYRatio = (event.clientY - rect.top) / rect.height;
+        const canvasX = mouseXRatio * canvas.width;
+        const canvasY = mouseYRatio * canvas.height;
+        const mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE };
 
         let bestLine = null;
-        let minDistSq = 0.25; // Hover sensitivity (0.5 grid units)
+        let minDistSq = 0.25;
 
         for (const line of userLines) {
             const p1 = line.p1;
@@ -1684,7 +1709,6 @@
 
             let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq;
             
-            // 0.2 < t < 0.8 ensures we are in the middle 60% of the line
             if (t > 0.2 && t < 0.8) {
                 const closestPointOnLine = {
                     x: p1.x + t * (p2.x - p1.x),
@@ -1723,8 +1747,6 @@
 
     window.onload = () => {
         document.getElementById('problem-quantity').textContent = totalProblems;
-        canvasWrapper.style.width = `${canvas.width}px`;
-        canvasWrapper.style.height = `${canvas.height}px`;
         document.getElementById('mode-line').disabled = true;
         
         initializeSetupListeners();
@@ -1738,22 +1760,24 @@
         });
 
         canvas.addEventListener('click', (event) => {
+            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
+            
             if (hoveredLine) {
                 userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
                 hoveredLine = null;
-                handleCanvasMouseMove(event); // Update hover state immediately
+                handleCanvasMouseMove(event);
                 redrawCanvas();
                 return;
             }
 
-            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
-
             const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const gridX = Math.round(x / GRID_SIZE);
-            const gridY = Math.round(y / GRID_SIZE);
+            const mouseXRatio = (event.clientX - rect.left) / rect.width;
+            const mouseYRatio = (event.clientY - rect.top) / rect.height;
+            const canvasX = mouseXRatio * canvas.width;
+            const canvasY = mouseYRatio * canvas.height;
+            
+            const gridX = Math.round(canvasX / GRID_SIZE);
+            const gridY = Math.round(canvasY / GRID_SIZE);
             if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
 
             const clickedGridPoint = { x: gridX, y: gridY };
@@ -1811,6 +1835,5 @@
         document.getElementById('setup-page').style.display = 'flex';
     };
 </script>
-
 </body>
 </html>
