@@ -74,6 +74,13 @@
         .secondary-btn:hover {
             background-color: #d9d9d9;
         }
+        #clear-canvas-btn {
+            background-color: #ea9999;
+            color: white;
+        }
+        #clear-canvas-btn:hover {
+            background-color: #e06666;
+        }
         .mode-btn-active {
             background-color: #ffc107;
             color: #333;
@@ -480,7 +487,7 @@
             </div>
             <div class="result-right">
                 <p>한 번에 맞춘 문제: <span id="correct-count">0</span>개</p>
-                <p>다시 도전하여 맞춘 문제: <span id="retried-count">0</span>개</p>
+                <p>다시 도전해 맞춘 문제: <span id="retried-count">0</span>개</p>
             </div>
         </div>
         <p><button class="primary-btn" onclick="location.reload()">새로운 학습 시작하기</button></p>
@@ -532,15 +539,18 @@
     let userVertices = [];
     let userLines = [];
     let tempLineStart = null;
+    let hoveredLine = null;
 
     let problemList = [];
 
     // 헬퍼 함수
     function isSamePoint(p1, p2) {
+        if (!p1 || !p2) return false;
         return p1.x === p2.x && p1.y === p2.y;
     }
     
     function isSameLine(l1, l2) {
+        if (!l1 || !l2) return false;
         const p11 = l1.p1;
         const p12 = l1.p2;
         const p21 = l2.p1;
@@ -1193,6 +1203,7 @@
         userVertices = [];
         userLines = [];
         tempLineStart = null;
+        hoveredLine = null;
         
         setCanvasMode('vertex');
         
@@ -1204,6 +1215,7 @@
             userVertices = [];
             userLines = [];
             tempLineStart = null;
+            hoveredLine = null;
         }
         // HTML 점 요소를 제거
         document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
@@ -1298,6 +1310,19 @@
         drawLines(problemLines, '#007bff');
         drawLines(userLines, '#28a745');
         
+        if (hoveredLine) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+            ctx.lineWidth = 6;
+            ctx.shadowColor = 'red';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
+            ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE);
+            ctx.stroke();
+            ctx.restore();
+        }
+
         renderProblemVertices();
 
         if (canvasMode === 'line') {
@@ -1549,11 +1574,9 @@
 
         if (mode === 'vertex') {
             vertexBtn.classList.add('mode-btn-active');
-            canvas.style.cursor = 'crosshair';
             tempLineStart = null;
         } else { // 'line' mode
             lineBtn.classList.add('mode-btn-active');
-            canvas.style.cursor = 'pointer';
             vertexBtn.disabled = false;
         }
         
@@ -1587,6 +1610,62 @@
         document.getElementById('final-accuracy').textContent = `${accuracy}%`;
     }
 
+    function handleCanvasMouseMove(event) {
+        if (document.getElementById('check-answer-btn').style.display === 'none') {
+            if (hoveredLine) {
+                hoveredLine = null;
+                canvas.style.cursor = 'default';
+                redrawCanvas();
+            }
+            return;
+        }
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const mousePoint = { x: x / GRID_SIZE, y: y / GRID_SIZE };
+
+        let bestLine = null;
+        let minDistSq = 0.25; // Hover sensitivity (0.5 grid units)
+
+        for (const line of userLines) {
+            const p1 = line.p1;
+            const p2 = line.p2;
+            const lineLengthSq = distSq(p1, p2);
+
+            if (lineLengthSq === 0) continue;
+
+            let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq;
+            
+            // 0.2 < t < 0.8 ensures we are in the middle 60% of the line
+            if (t > 0.2 && t < 0.8) {
+                const closestPointOnLine = {
+                    x: p1.x + t * (p2.x - p1.x),
+                    y: p1.y + t * (p2.y - p1.y)
+                };
+                const distanceSq = distSq(mousePoint, closestPointOnLine);
+                if (distanceSq < minDistSq) {
+                    minDistSq = distanceSq;
+                    bestLine = line;
+                }
+            }
+        }
+        
+        if (!isSameLine(hoveredLine, bestLine)) {
+            hoveredLine = bestLine;
+            redrawCanvas();
+        }
+
+        if (hoveredLine) {
+            canvas.style.cursor = 'pointer';
+        } else if (canvasMode === 'line') {
+            canvas.style.cursor = 'pointer';
+        } else {
+            canvas.style.cursor = 'crosshair';
+        }
+    }
+
+
     window.onload = () => {
         document.getElementById('problem-quantity').textContent = totalProblems;
         canvasWrapper.style.width = `${canvas.width}px`;
@@ -1595,7 +1674,23 @@
         
         initializeSetupListeners();
         
+        canvas.addEventListener('mousemove', handleCanvasMouseMove);
+        canvas.addEventListener('mouseleave', () => {
+            if (hoveredLine) {
+                hoveredLine = null;
+                redrawCanvas();
+            }
+        });
+
         canvas.addEventListener('click', (event) => {
+            if (hoveredLine) {
+                userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
+                hoveredLine = null;
+                handleCanvasMouseMove(event); // Update hover state immediately
+                redrawCanvas();
+                return;
+            }
+
             if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
 
             const rect = canvas.getBoundingClientRect();
