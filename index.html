@@ -173,13 +173,12 @@
         }
         .correct, .incorrect {
             padding: 10px;
-            border: 1px solid;
             border-radius: 8px;
             font-weight: bold;
             margin-top: 15px;
         }
-        .correct { color: #28a745; border-color: #28a745; }
-        .incorrect { color: #dc3545; border-color: #dc3545; }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
 
         /* UI 개선을 위한 추가 스타일 */
         .quantity-display {
@@ -341,12 +340,9 @@
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 0;
+            line-height: 1.5;
         }
         .result-popup #popup-detail-message {
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9em;
-            color: #dc3545;
             display: none;
         }
         .result-popup #popup-next-btn {
@@ -354,6 +350,33 @@
             align-self: center;
         }
         
+        /* 최종 결과 페이지 스타일 */
+        .final-result-layout {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            gap: 20px;
+        }
+        .result-left, .result-right {
+            flex: 1;
+            padding: 20px;
+        }
+        .result-left {
+            border-right: 1px solid #ddd;
+        }
+        .result-right p {
+            font-size: 1.1em;
+            margin: 15px 0;
+        }
+        #final-accuracy {
+            font-size: 4em;
+            font-weight: bold;
+            color: #4b8134;
+            margin-top: 10px;
+        }
+
         /* 반응형 디자인 */
         @media (max-width: 768px) {
             .main-layout {
@@ -369,6 +392,14 @@
             .problem-footer {
                 justify-content: center;
             }
+            .final-result-layout {
+                flex-direction: column;
+            }
+            .result-left {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -378,7 +409,7 @@
     <div id="setup-page">
         <h1>선대칭/점대칭도형 완전 정복</h1>
         <h2 style="text-align: center;">문제 유형 및 개수 설정</h2>
-        <small>무작위로 생성되는 새로운 문제를 원하는 만큼 연습할 수 있습니다.</small>
+        <small>무작위로 생성되는 새로운 문제를 <br> 원하는 만큼 연습할 수 있습니다. <br> (최소 5, 최대 50문제)</small>
 
         <div class="main-layout">
             <div class="left-panel">
@@ -442,12 +473,16 @@
 
     <div id="final-result-page">
         <h2>학습 완료</h2>
-        <p>한 번에 맞춘 문제 수: <span id="correct-count">0</span>개</p>
-        <p>다시 도전하여 맞춘 문제 수: <span id="retried-count">0</span>개</p>
-        <hr>
-        <p>나의 정확도:</p>
-        <div id="final-accuracy">0%</div>
-        <small>정확도 = (한번에 맞춘 문제 수 / 전체 문제 수) * 100</small>
+        <div class="final-result-layout">
+            <div class="result-left">
+                <p>나의 정확도</p>
+                <div id="final-accuracy">0%</div>
+            </div>
+            <div class="result-right">
+                <p>한 번에 맞춘 문제: <span id="correct-count">0</span>개</p>
+                <p>다시 도전하여 맞춘 문제: <span id="retried-count">0</span>개</p>
+            </div>
+        </div>
         <p><button class="primary-btn" onclick="location.reload()">새로운 학습 시작하기</button></p>
     </div>
 </div>
@@ -1311,19 +1346,16 @@
         const popupMainMessage = document.getElementById('popup-main-message');
         const popupDetailMessage = document.getElementById('popup-detail-message');
         const popupNextBtn = document.getElementById('popup-next-btn');
-        const checkBtn = document.getElementById('check-answer-btn');
 
-        popupMainMessage.textContent = mainMessage;
-        
         if (isCorrect) {
-            popupDetailMessage.style.display = 'none';
+            popupMainMessage.innerHTML = mainMessage;
             popupMainMessage.className = 'correct';
+            popupDetailMessage.style.display = 'none';
             popupNextBtn.style.display = 'block';
         } else {
-            popupDetailMessage.textContent = detailMessage;
-            popupDetailMessage.style.display = 'block';
-            popupDetailMessage.className = 'incorrect';
+            popupMainMessage.innerHTML = `${mainMessage}<br><span style="font-size: 80%;">${detailMessage}</span>`;
             popupMainMessage.className = 'incorrect';
+            popupDetailMessage.style.display = 'none';
             popupNextBtn.style.display = 'none';
         }
         
