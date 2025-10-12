@@ -22,6 +22,7 @@
             text-align: center;
         }
         .container {
+            position: relative; /* QR코드 버튼 위치 기준 */
             background-color: white;
             padding: 30px;
             border-radius: 12px;
@@ -187,21 +188,42 @@
         .correct { color: #28a745; }
         .incorrect { color: #dc3545; }
 
-        /* UI 개선을 위한 추가 스타일 */
-        .quantity-display {
-            display: inline-flex;
-            justify-content: center;
+        #quantity-control {
+            display: flex;
             align-items: center;
-            width: 40px;
-            height: 40px;
-            background-color: #ffc107;
+            justify-content: center;
+            gap: 15px;
+        }
+        #quantity-control button {
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            font-size: 18px;
+            padding: 0;
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 30px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+        #quantity-control button:hover {
+             background-color: #e0e0e0;
+        }
+        .quantity-display {
+            display: inline-block;
+            width: auto;
+            min-width: 40px;
+            height: auto;
+            background-color: transparent;
+            border-radius: 0;
+            font-size: 24px;
             font-weight: bold;
             color: #333;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            vertical-align: middle;
-            margin: 0 10px;
+            box-shadow: none;
+            vertical-align: baseline;
+            margin: 0;
+            text-align: center;
         }
         
         .footer {
@@ -211,7 +233,6 @@
             text-align: center;
         }
 
-        /* 메인 레이아웃 변경 */
         .main-layout {
             display: flex;
             flex-direction: row;
@@ -253,13 +274,11 @@
             flex-shrink: 0;
         }
         
-        /* 시작 버튼 컨테이너 스타일 */
         .setting-group.start-btn-container {
             border: none;
             background-color: transparent;
         }
         
-        /* 문제 페이지 헤더 스타일 */
         .problem-header {
             display: flex;
             justify-content: space-between;
@@ -288,7 +307,6 @@
             margin: 0;
         }
         
-        /* 문제 페이지 푸터 스타일 (정답 확인 및 다음 문제 버튼) */
         .problem-footer {
             display: flex;
             justify-content: flex-end;
@@ -297,7 +315,6 @@
             margin-top: 20px;
         }
         
-        /* 결과 메시지 팝업 스타일 */
         .result-popup-overlay {
             position: fixed;
             top: 0;
@@ -309,9 +326,8 @@
             align-items: center;
             z-index: 100;
         }
-
         .result-popup {
-            background-color: rgba(255, 255, 255, 1);
+            background-color: white;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -383,6 +399,56 @@
             color: #4b8134;
             margin-top: 10px;
         }
+        
+        /* --- QR 코드 팝업 스타일 --- */
+        #qr-code-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            font-size: 14px;
+            z-index: 20;
+        }
+        .popup-overlay-qr {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.4); /* 불투명 40% 하양 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        .popup-qr {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            text-align: center;
+        }
+        .popup-qr img {
+            max-width: 200px;
+            height: auto;
+        }
+        .popup-qr p {
+            margin-top: 15px;
+            color: #666;
+        }
+        .close-btn-qr {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
 
         /* 반응형 디자인 */
         @media (max-width: 768px) {
@@ -413,6 +479,7 @@
 <body>
 
 <div class="container">
+    <button id="qr-code-btn" class="secondary-btn">QR 코드</button>
     <div id="setup-page">
         <h1>선대칭/점대칭도형 완전 정복</h1>
         <h2 style="text-align: center;">문제 유형 및 개수 설정</h2>
@@ -442,9 +509,9 @@
                 <div class="setting-group">
                     <h3>문제 개수 설정</h3>
                     <div id="quantity-control">
-                        <button id="quantity-minus-5">-5</button>
+                        <button id="quantity-minus">-</button>
                         <span id="problem-quantity" class="quantity-display">5</span>
-                        <button id="quantity-plus-5">+5</button>
+                        <button id="quantity-plus">+</button>
                     </div>
                 </div>
                 <div class="setting-group start-btn-container">
@@ -505,6 +572,14 @@
             <p id="popup-detail-message"></p>
             <button id="popup-next-btn" class="primary-btn" onclick="nextProblem()" style="display: none;">다음 문제 도전하기</button>
         </div>
+    </div>
+</div>
+
+<div id="qr-popup-overlay" class="popup-overlay-qr" style="display: none;">
+    <div class="popup-qr">
+        <button class="close-btn-qr" onclick="closeQrPopup()">&times;</button>
+        <img src="https://i.imgur.com/g4yS8yx.png" alt="QR Code">
+        <p>학생들에게 QR코드를 보여주세요!</p>
     </div>
 </div>
 
@@ -991,44 +1066,22 @@
 
         } else if (type === 'point') {
             const numPoints = (selectedDifficulty == 1) ? getRandomInt(3, 4) : getRandomInt(5, 6);
-            let initialPoints = [];
-            const MAX_POINT_GEN_ATTEMPTS = 50;
-            let currentAttempts = 0;
-
-            const isHorizontalAxis = Math.random() < 0.5;
-            let lineStart, lineEnd;
-
-            if(isHorizontalAxis) {
-                const y = CENTER_POINT.y;
-                const halfLength = getRandomInt(3, 7);
-                lineStart = {x: CENTER_POINT.x - halfLength, y: y};
-                lineEnd = {x: CENTER_POINT.x + halfLength, y: y};
-            } else {
-                const x = CENTER_POINT.x;
-                const halfLength = getRandomInt(3, 7);
-                lineStart = {x: x, y: CENTER_POINT.y - halfLength};
-                lineEnd = {x: x, y: CENTER_POINT.y + halfLength};
-            }
-            initialPoints.push(lineStart);
-            
-            const numInnerPoints = numPoints - 2;
             let halfVertices = [];
-            for(let i = 0; i < numInnerPoints; i++) {
+            
+            for(let i = 0; i < numPoints; i++) {
                 let newV;
                 let success = false;
                 let attemptCount = 0;
-                while(!success && attemptCount < MAX_POINT_GEN_ATTEMPTS) {
-                    let x, y;
-                    if(isHorizontalAxis) {
-                        x = getRandomInt(MIN_COORD, MAX_COORD);
-                        y = getRandomInt(MIN_COORD, CENTER_POINT.y - 1);
-                    } else {
-                        x = getRandomInt(MIN_COORD, CENTER_POINT.x - 1);
-                        y = getRandomInt(MIN_COORD, MAX_COORD);
-                    }
+                while(!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                    let x = getRandomInt(MIN_COORD, MAX_COORD);
+                    let y = getRandomInt(MIN_COORD, MAX_COORD);
                     newV = {x: x, y: y};
                     
-                    if(!isTooClose(newV, [...initialPoints, ...halfVertices])) {
+                    if (!isSamePoint(newV, CENTER_POINT) && 
+                        !isTooClose(newV, halfVertices) &&
+                        !isProblemTooLinear(halfVertices, newV) && 
+                        !isProblemTooSharp(halfVertices, newV)) { 
+                        
                         halfVertices.push(newV);
                         success = true;
                     }
@@ -1036,13 +1089,15 @@
                 }
                 if(!success) return null;
             }
+            
             halfVertices.sort((a, b) => {
                 const angleA = Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x);
                 const angleB = Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x);
                 return angleA - angleB;
             });
-            initialPoints = initialPoints.concat(halfVertices);
-            initialPoints.push(lineEnd);
+            
+            const initialPoints = halfVertices;
+            const initialLines = createSequentialLines(initialPoints, false);
 
             let allVertices = [];
             let processed = new Set();
@@ -1079,14 +1134,6 @@
             if(!isProblemValid) return null;
             
             const allLines = createSequentialLines(allVertices, true);
-
-            const initialLines = [];
-            const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`));
-            allLines.forEach(line => {
-                if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) {
-                    initialLines.push(line);
-                }
-            });
             
             return {
                 type: 'point',
@@ -1108,8 +1155,8 @@
         document.querySelectorAll('#difficulty-select button').forEach(button => {
             button.addEventListener('click', handleDifficultySelect);
         });
-        document.getElementById('quantity-minus-5').addEventListener('click', () => changeQuantity(-5));
-        document.getElementById('quantity-plus-5').addEventListener('click', () => changeQuantity(5));
+        document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
+        document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
     }
 
     function handleTypeSelect(event) {
@@ -1665,6 +1712,14 @@
         }
     }
 
+    function showQrPopup() {
+        document.getElementById('qr-popup-overlay').style.display = 'flex';
+    }
+
+    function closeQrPopup() {
+        document.getElementById('qr-popup-overlay').style.display = 'none';
+    }
+
 
     window.onload = () => {
         document.getElementById('problem-quantity').textContent = totalProblems;
@@ -1751,9 +1806,7 @@
         
         document.getElementById('clear-canvas-btn').addEventListener('click', () => clearCanvas(true));
 
-        document.getElementById('quantity-minus-5').addEventListener('click', () => changeQuantity(-5));
-        document.getElementById('quantity-plus-5').addEventListener('click', () => changeQuantity(5));
-
+        document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
 
         document.getElementById('setup-page').style.display = 'flex';
     };
