@@ -837,132 +837,111 @@
                 };
 
             } else {
-                 
-                 if (axisDirection === 'vertical') {
-                     let axisPoint1, axisPoint2;
-                     let nonAxisPoints = [];
-                     let pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
-                     
-                     axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 1) };
-                     axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 1, maxCoord) };
-                     
-                     // Y축에 점을 찍는 경우
-                     if (Math.random() < 0.2) {
-                         const y = getRandomInt(axisPoint1.y, axisPoint2.y);
-                         const axisPoint = { x: HALF_COUNT, y: y };
-                         tempVertices.push(axisPoint);
-                     }
-                     
-                     // Y축 외부에 점을 찍는 경우
-                     for (let i = 0; i < pointCount - (tempVertices.length > 0 ? 1 : 0); i++) {
-                         let newV;
-                         let success = false;
-                         let attemptCount = 0;
-                         while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                             let x = getRandomInt(minCoord, HALF_COUNT - 1); // HALF_COUNT 포함
-                             let y = getRandomInt(minCoord, maxCoord);
-                             newV = { x: x, y: y };
+                
+                if (axisDirection === 'vertical') {
+                    const pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                    let nonAxisPoints = [];
 
-                             let isValid = !isTooClose(newV, nonAxisPoints);
-                             if (newV.x === HALF_COUNT) {
-                                 isValid = !isTooClose(newV, nonAxisPoints);
-                             }
-                             if (nonAxisPoints.length > 0) {
-                                 let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
-                                 if (isTooWeakSlope(lastPoint, newV)) {
-                                     isValid = false;
-                                 }
-                             }
-                             if (isValid) {
-                                 nonAxisPoints.push(newV);
-                                 success = true;
-                             }
-                             attemptCount++;
-                         }
-                     }
-                     nonAxisPoints.sort((a, b) => a.y - b.y);
+                    const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) };
+                    const axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 2, maxCoord) };
+                    
+                    for (let i = 0; i < pointCount - 2; i++) {
+                        let newV;
+                        let success = false;
+                        let attemptCount = 0;
+                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                            let x = getRandomInt(minCoord, HALF_COUNT - 1);
+                            let y = getRandomInt(axisPoint1.y, axisPoint2.y);
+                            newV = { x: x, y: y };
 
-                     let initialVertices = [...nonAxisPoints];
-                     if (tempVertices.length > 0) {
-                         initialVertices.unshift(tempVertices[0]);
-                     }
-                     
-                     if (initialVertices.length < 3) return null;
+                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            
+                            if (nonAxisPoints.length > 0) {
+                                let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
+                                if (isTooWeakSlope(lastPoint, newV)) {
+                                    isValid = false;
+                                }
+                            }
+                            if (isValid) {
+                                nonAxisPoints.push(newV);
+                                success = true;
+                            }
+                            attemptCount++;
+                        }
+                    }
+                    nonAxisPoints.sort((a, b) => a.y - b.y);
 
-                     let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)));
-                     allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
-                     allVertices.sort((a, b) => a.y - b.y);
-                     
-                     let initialLines = createSequentialLines(initialVertices, false);
-                     
-                     return {
-                         type: 'line',
-                         isSlantedAxis: false,
-                         axisDirection: axisDirection,
-                         initialVertices: initialVertices,
-                         initialLines: initialLines,
-                         allVertices: allVertices,
-                         allLines: createSequentialLines(allVertices, true)
-                     };
+                    let initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
+                    
+                    if (initialVertices.length < 2) return null;
 
-                 } else { // horizontal
-                     let axisPoint1, axisPoint2;
-                     let nonAxisPoints = [];
-                     let pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
-                     
-                     axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 1), y: HALF_COUNT };
-                     axisPoint2 = { x: getRandomInt(HALF_COUNT + 1, maxCoord), y: HALF_COUNT };
+                    let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse());
+                    allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
+                    
+                    let initialLines = createSequentialLines(initialVertices, false);
+                    
+                    return {
+                        type: 'line',
+                        isSlantedAxis: false,
+                        axisDirection: axisDirection,
+                        initialVertices: initialVertices,
+                        initialLines: initialLines,
+                        allVertices: allVertices,
+                        allLines: createSequentialLines(allVertices, true)
+                    };
 
-                     tempVertices.push(axisPoint1);
+                } else { // horizontal
+                    const pointCount = selectedDifficulty == 1 ? getRandomInt(3, 4) : getRandomInt(5, 6);
+                    let nonAxisPoints = [];
+                    
+                    const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT };
+                    const axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT };
 
-                     for (let i = 0; i < pointCount - 2; i++) {
-                         let newV;
-                         let success = false;
-                         let attemptCount = 0;
-                         while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
-                             let x = getRandomInt(minCoord, maxCoord);
-                             let y = getRandomInt(minCoord, HALF_COUNT - 2);
-                             newV = { x: x, y: y };
-                             
-                             let isValid = !isTooClose(newV, nonAxisPoints);
-                             if (nonAxisPoints.length > 0) {
-                                 let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
-                                 if (isTooWeakSlope(lastPoint, newV)) {
-                                     isValid = false;
-                                 }
-                             }
-                             
-                             if (isValid) {
-                                 nonAxisPoints.push(newV);
-                                 success = true;
-                             }
-                             attemptCount++;
-                         }
-                     }
-                     nonAxisPoints.sort((a, b) => a.x - b.x);
+                    for (let i = 0; i < pointCount - 2; i++) {
+                        let newV;
+                        let success = false;
+                        let attemptCount = 0;
+                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                            let x = getRandomInt(axisPoint1.x, axisPoint2.x);
+                            let y = getRandomInt(minCoord, HALF_COUNT - 1);
+                            newV = { x: x, y: y };
+                            
+                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            if (nonAxisPoints.length > 0) {
+                                let lastPoint = nonAxisPoints[nonAxisPoints.length - 1];
+                                if (isTooWeakSlope(lastPoint, newV)) {
+                                    isValid = false;
+                                }
+                            }
+                            
+                            if (isValid) {
+                                nonAxisPoints.push(newV);
+                                success = true;
+                            }
+                            attemptCount++;
+                        }
+                    }
+                    nonAxisPoints.sort((a, b) => a.x - b.x);
 
-                     let initialVertices = [...nonAxisPoints];
-                     initialVertices.unshift(axisPoint1);
-                     initialVertices.push(axisPoint2);
-                     
-                     if (initialVertices.length < 3) return null;
-                     
-                     let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)));
-                     allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
-                     allVertices.sort((a, b) => a.x - b.y);
+                    let initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
+                    
+                    if (initialVertices.length < 2) return null;
+                    
+                    let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse());
+                    allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
 
-                     let initialLines = createSequentialLines(initialVertices, false);
+                    let initialLines = createSequentialLines(initialVertices, false);
 
-                     return {
-                         type: 'line',
-                         isSlantedAxis: false,
-                         axisDirection: axisDirection,
-                         initialVertices: initialVertices,
-                         initialLines: initialLines,
-                         allVertices: allVertices,
-                         allLines: createSequentialLines(allVertices, true)
-                     };
-                 }
+                    return {
+                        type: 'line',
+                        isSlantedAxis: false,
+                        axisDirection: axisDirection,
+                        initialVertices: initialVertices,
+                        initialLines: initialLines,
+                        allVertices: allVertices,
+                        allLines: createSequentialLines(allVertices, true)
+                    };
+                }
             }
 
         } else if (type === 'point') {
@@ -1030,8 +1009,8 @@
                     const symV = calculateSymmetricPoint(p, 'point');
                     const symKey = `${symV.x},${symV.y}`;
                     if (!processed.has(symKey)) {
-                         allVertices.push(symV);
-                         processed.add(symKey);
+                        allVertices.push(symV);
+                        processed.add(symKey);
                     }
                 }
             });
@@ -1598,18 +1577,7 @@
             const clickedGridPoint = { x: gridX, y: gridY };
 
             if (canvasMode === 'vertex') {
-                const currentP = problemList[currentProblem];
-                const pType = currentP ? currentP.type : 'line';
-                
-                const isSlantedAxis = (pType === 'line' && currentP.isSlantedAxis);
-                const onSlantedAxis = isSlantedAxis && (clickedGridPoint.x === clickedGridPoint.y);
-                const onVerticalAxis = !isSlantedAxis && (clickedGridPoint.x === HALF_COUNT);
-
-                if (isVertexOnProblemBoundary(clickedGridPoint) || (pType === 'point' && isSamePoint(clickedGridPoint, CENTER_POINT))) {
-                    return;
-                }
-                
-                if (pType === 'line' && (onSlantedAxis || onVerticalAxis) && !isVertexOnProblemBoundary(clickedGridPoint)) {
+                if (isVertexOnProblemBoundary(clickedGridPoint)) {
                     return;
                 }
 
