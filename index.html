@@ -894,7 +894,7 @@ function sortSlantedAxisVertices(vertices) {
 
     aboveAxis.sort((a,b) => {
         const angleA = Math.atan2(a.y - p2.y, a.x - p2.x);
-        const angleB = Math.atan2(b.y - p2.y, b.x - p2.x);
+        const angleB = Math.atan2(b.y - p2.y, b.x - p2.y);
         return angleB - angleA;
     });
     
@@ -1259,419 +1259,419 @@ function generateRandomProblem(type) {
     return null;
 }
 
-    // 1. 설정 및 시작
-    function initializeSetupListeners() {
-        document.querySelectorAll('#type-select button').forEach(button => {
-            button.addEventListener('click', handleTypeSelect);
-        });
-        document.querySelectorAll('#difficulty-select button').forEach(button => {
-            button.addEventListener('click', handleDifficultySelect);
-        });
-        document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
-        document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
-    }
+// 1. 설정 및 시작
+function initializeSetupListeners() {
+    document.querySelectorAll('#type-select button').forEach(button => {
+        button.addEventListener('click', handleTypeSelect);
+    });
+    document.querySelectorAll('#difficulty-select button').forEach(button => {
+        button.addEventListener('click', handleDifficultySelect);
+    });
+    document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
+    document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
+}
 
-    function handleTypeSelect(event) {
-        document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        selectedType = event.currentTarget.getAttribute('data-type');
+function handleTypeSelect(event) {
+    document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    selectedType = event.currentTarget.getAttribute('data-type');
+}
+
+function handleDifficultySelect(event) {
+    document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    selectedDifficulty = event.currentTarget.getAttribute('data-difficulty');
+}
+
+function changeQuantity(delta) {
+    const current = parseInt(document.getElementById('problem-quantity').textContent);
+    let newQuantity = current + delta;
+    if (newQuantity < 5) newQuantity = 5;
+    if (newQuantity > 50) newQuantity = 50;
+    document.getElementById('problem-quantity').textContent = newQuantity;
+    totalProblems = newQuantity;
+}
+
+function startQuiz() {
+    const problemsToGenerate = totalProblems;
+    problemList = [];
+    let generatedVertexStrings = new Set();
+    let attempt = 0;
+    const MAX_ATTEMPTS = problemsToGenerate * 20;
+
+    while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
+        let type;
+        if (selectedType === 'both') {
+            type = Math.random() < 0.5 ? 'line' : 'point';
+        } else {
+            type = selectedType;
+        }
+        
+        const newProblem = generateRandomProblem(type);
+        
+        if (newProblem && newProblem.initialVertices.length >= 2) {
+            const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
+            if (!generatedVertexStrings.has(vertexString)) {
+                problemList.push(newProblem);
+                generatedVertexStrings.add(vertexString);
+            }
+        }
+        attempt++;
     }
     
-    function handleDifficultySelect(event) {
-        document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        selectedDifficulty = event.currentTarget.getAttribute('data-difficulty');
+    totalProblems = problemList.length;
+    
+    if (totalProblems === 0) {
+        alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
+        location.reload();
+        return;
+    }
+    
+    currentProblem = 0;
+    score.isFirstAttempt = true;
+    hasSubmittedScore = false; // 새 게임 시작 시 등록 플래그 초기화
+    
+    document.getElementById('setup-page').style.display = 'none';
+    document.getElementById('problem-page').style.display = 'block';
+    
+    loadProblem();
+}
+
+function loadProblem() {
+    if (currentProblem >= totalProblems) {
+        showFinalResult();
+        return;
     }
 
-    function changeQuantity(delta) {
-        const current = parseInt(document.getElementById('problem-quantity').textContent);
-        let newQuantity = current + delta;
-        if (newQuantity < 5) newQuantity = 5;
-        if (newQuantity > 50) newQuantity = 50;
-        document.getElementById('problem-quantity').textContent = newQuantity;
-        totalProblems = newQuantity;
+    const currentP = problemList[currentProblem];
+    const pType = currentP.type === 'line' ? '선대칭' : '점대칭';
+    
+    let problemNumText = `${currentProblem + 1}번째 문제 (${pType})`;
+    const pTypeText = currentP.type === 'line' ? '선대칭도형' : '점대칭도형';
+    let instructionText = `아래 도형은 ${pTypeText}입니다. 나머지 부분을 완성해 주세요.`;
+
+    if (window.innerWidth < 480) {
+        problemNumText = `${currentProblem + 1}번째 문제<br>(${pType})`;
+        instructionText = `아래 도형은 ${pTypeText}입니다.<br>나머지 부분을 완성해 주세요.`;
     }
+    document.getElementById('problem-number').innerHTML = problemNumText;
+    document.getElementById('problem-instruction').innerHTML = instructionText;
+    
+    const checkBtn = document.getElementById('check-answer-btn');
+    const nextBtn = document.getElementById('next-problem-btn');
+    checkBtn.style.display = 'block';
+    nextBtn.style.display = 'none';
 
-    function startQuiz() {
-        const problemsToGenerate = totalProblems;
-        problemList = [];
-        let generatedVertexStrings = new Set();
-        let attempt = 0;
-        const MAX_ATTEMPTS = problemsToGenerate * 20;
+    closePopup();
+    
+    score.isFirstAttempt = true;
 
-        while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
-            let type;
-            if (selectedType === 'both') {
-                type = Math.random() < 0.5 ? 'line' : 'point';
-            } else {
-                type = selectedType;
-            }
-            
-            const newProblem = generateRandomProblem(type);
-            
-            if (newProblem && newProblem.initialVertices.length >= 2) {
-                const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
-                if (!generatedVertexStrings.has(vertexString)) {
-                    problemList.push(newProblem);
-                    generatedVertexStrings.add(vertexString);
-                }
-            }
-            attempt++;
-        }
-        
-        totalProblems = problemList.length;
-        
-        if (totalProblems === 0) {
-            alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
-            location.reload();
-            return;
-        }
-        
-        currentProblem = 0;
-        score.isFirstAttempt = true;
-        hasSubmittedScore = false; // 새 게임 시작 시 등록 플래그 초기화
-        
-        document.getElementById('setup-page').style.display = 'none';
-        document.getElementById('problem-page').style.display = 'block';
-        
-        loadProblem();
-    }
+    problemVertices = currentP.initialVertices;
+    problemLines = currentP.initialLines;
+    userVertices = [];
+    userLines = [];
+    tempLineStart = null;
+    hoveredLine = null;
+    
+    setCanvasMode('vertex');
+    
+    clearCanvas(false);
+}
 
-    function loadProblem() {
-        if (currentProblem >= totalProblems) {
-            showFinalResult();
-            return;
-        }
-
-        const currentP = problemList[currentProblem];
-        const pType = currentP.type === 'line' ? '선대칭' : '점대칭';
-        
-        let problemNumText = `${currentProblem + 1}번째 문제 (${pType})`;
-        const pTypeText = currentP.type === 'line' ? '선대칭도형' : '점대칭도형';
-        let instructionText = `아래 도형은 ${pTypeText}입니다. 나머지 부분을 완성해 주세요.`;
-
-        if (window.innerWidth < 480) {
-            problemNumText = `${currentProblem + 1}번째 문제<br>(${pType})`;
-            instructionText = `아래 도형은 ${pTypeText}입니다.<br>나머지 부분을 완성해 주세요.`;
-        }
-        document.getElementById('problem-number').innerHTML = problemNumText;
-        document.getElementById('problem-instruction').innerHTML = instructionText;
-        
-        const checkBtn = document.getElementById('check-answer-btn');
-        const nextBtn = document.getElementById('next-problem-btn');
-        checkBtn.style.display = 'block';
-        nextBtn.style.display = 'none';
-
-        closePopup();
-        
-        score.isFirstAttempt = true;
-
-        problemVertices = currentP.initialVertices;
-        problemLines = currentP.initialLines;
+function clearCanvas(clearUserDrawing) {
+    if (clearUserDrawing) {
         userVertices = [];
         userLines = [];
         tempLineStart = null;
         hoveredLine = null;
-        
-        setCanvasMode('vertex');
-        
-        clearCanvas(false);
     }
+    document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
+    
+    redrawCanvas();
+    setCanvasMode('vertex');
+    closePopup();
+    
+    const checkBtn = document.getElementById('check-answer-btn');
+    const nextBtn = document.getElementById('next-problem-btn');
+    checkBtn.style.display = 'block';
+    nextBtn.style.display = 'none';
+}
 
-    function clearCanvas(clearUserDrawing) {
-        if (clearUserDrawing) {
-            userVertices = [];
-            userLines = [];
-            tempLineStart = null;
-            hoveredLine = null;
-        }
-        document.querySelectorAll('.user-dot').forEach(dot => dot.remove());
-        
-        redrawCanvas();
-        setCanvasMode('vertex');
-        closePopup();
-        
-        const checkBtn = document.getElementById('check-answer-btn');
-        const nextBtn = document.getElementById('next-problem-btn');
-        checkBtn.style.display = 'block';
-        nextBtn.style.display = 'none';
+// 2. 캔버스 그리기 및 모드 제어
+function renderProblemVertices() {
+    document.querySelectorAll('.problem-dot').forEach(dot => dot.remove());
+    problemVertices.forEach((v) => {
+        const dot = document.createElement('div');
+        dot.className = 'problem-dot';
+        dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+        dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+        canvasWrapper.appendChild(dot);
+    });
+}
+
+function drawGrid() {
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 0.5;
+    
+    ctx.setLineDash([1, 4]);
+    
+    for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
     }
     
-    // 2. 캔버스 그리기 및 모드 제어
-    function renderProblemVertices() {
-        document.querySelectorAll('.problem-dot').forEach(dot => dot.remove());
-        problemVertices.forEach((v) => {
-            const dot = document.createElement('div');
-            dot.className = 'problem-dot';
-            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
-            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
-            canvasWrapper.appendChild(dot);
-        });
-    }
+    ctx.setLineDash([]);
 
-    function drawGrid() {
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 0.5;
-        
-        ctx.setLineDash([1, 4]);
-        
-        for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-        }
-        for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-        }
-        
-        ctx.setLineDash([]);
-
-        if (problemList.length > currentProblem) {
-            const currentP = problemList[currentProblem];
-            ctx.strokeStyle = '#ff0000';
-            ctx.lineWidth = 2;
-            if (currentP.type === 'line') {
-                if (currentP.isSlantedAxis) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(canvas.width, canvas.height);
-                    ctx.stroke();
-                } else if (currentP.axisDirection === 'vertical') {
-                    const centerX = canvas.width / 2;
-                    ctx.beginPath();
-                    ctx.moveTo(centerX, 0);
-                    ctx.lineTo(centerX, canvas.height);
-                    ctx.stroke();
-                } else if (currentP.axisDirection === 'horizontal') {
-                    const centerY = canvas.height / 2;
-                    ctx.beginPath();
-                    ctx.moveTo(0, centerY);
-                    ctx.lineTo(canvas.width, centerY);
-                    ctx.stroke();
-                }
-            } else if (currentP.type === 'point') {
+    if (problemList.length > currentProblem) {
+        const currentP = problemList[currentProblem];
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 2;
+        if (currentP.type === 'line') {
+            if (currentP.isSlantedAxis) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.stroke();
+            } else if (currentP.axisDirection === 'vertical') {
                 const centerX = canvas.width / 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, 0);
+                ctx.lineTo(centerX, canvas.height);
+                ctx.stroke();
+            } else if (currentP.axisDirection === 'horizontal') {
                 const centerY = canvas.height / 2;
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
-                ctx.fillStyle = '#ff0000';
-                ctx.fill();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.stroke();
             }
-        }
-    }
-
-    function drawLines(lines, color) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 3;
-        lines.forEach(line => {
+        } else if (currentP.type === 'point') {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
             ctx.beginPath();
-            ctx.moveTo(line.p1.x * GRID_SIZE, line.p1.y * GRID_SIZE);
-            ctx.lineTo(line.p2.x * GRID_SIZE, line.p2.y * GRID_SIZE);
-            ctx.stroke();
-        });
-    }
-
-    function redrawCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawGrid();
-
-        drawLines(problemLines, '#007bff');
-        drawLines(userLines, '#28a745');
-        
-        if (hoveredLine) {
-            ctx.save();
-            ctx.strokeStyle = 'rgba(234, 153, 153, 0.5)';
-            ctx.lineWidth = 8;
-            ctx.shadowColor = 'rgba(234, 153, 153, 0.7)';
-            ctx.shadowBlur = 10;
-            ctx.beginPath();
-            ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
-            ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE);
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        renderProblemVertices();
-
-        if (canvasMode === 'line') {
-            renderPointsForLineMode();
-        } else {
-             renderUserVertices();
+            ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff0000';
+            ctx.fill();
         }
     }
+}
 
-    function renderPointsForLineMode() {
-        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+function drawLines(lines, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    lines.forEach(line => {
+        ctx.beginPath();
+        ctx.moveTo(line.p1.x * GRID_SIZE, line.p1.y * GRID_SIZE);
+        ctx.lineTo(line.p2.x * GRID_SIZE, line.p2.y * GRID_SIZE);
+        ctx.stroke();
+    });
+}
 
-        const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
-        
-        allPoints.forEach((v) => {
-            const dot = document.createElement('div');
-            dot.className = (tempLineStart && isSamePoint(v, tempLineStart)) ? 'selected-line-dot' : 'line-dot';
-            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
-            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
-            canvasWrapper.appendChild(dot);
-        });
+function redrawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+
+    drawLines(problemLines, '#007bff');
+    drawLines(userLines, '#28a745');
+    
+    if (hoveredLine) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(234, 153, 153, 0.5)';
+        ctx.lineWidth = 8;
+        ctx.shadowColor = 'rgba(234, 153, 153, 0.7)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
+        ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE);
+        ctx.stroke();
+        ctx.restore();
     }
 
-    function renderUserVertices() {
-        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+    renderProblemVertices();
 
-        userVertices.forEach((v) => {
-            const dot = document.createElement('div');
-            dot.className = 'user-dot';
-            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
-            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
-            canvasWrapper.appendChild(dot);
-        });
+    if (canvasMode === 'line') {
+        renderPointsForLineMode();
+    } else {
+         renderUserVertices();
     }
+}
 
-    function isVertexOnProblemBoundary(v) {
-        return problemVertices.some(pv => isSamePoint(pv, v));
+function renderPointsForLineMode() {
+    document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+
+    const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
+    
+    allPoints.forEach((v) => {
+        const dot = document.createElement('div');
+        dot.className = (tempLineStart && isSamePoint(v, tempLineStart)) ? 'selected-line-dot' : 'line-dot';
+        dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+        dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+        canvasWrapper.appendChild(dot);
+    });
+}
+
+function renderUserVertices() {
+    document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+
+    userVertices.forEach((v) => {
+        const dot = document.createElement('div');
+        dot.className = 'user-dot';
+        dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+        dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+        canvasWrapper.appendChild(dot);
+    });
+}
+
+function isVertexOnProblemBoundary(v) {
+    return problemVertices.some(pv => isSamePoint(pv, v));
+}
+
+function showPopup(mainMessage, detailMessage, isCorrect) {
+    const popupOverlay = document.getElementById('result-popup-overlay');
+    const popupMainMessage = document.getElementById('popup-main-message');
+    const popupDetailMessage = document.getElementById('popup-detail-message');
+    const popupNextBtn = document.getElementById('popup-next-btn');
+
+    if (isCorrect) {
+        popupMainMessage.innerHTML = mainMessage;
+        popupMainMessage.className = 'correct';
+        popupDetailMessage.style.display = 'none';
+        popupNextBtn.style.display = 'block';
+    } else {
+        popupMainMessage.innerHTML = `${mainMessage}<br><span style="font-size: 80%;">${detailMessage}</span>`;
+        popupMainMessage.className = 'incorrect';
+        popupDetailMessage.style.display = 'none';
+        popupNextBtn.style.display = 'none';
     }
     
-    function showPopup(mainMessage, detailMessage, isCorrect) {
-        const popupOverlay = document.getElementById('result-popup-overlay');
-        const popupMainMessage = document.getElementById('popup-main-message');
-        const popupDetailMessage = document.getElementById('popup-detail-message');
-        const popupNextBtn = document.getElementById('popup-next-btn');
+    popupOverlay.style.display = 'flex';
+}
 
-        if (isCorrect) {
-            popupMainMessage.innerHTML = mainMessage;
-            popupMainMessage.className = 'correct';
-            popupDetailMessage.style.display = 'none';
-            popupNextBtn.style.display = 'block';
-        } else {
-            popupMainMessage.innerHTML = `${mainMessage}<br><span style="font-size: 80%;">${detailMessage}</span>`;
-            popupMainMessage.className = 'incorrect';
-            popupDetailMessage.style.display = 'none';
-            popupNextBtn.style.display = 'none';
-        }
-        
-        popupOverlay.style.display = 'flex';
-    }
+function closePopup() {
+    document.getElementById('result-popup-overlay').style.display = 'none';
+}
 
-    function closePopup() {
-        document.getElementById('result-popup-overlay').style.display = 'none';
-    }
+function checkAnswer() {
+    const currentP = problemList[currentProblem];
+    const problemType = currentP.type;
+    
+    let verticesAreCorrect = checkVerticesSymmetry(problemType);
+    let isLinesCorrect = false;
 
-    function checkAnswer() {
-        const currentP = problemList[currentProblem];
-        const problemType = currentP.type;
-        
-        let verticesAreCorrect = checkVerticesSymmetry(problemType);
-        let isLinesCorrect = false;
-
-        if (verticesAreCorrect) {
-            if (problemType === 'line') {
-                isLinesCorrect = checkLineSymmetryLines(currentP);
-            } else if (problemType === 'point') {
-                isLinesCorrect = checkPointSymmetryLines(currentP);
-            }
-        }
-        
-        if (verticesAreCorrect && isLinesCorrect) {
-            showPopup('정답입니다🎉', '', true);
-            
-            if (score.isFirstAttempt) { score.correct++; } else { score.retried++; }
-            score.totalAttempted++;
-            
-            document.getElementById('check-answer-btn').style.display = 'none';
-            document.getElementById('next-problem-btn').style.display = 'block';
-
-        } else {
-            let detailMessage;
-            
-            if (!verticesAreCorrect) {
-                detailMessage = '꼭짓점의 위치나 개수가 잘못되었어요.';
-            } else if (!isLinesCorrect) {
-                detailMessage = '도형이 대칭을 이루지 않거나 빠뜨린 선분이 있어요.';
-            } else {
-                detailMessage = '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
-            }
-
-            showPopup('다시 생각해 볼까요?', detailMessage, false);
-            score.isFirstAttempt = false;
-            
-            document.getElementById('check-answer-btn').style.display = 'block';
-            document.getElementById('next-problem-btn').style.display = 'none';
-        }
-    }
-
-    function checkVerticesSymmetry(problemType) {
-        const currentP = problemList[currentProblem];
-        const isSlantedAxis = (currentP.type === 'line' && currentP.isSlantedAxis);
-        
-        const allProblemAndUserVerticesSet = new Map();
-        [...problemVertices, ...userVertices].forEach(v => {
-            const key = `${Math.round(v.x)},${Math.round(v.y)}`;
-            if (!allProblemAndUserVerticesSet.has(key)) {
-                allProblemAndUserVerticesSet.set(key, { x: Math.round(v.x), y: Math.round(v.y) });
-            }
-        });
-        const finalVertices = Array.from(allProblemAndUserVerticesSet.values());
-        
-        const numVertices = finalVertices.length;
-        
+    if (verticesAreCorrect) {
         if (problemType === 'line') {
-            const axisDirection = currentP.axisDirection;
-            let boundaryVerticesCount;
-
-            if (isSlantedAxis) {
-                boundaryVerticesCount = finalVertices.filter(v => v.x === v.y).length;
-            } else if (axisDirection === 'vertical') {
-                boundaryVerticesCount = finalVertices.filter(v => v.x === HALF_COUNT).length;
-            } else if (axisDirection === 'horizontal') {
-                boundaryVerticesCount = finalVertices.filter(v => v.y === HALF_COUNT).length;
-            }
-            
-            const nonBoundaryCount = numVertices - boundaryVerticesCount;
-
-            if (nonBoundaryCount % 2 !== 0) {
-                return false;
-            }
+            isLinesCorrect = checkLineSymmetryLines(currentP);
+        } else if (problemType === 'point') {
+            isLinesCorrect = checkPointSymmetryLines(currentP);
         }
-        
-        let symmetricPairs = new Map();
-        for (const v of finalVertices) {
-            const key = `${v.x},${v.y}`;
-            if (symmetricPairs.has(key)) continue;
-
-            const symmetricV = calculateSymmetricPoint(v, problemType, isSlantedAxis, currentP.axisDirection);
-            
-            if (isSamePoint(v, symmetricV)) {
-                symmetricPairs.set(key, true);
-                continue;
-            }
-
-            const symmetricExists = finalVertices.some(av => isSamePoint(av, symmetricV));
-
-            if (!symmetricExists) return false;
-            
-            symmetricPairs.set(key, true);
-            symmetricPairs.set(`${symmetricV.x},${symmetricV.y}`, true);
-        }
-        return true;
     }
     
-    function checkLineSymmetryLines(currentP) {
-        const correctSymmetricLines = currentP.initialLines.map(line => ({
-            p1: calculateSymmetricPoint(line.p1, 'line', currentP.isSlantedAxis, currentP.axisDirection),
-            p2: calculateSymmetricPoint(line.p2, 'line', currentP.isSlantedAxis, currentP.axisDirection)
-        }));
+    if (verticesAreCorrect && isLinesCorrect) {
+        showPopup('정답입니다🎉', '', true);
         
-        if (userLines.length !== correctSymmetricLines.length) {
+        if (score.isFirstAttempt) { score.correct++; } else { score.retried++; }
+        score.totalAttempted++;
+        
+        document.getElementById('check-answer-btn').style.display = 'none';
+        document.getElementById('next-problem-btn').style.display = 'block';
+
+    } else {
+        let detailMessage;
+        
+        if (!verticesAreCorrect) {
+            detailMessage = '꼭짓점의 위치나 개수가 잘못되었어요.';
+        } else if (!isLinesCorrect) {
+            detailMessage = '도형이 대칭을 이루지 않거나 빠뜨린 선분이 있어요.';
+        } else {
+            detailMessage = '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
+        }
+
+        showPopup('다시 생각해 볼까요?', detailMessage, false);
+        score.isFirstAttempt = false;
+        
+        document.getElementById('check-answer-btn').style.display = 'block';
+        document.getElementById('next-problem-btn').style.display = 'none';
+    }
+}
+
+function checkVerticesSymmetry(problemType) {
+    const currentP = problemList[currentProblem];
+    const isSlantedAxis = (currentP.type === 'line' && currentP.isSlantedAxis);
+    
+    const allProblemAndUserVerticesSet = new Map();
+    [...problemVertices, ...userVertices].forEach(v => {
+        const key = `${Math.round(v.x)},${Math.round(v.y)}`;
+        if (!allProblemAndUserVerticesSet.has(key)) {
+            allProblemAndUserVerticesSet.set(key, { x: Math.round(v.x), y: Math.round(v.y) });
+        }
+    });
+    const finalVertices = Array.from(allProblemAndUserVerticesSet.values());
+    
+    const numVertices = finalVertices.length;
+    
+    if (problemType === 'line') {
+        const axisDirection = currentP.axisDirection;
+        let boundaryVerticesCount;
+
+        if (isSlantedAxis) {
+            boundaryVerticesCount = finalVertices.filter(v => v.x === v.y).length;
+        } else if (axisDirection === 'vertical') {
+            boundaryVerticesCount = finalVertices.filter(v => v.x === HALF_COUNT).length;
+        } else if (axisDirection === 'horizontal') {
+            boundaryVerticesCount = finalVertices.filter(v => v.y === HALF_COUNT).length;
+        }
+        
+        const nonBoundaryCount = numVertices - boundaryVerticesCount;
+
+        if (nonBoundaryCount % 2 !== 0) {
             return false;
         }
-
-        for (const userLine of userLines) {
-            const match = correctSymmetricLines.some(correctLine => isSameLine(userLine, correctLine));
-            if (!match) {
-                return false;
-            }
-        }
-        
-        return true;
     }
     
+    let symmetricPairs = new Map();
+    for (const v of finalVertices) {
+        const key = `${v.x},${v.y}`;
+        if (symmetricPairs.has(key)) continue;
+
+        const symmetricV = calculateSymmetricPoint(v, problemType, isSlantedAxis, currentP.axisDirection);
+        
+        if (isSamePoint(v, symmetricV)) {
+            symmetricPairs.set(key, true);
+            continue;
+        }
+
+        const symmetricExists = finalVertices.some(av => isSamePoint(av, symmetricV));
+
+        if (!symmetricExists) return false;
+        
+        symmetricPairs.set(key, true);
+        symmetricPairs.set(`${symmetricV.x},${symmetricV.y}`, true);
+    }
+    return true;
+}
+
+function checkLineSymmetryLines(currentP) {
+    const correctSymmetricLines = currentP.initialLines.map(line => ({
+        p1: calculateSymmetricPoint(line.p1, 'line', currentP.isSlantedAxis, currentP.axisDirection),
+        p2: calculateSymmetricPoint(line.p2, 'line', currentP.isSlantedAxis, currentP.axisDirection)
+    }));
+    
+    if (userLines.length !== correctSymmetricLines.length) {
+        return false;
+    }
+
+    for (const userLine of userLines) {
+        const match = correctSymmetricLines.some(correctLine => isSameLine(userLine, correctLine));
+        if (!match) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 function checkPointSymmetryLines(currentP) {
     // 1. 문제에 원래 있던 선들과 사용자가 그린 선들을 모두 합칩니다.
     const allDrawnLines = [...problemLines, ...userLines];
@@ -1702,64 +1702,64 @@ function checkPointSymmetryLines(currentP) {
     return correctLinesCopy.length === 0;
 }
     
-    function findClosestValidLinePoint(v) {
-        const allTargetVertices = [
-            ...problemVertices,
-            ...userVertices
-        ];
-        
-        if (problemList.length > currentProblem && problemList[currentProblem].type === 'point') {
-            allTargetVertices.push(CENTER_POINT);
-        }
+function findClosestValidLinePoint(v) {
+    const allTargetVertices = [
+        ...problemVertices,
+        ...userVertices
+    ];
+    
+    if (problemList.length > currentProblem && problemList[currentProblem].type === 'point') {
+        allTargetVertices.push(CENTER_POINT);
+    }
 
-        let closestPoint = null;
-        let minDistSq = Infinity;
+    let closestPoint = null;
+    let minDistSq = Infinity;
 
-        for (const p of allTargetVertices) {
-            const dist = distSq(v, p);
-            if (dist < minDistSq) {
-                minDistSq = dist;
-                closestPoint = p;
-            }
+    for (const p of allTargetVertices) {
+        const dist = distSq(v, p);
+        if (dist < minDistSq) {
+            minDistSq = dist;
+            closestPoint = p;
         }
-        return closestPoint;
+    }
+    return closestPoint;
+}
+    
+function setCanvasMode(mode) {
+    canvasMode = mode;
+    const vertexBtn = document.getElementById('mode-vertex');
+    const lineBtn = document.getElementById('mode-line');
+
+    vertexBtn.classList.remove('mode-btn-active');
+    lineBtn.classList.remove('mode-btn-active');
+    
+    const canStartLineDrawing = userVertices.length >= 1 || problemVertices.length > 1;
+
+    if (mode === 'vertex') {
+        vertexBtn.classList.add('mode-btn-active');
+        tempLineStart = null;
+    } else { // 'line' mode
+        lineBtn.classList.add('mode-btn-active');
+        vertexBtn.disabled = false;
     }
     
-    function setCanvasMode(mode) {
-        canvasMode = mode;
-        const vertexBtn = document.getElementById('mode-vertex');
-        const lineBtn = document.getElementById('mode-line');
-
-        vertexBtn.classList.remove('mode-btn-active');
-        lineBtn.classList.remove('mode-btn-active');
-        
-        const canStartLineDrawing = userVertices.length >= 1 || problemVertices.length > 1;
-
-        if (mode === 'vertex') {
-            vertexBtn.classList.add('mode-btn-active');
-            tempLineStart = null;
-        } else { // 'line' mode
-            lineBtn.classList.add('mode-btn-active');
-            vertexBtn.disabled = false;
-        }
-        
-        document.getElementById('mode-line').disabled = !canStartLineDrawing;
-        redrawCanvas();
-    }
+    document.getElementById('mode-line').disabled = !canStartLineDrawing;
+    redrawCanvas();
+}
     
-    function renderUserVertices() {
-        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+function renderUserVertices() {
+    document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
 
-        userVertices.forEach((v) => {
-            const dot = document.createElement('div');
-            dot.className = 'user-dot';
-            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
-            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
-            canvasWrapper.appendChild(dot);
-        });
-    }
+    userVertices.forEach((v) => {
+        const dot = document.createElement('div');
+        dot.className = 'user-dot';
+        dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+        dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+        canvasWrapper.appendChild(dot);
+    });
+}
 
-    // --- showFinalResult 함수 (전체 교체) ---
+// --- showFinalResult 함수 (전체 교체) ---
 function showFinalResult() {
     document.getElementById('problem-page').style.display = 'none';
     document.getElementById('final-result-page').style.display = 'block';
@@ -1785,120 +1785,120 @@ function showFinalResult() {
     document.getElementById('final-score').textContent = finalScore; // 계산된 최종 점수 표시
 }
 
-    function handleCanvasMouseMove(event) {
-        if (document.getElementById('check-answer-btn').style.display === 'none') {
-            if (hoveredLine) {
-                hoveredLine = null;
-                canvas.style.cursor = 'default';
-                redrawCanvas();
-            }
-            return;
-        }
-        
-        const rect = canvas.getBoundingClientRect();
-        const mouseXRatio = (event.clientX - rect.left) / rect.width;
-        const mouseYRatio = (event.clientY - rect.top) / rect.height;
-        const canvasX = mouseXRatio * canvas.width;
-        const canvasY = mouseYRatio * canvas.height;
-        const mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE };
-
-        let bestLine = null;
-        let minDistSq = 0.25;
-
-        for (const line of userLines) {
-            const p1 = line.p1;
-            const p2 = line.p2;
-            const lineLengthSq = distSq(p1, p2);
-
-            if (lineLengthSq === 0) continue;
-
-            let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq;
-            
-            if (t > 0.2 && t < 0.8) {
-                const closestPointOnLine = {
-                    x: p1.x + t * (p2.x - p1.x),
-                    y: p1.y + t * (p2.y - p1.y)
-                };
-                const distanceSq = distSq(mousePoint, closestPointOnLine);
-                if (distanceSq < minDistSq) {
-                    minDistSq = distanceSq;
-                    bestLine = line;
-                }
-            }
-        }
-        
-        if (!isSameLine(hoveredLine, bestLine)) {
-            hoveredLine = bestLine;
+function handleCanvasMouseMove(event) {
+    if (document.getElementById('check-answer-btn').style.display === 'none') {
+        if (hoveredLine) {
+            hoveredLine = null;
+            canvas.style.cursor = 'default';
             redrawCanvas();
         }
-
-        if (hoveredLine) {
-            canvas.style.cursor = 'pointer';
-        } else if (canvasMode === 'line') {
-            canvas.style.cursor = 'pointer';
-        } else {
-            canvas.style.cursor = 'crosshair';
-        }
-    }
-
-    function showQrPopup() {
-        document.getElementById('qr-popup-overlay').style.display = 'flex';
-    }
-
-    function closeQrPopup() {
-        document.getElementById('qr-popup-overlay').style.display = 'none';
+        return;
     }
     
-    function showHofPopup() {
-        const tableBody = document.querySelector('#hof-table tbody');
-        const messageEl = document.getElementById('hof-message');
-        const inputGroup = document.querySelector('.hof-input-group');
+    const rect = canvas.getBoundingClientRect();
+    const mouseXRatio = (event.clientX - rect.left) / rect.width;
+    const mouseYRatio = (event.clientY - rect.top) / rect.height;
+    const canvasX = mouseXRatio * canvas.width;
+    const canvasY = mouseYRatio * canvas.height;
+    const mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE };
 
-        if (hasSubmittedScore) {
-            inputGroup.style.display = 'none';
-            messageEl.textContent = '이번 학습 기록은 이미 등록되었습니다.';
-            messageEl.style.color = 'blue';
-        } else {
-            inputGroup.style.display = 'block';
-            messageEl.textContent = '';
-            document.getElementById('hof-initial').value = '';
-            document.getElementById('hof-submit-btn').disabled = false;
-        }
+    let bestLine = null;
+    let minDistSq = 0.25;
+
+    for (const line of userLines) {
+        const p1 = line.p1;
+        const p2 = line.p2;
+        const lineLengthSq = distSq(p1, p2);
+
+        if (lineLengthSq === 0) continue;
+
+        let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq;
         
-        tableBody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
-        document.getElementById('hof-popup-overlay').style.display = 'flex';
-
-        fetch(webAppUrl)
-            .then(response => response.json())
-            .then(data => {
-                tableBody.innerHTML = '';
-                if (data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="3">아직 등록된 기록이 없습니다.</td></tr>';
-                } else {
-                    data.forEach(item => {
-                        let initialStyle = '';
-                        if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"';
-                        if (item.rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
-                        if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 5px #cd7f32, 0 0 8px #aa5e19; text-shadow: 0 0 3px #fff;"';
-                        
-                        const row = `<tr>
-                            <td>${item.rank}</td>
-                            <td ${initialStyle}>${item.initial} ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : ''}</td>
-                            <td>${item.score}</td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    });
-                }
-            })
-            .catch(error => {
-                tableBody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
-                console.error('Error fetching leaderboard:', error);
-            });
+        if (t > 0.2 && t < 0.8) {
+            const closestPointOnLine = {
+                x: p1.x + t * (p2.x - p1.x),
+                y: p1.y + t * (p2.y - p1.y)
+            };
+            const distanceSq = distSq(mousePoint, closestPointOnLine);
+            if (distanceSq < minDistSq) {
+                minDistSq = distanceSq;
+                bestLine = line;
+            }
+        }
+    }
+    
+    if (!isSameLine(hoveredLine, bestLine)) {
+        hoveredLine = bestLine;
+        redrawCanvas();
     }
 
-    function closeHofPopup() {
-        document.getElementById('hof-popup-overlay').style.display = 'none';
+    if (hoveredLine) {
+        canvas.style.cursor = 'pointer';
+    } else if (canvasMode === 'line') {
+        canvas.style.cursor = 'pointer';
+    } else {
+        canvas.style.cursor = 'crosshair';
     }
+}
+
+function showQrPopup() {
+    document.getElementById('qr-popup-overlay').style.display = 'flex';
+}
+
+function closeQrPopup() {
+    document.getElementById('qr-popup-overlay').style.display = 'none';
+}
+    
+function showHofPopup() {
+    const tableBody = document.querySelector('#hof-table tbody');
+    const messageEl = document.getElementById('hof-message');
+    const inputGroup = document.querySelector('.hof-input-group');
+
+    if (hasSubmittedScore) {
+        inputGroup.style.display = 'none';
+        messageEl.textContent = '이번 학습 기록은 이미 등록되었습니다.';
+        messageEl.style.color = 'blue';
+    } else {
+        inputGroup.style.display = 'block';
+        messageEl.textContent = '';
+        document.getElementById('hof-initial').value = '';
+        document.getElementById('hof-submit-btn').disabled = false;
+    }
+    
+    tableBody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
+    document.getElementById('hof-popup-overlay').style.display = 'flex';
+
+    fetch(webAppUrl)
+        .then(response => response.json())
+        .then(data => {
+            tableBody.innerHTML = '';
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3">아직 등록된 기록이 없습니다.</td></tr>';
+            } else {
+                data.forEach(item => {
+                    let initialStyle = '';
+                    if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"';
+                    if (item.rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
+                    if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 5px #cd7f32, 0 0 8px #aa5e19; text-shadow: 0 0 3px #fff;"';
+                    
+                    const row = `<tr>
+                        <td>${item.rank}</td>
+                        <td ${initialStyle}>${item.initial} ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : ''}</td>
+                        <td>${item.score}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            }
+        })
+        .catch(error => {
+            tableBody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
+            console.error('Error fetching leaderboard:', error);
+        });
+}
+
+function closeHofPopup() {
+    document.getElementById('hof-popup-overlay').style.display = 'none';
+}
 
 function submitScore() {
     const initialInput = document.getElementById('hof-initial');
@@ -1953,98 +1953,99 @@ function submitScore() {
 }
 
 
-    window.onload = () => {
-        document.getElementById('problem-quantity').textContent = totalProblems;
-        document.getElementById('mode-line').disabled = true;
-        
-        initializeSetupListeners();
-        
-        canvas.addEventListener('mousemove', handleCanvasMouseMove);
-        canvas.addEventListener('mouseleave', () => {
-            if (hoveredLine) {
-                hoveredLine = null;
-                canvas.style.cursor = 'default';
-                redrawCanvas();
-            }
-        });
+window.onload = () => {
+    // 모든 초기화 및 이벤트 리스너를 이 함수 안에서 호출하도록 통합
+    document.getElementById('problem-quantity').textContent = totalProblems;
+    document.getElementById('mode-line').disabled = true;
+    
+    initializeSetupListeners();
+    
+    canvas.addEventListener('mousemove', handleCanvasMouseMove);
+    canvas.addEventListener('mouseleave', () => {
+        if (hoveredLine) {
+            hoveredLine = null;
+            canvas.style.cursor = 'default';
+            redrawCanvas();
+        }
+    });
 
-        canvas.addEventListener('click', (event) => {
-            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
-            
-            if (hoveredLine) {
-                userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
-                hoveredLine = null;
-                handleCanvasMouseMove(event);
-                redrawCanvas();
+    canvas.addEventListener('click', (event) => {
+        if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
+        
+        if (hoveredLine) {
+            userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
+            hoveredLine = null;
+            handleCanvasMouseMove(event);
+            redrawCanvas();
+            return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+        const mouseXRatio = (event.clientX - rect.left) / rect.width;
+        const mouseYRatio = (event.clientY - rect.top) / rect.height;
+        const canvasX = mouseXRatio * canvas.width;
+        const canvasY = mouseYRatio * canvas.height;
+        
+        const gridX = Math.round(canvasX / GRID_SIZE);
+        const gridY = Math.round(canvasY / GRID_SIZE);
+        if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
+
+        const clickedGridPoint = { x: gridX, y: gridY };
+
+        if (canvasMode === 'vertex') {
+            if (isVertexOnProblemBoundary(clickedGridPoint)) {
                 return;
             }
 
-            const rect = canvas.getBoundingClientRect();
-            const mouseXRatio = (event.clientX - rect.left) / rect.width;
-            const mouseYRatio = (event.clientY - rect.top) / rect.height;
-            const canvasX = mouseXRatio * canvas.width;
-            const canvasY = mouseYRatio * canvas.height;
-            
-            const gridX = Math.round(canvasX / GRID_SIZE);
-            const gridY = Math.round(canvasY / GRID_SIZE);
-            if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
+            const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
+            if (existingIndex > -1) {
+                userVertices.splice(existingIndex, 1);
+                userLines = userLines.filter(line =>
+                    !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
+                );
+            } else {
+                userVertices.push(clickedGridPoint);
+            }
+            redrawCanvas();
 
-            const clickedGridPoint = { x: gridX, y: gridY };
+        } else if (canvasMode === 'line') {
+            const targetPoint = findClosestValidLinePoint(clickedGridPoint);
 
-            if (canvasMode === 'vertex') {
-                if (isVertexOnProblemBoundary(clickedGridPoint)) {
-                    return;
-                }
+            if (!targetPoint) {
+                return;
+            }
 
-                const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
-                if (existingIndex > -1) {
-                    userVertices.splice(existingIndex, 1);
-                    userLines = userLines.filter(line =>
-                        !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
-                    );
+            if (!tempLineStart) {
+                tempLineStart = targetPoint;
+                redrawCanvas();
+            } else {
+                if (isSamePoint(tempLineStart, targetPoint)) {
+                    tempLineStart = null;
                 } else {
-                    userVertices.push(clickedGridPoint);
+                    const newLine = { p1: tempLineStart, p2: targetPoint };
+                    if (!isLineExists(newLine)) {
+                        userLines.push(newLine);
+                    } else {
+                        userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
+                    }
+                    tempLineStart = null;
                 }
                 redrawCanvas();
-
-            } else if (canvasMode === 'line') {
-                const targetPoint = findClosestValidLinePoint(clickedGridPoint);
-
-                if (!targetPoint) {
-                    return;
-                }
-
-                if (!tempLineStart) {
-                    tempLineStart = targetPoint;
-                    redrawCanvas();
-                } else {
-                    if (isSamePoint(tempLineStart, targetPoint)) {
-                        tempLineStart = null;
-                    } else {
-                        const newLine = { p1: tempLineStart, p2: targetPoint };
-                        if (!isLineExists(newLine)) {
-                            userLines.push(newLine);
-                        } else {
-                            userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
-                        }
-                        tempLineStart = null;
-                    }
-                    redrawCanvas();
-                }
             }
-        });
+        }
+    });
 
-        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
-        document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
-        
-        document.getElementById('clear-canvas-btn').addEventListener('click', () => clearCanvas(true));
+    document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+    document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
+    
+    document.getElementById('clear-canvas-btn').addEventListener('click', () => clearCanvas(true));
 
-        document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
-        document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
-        document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
+    document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
+    document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
+    document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
 
-        document.getElementById('setup-page').style.display = 'flex';
-    };
+    document.getElementById('setup-page').style.display = 'flex';
+};
 </script>
 
 </body>
