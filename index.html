@@ -1613,6 +1613,7 @@ button:hover {
 
             showPopup('다시 생각해 볼까요?', detailMessage, false);
             currentProblemAttempts++;
+            saveGameState(); // <<< ✨ 여기가 추가된 부분이에요!
             
             document.getElementById('check-answer-btn').style.display = 'block';
             document.getElementById('next-problem-btn').style.display = 'none';
