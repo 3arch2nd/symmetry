@@ -670,6 +670,7 @@ button:hover {
     let selectedDifficulty = 1;
     let finalAccuracyValue = 0;
     let hasSubmittedScore = false;
+    let isExitingIntentionally = false; // ✨ '의도된 이탈' 깃발
     
     const canvas = document.getElementById('grid-canvas');
     const ctx = canvas.getContext('2d');
@@ -2038,7 +2039,6 @@ function checkPointSymmetryLines(currentP) {
             } else {
                 document.getElementById('setup-page').style.display = 'none';
                 document.getElementById('problem-page').style.display = 'block';
-                // ✨ 이제 이어할 때는 초기화 기능이 없는 안전한 loadProblem 함수를 호출합니다.
                 loadProblem();
             }
         } else {
@@ -2140,6 +2140,8 @@ function checkPointSymmetryLines(currentP) {
 
         document.querySelector('.home-button').addEventListener('click', () => {
             if (confirm('진행 상황을 초기화하고 첫 페이지로 돌아갈까요?')) {
+                // ✨ '의도된 이탈' 깃발 올리기
+                isExitingIntentionally = true;
                 clearGameState();
                 location.reload();
             }
@@ -2160,11 +2162,16 @@ function checkPointSymmetryLines(currentP) {
         });
 
         document.getElementById('restart-btn').addEventListener('click', () => {
+            // ✨ '의도된 이탈' 깃발 올리기
+            isExitingIntentionally = true;
             clearGameState();
             location.reload();
         });
 
         const saveOnExit = () => {
+            // ✨ 깃발이 올라가 있으면 저장하지 않음
+            if (isExitingIntentionally) return;
+
             if (document.getElementById('problem-page').style.display === 'block') {
                 saveGameState();
             }
