@@ -394,6 +394,19 @@ button:hover {
     color: #4b8134;
     margin-top: 10px;
 }
+        /* *** 최종 점수 스타일 추가 *** */
+.score-display {
+    margin-top: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+#final-score {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #4b8134;
+    display: inline-block;
+    margin-left: 5px;
+}
 
 #qr-code-btn {
     position: absolute;
@@ -530,6 +543,7 @@ button:hover {
             <div class="result-right">
                 <p>한 번에 맞춘 문제: <span id="correct-count">0</span>개</p>
                 <p>다시 도전해 맞춘 문제: <span id="retried-count">0</span>개</p>
+                <p class="score-display">최종 점수: <span id="final-score">0</span>점</p>
             </div>
         </div>
         <div>
@@ -1705,18 +1719,31 @@ button:hover {
         });
     }
 
-    function showFinalResult() {
-        document.getElementById('problem-page').style.display = 'none';
-        document.getElementById('final-result-page').style.display = 'block';
-        
-        const total = totalProblems;
-        const accuracy = total > 0 ? parseFloat(((score.correct / total) * 100).toFixed(1)) : 0;
-        finalAccuracyValue = accuracy;
+    // --- showFinalResult 함수 (전체 교체) ---
+function showFinalResult() {
+    document.getElementById('problem-page').style.display = 'none';
+    document.getElementById('final-result-page').style.display = 'block';
+    
+    const total = totalProblems;
+    const accuracy = total > 0 ? parseFloat(((score.correct / total) * 100).toFixed(1)) : 0;
+    finalAccuracyValue = accuracy;
 
-        document.getElementById('correct-count').textContent = score.correct;
-        document.getElementById('retried-count').textContent = score.retried;
-        document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+    // --- 최종 점수 계산 로직 추가 ---
+    const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
+    let typeMultiplier = 1.0;
+    if (selectedType === 'point') {
+        typeMultiplier = 1.1;
+    } else if (selectedType === 'both') {
+        typeMultiplier = 1.05;
     }
+    const finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
+    // --- --- ---
+
+    document.getElementById('correct-count').textContent = score.correct;
+    document.getElementById('retried-count').textContent = score.retried;
+    document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+    document.getElementById('final-score').textContent = finalScore; // 계산된 최종 점수 표시
+}
 
     function handleCanvasMouseMove(event) {
         if (document.getElementById('check-answer-btn').style.display === 'none') {
