@@ -31,7 +31,7 @@
             max-width: 800px;
             text-align: center;
             margin: 20px auto;
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
         h1 {
             color: #4b8134;
@@ -214,7 +214,7 @@
             color: #333;
         }
         #quantity-control button:hover {
-             background-color: #e0e0e0;
+            background-color: #e0e0e0;
         }
         .quantity-display {
             display: inline-block;
@@ -264,7 +264,7 @@
             gap: 20px;
         }
         .right-panel .setting-group, .left-panel .setting-group {
-             flex-grow: 1;
+            flex-grow: 1;
         }
         
         #start-quiz-btn {
@@ -821,7 +821,7 @@ function calculateSymmetricPoint(v, type, isSlantedAxis = false, axisDirection =
         } else if (axisDirection === 'horizontal') {
             symX = v.x;
             symY = 2 * C - v.y;
-        } else { 
+        } else {
             symX = 2 * C - v.x;
             symY = v.y;
         }
@@ -1091,7 +1091,7 @@ function generateRandomProblem(type) {
                 allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
                 
                 let initialLines = createSequentialLines(initialVertices, false);
-                
+
                 return {
                     type: 'line',
                     isSlantedAxis: false,
@@ -1871,15 +1871,15 @@ function showFinalResult() {
         fetch(webAppUrl)
             .then(response => response.json())
             .then(data => {
-                tableBody.innerHTML = ''; 
+                tableBody.innerHTML = '';
                 if (data.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="3">아직 등록된 기록이 없습니다.</td></tr>';
                 } else {
                     data.forEach(item => {
                         let initialStyle = '';
-                        if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"'; 
+                        if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"';
                         if (item.rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
-                        if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 3px #fff;"'; 
+                        if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 5px #cd7f32, 0 0 8px #aa5e19; text-shadow: 0 0 3px #fff;"';
                         
                         const row = `<tr>
                             <td>${item.rank}</td>
@@ -1899,8 +1899,6 @@ function showFinalResult() {
     function closeHofPopup() {
         document.getElementById('hof-popup-overlay').style.display = 'none';
     }
-
-// *** 수정된 JavaScript 함수 ***
 
 function submitScore() {
     const initialInput = document.getElementById('hof-initial');
@@ -1923,7 +1921,7 @@ function submitScore() {
         problems: totalProblems,
         accuracy: finalAccuracyValue,
         difficulty: selectedDifficulty,
-        type: selectedType // <-- 이 줄이 추가되었습니다!
+        type: selectedType
     };
 
     fetch(webAppUrl, {
@@ -1965,6 +1963,7 @@ function submitScore() {
         canvas.addEventListener('mouseleave', () => {
             if (hoveredLine) {
                 hoveredLine = null;
+                canvas.style.cursor = 'default';
                 redrawCanvas();
             }
         });
