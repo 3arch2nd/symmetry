@@ -1784,13 +1784,13 @@ function checkPointSymmetryLines(currentP) {
                 totalWeightedScore += 1.0;
                 correctCount++;
             } else if (attempts === 1) {
-                totalWeightedScore += 0.8;
-                retriedCount++;
-            } else if (attempts === 2) {
                 totalWeightedScore += 0.6;
                 retriedCount++;
-            } else if (attempts === 3) {
+            } else if (attempts === 2) {
                 totalWeightedScore += 0.4;
+                retriedCount++;
+            } else if (attempts === 3) {
+                totalWeightedScore += 0.2;
                 retriedCount++;
             } else {
                 retriedCount++;
