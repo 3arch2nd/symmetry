@@ -1260,17 +1260,6 @@ function generateRandomProblem(type) {
 }
 
 // 1. 설정 및 시작
-function initializeSetupListeners() {
-    document.querySelectorAll('#type-select button').forEach(button => {
-        button.addEventListener('click', handleTypeSelect);
-    });
-    document.querySelectorAll('#difficulty-select button').forEach(button => {
-        button.addEventListener('click', handleDifficultySelect);
-    });
-    document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
-    document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
-}
-
 function handleTypeSelect(event) {
     document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
@@ -1958,8 +1947,17 @@ window.onload = () => {
     document.getElementById('problem-quantity').textContent = totalProblems;
     document.getElementById('mode-line').disabled = true;
     
-    initializeSetupListeners();
-    
+    // 이전에 initializeSetupListeners()로 묶었던 함수들을 window.onload 내부에 직접 작성
+    document.querySelectorAll('#type-select button').forEach(button => {
+        button.addEventListener('click', handleTypeSelect);
+    });
+    document.querySelectorAll('#difficulty-select button').forEach(button => {
+        button.addEventListener('click', handleDifficultySelect);
+    });
+    document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
+    document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
+    document.getElementById('start-quiz-btn').addEventListener('click', startQuiz); // 시작 버튼 이벤트 리스너
+
     canvas.addEventListener('mousemove', handleCanvasMouseMove);
     canvas.addEventListener('mouseleave', () => {
         if (hoveredLine) {
@@ -2035,7 +2033,6 @@ window.onload = () => {
         }
     });
 
-    document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
     document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
     
     document.getElementById('clear-canvas-btn').addEventListener('click', () => clearCanvas(true));
