@@ -422,11 +422,39 @@ button:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.8); /* 흰색, 80% 불투명 */
+    background-color: rgba(255, 255, 255, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 200;
+}
+.popup-qr {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    text-align: center;
+}
+.popup-qr img {
+    max-width: 120px; /* 이 부분을 200px에서 120px로 수정했습니다. */
+    height: auto;
+}
+.popup-qr p {
+    margin-top: 15px;
+    color: #666;
+}
+.close-btn-qr {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
 }
 
 #hof-popup-overlay { background-color: rgba(0, 0, 0, 0.2); }
