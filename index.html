@@ -1611,9 +1611,10 @@ button:hover {
                 detailMessage = '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
             }
 
-            showPopup('다시 생각해 볼까요?', detailMessage, false);
+            // ✨ 여기가 수정된 부분이에요! 순서 변경!
             currentProblemAttempts++;
-            saveGameState(); // <<< ✨ 여기가 추가된 부분이에요!
+            saveGameState();
+            showPopup('다시 생각해 볼까요?', detailMessage, false);
             
             document.getElementById('check-answer-btn').style.display = 'block';
             document.getElementById('next-problem-btn').style.display = 'none';
