@@ -652,7 +652,8 @@ button:hover {
     let totalProblems = 5;
     let currentProblem = 0;
     let canvasMode = 'vertex';
-    let score = { correct: 0, retried: 0, totalAttempted: 0, isFirstAttempt: true };
+    let score = { results: [] }; // 문제별 결과를 상세히 기록할 배열
+    let currentProblemAttempts = 0; // 현재 문제의 실패 횟수를 기록
     let selectedDifficulty = 1;
     let finalAccuracyValue = 0;
     let hasSubmittedScore = false;
@@ -1337,7 +1338,8 @@ button:hover {
         }
         
         currentProblem = 0;
-        score.isFirstAttempt = true;
+        score = { results: [] }; // ✨ 새로운 점수 객체로 초기화
+        currentProblemAttempts = 0; // ✨ 시도 횟수 초기화
         hasSubmittedScore = false; // 새 게임 시작 시 등록 플래그 초기화
         
         document.getElementById('setup-page').style.display = 'none';
@@ -1373,7 +1375,7 @@ button:hover {
 
         closePopup();
         
-        score.isFirstAttempt = true;
+        currentProblemAttempts = 0;
 
         problemVertices = currentP.initialVertices;
         problemLines = currentP.initialLines;
@@ -1580,9 +1582,9 @@ button:hover {
         if (verticesAreCorrect && isLinesCorrect) {
             showPopup('정답입니다🎉', '', true);
             
-            if (score.isFirstAttempt) { score.correct++; } else { score.retried++; }
-            score.totalAttempted++;
-            saveGameState();
+        // '몇 번 틀렸는지(currentProblemAttempts)'를 결과 배열에 추가합니다.
+        score.results.push(currentProblemAttempts); 
+        saveGameState();
             
             document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
@@ -1599,7 +1601,7 @@ button:hover {
             }
 
             showPopup('다시 생각해 볼까요?', detailMessage, false);
-            score.isFirstAttempt = false;
+            currentProblemAttempts++;
             
             document.getElementById('check-answer-btn').style.display = 'block';
             document.getElementById('next-problem-btn').style.display = 'none';
@@ -1774,12 +1776,37 @@ function showFinalResult() {
     clearGameState();
     document.getElementById('problem-page').style.display = 'none';
     document.getElementById('final-result-page').style.display = 'block';
-    
+
+    let totalWeightedScore = 0; // 가중치가 적용된 점수의 총합
+    let correctCount = 0; // 한 번에 맞춘 문제 수
+    let retriedCount = 0; // 재도전해서 맞춘 문제 수
+
+    // 상세 기록이 담긴 score.results 배열을 하나씩 확인하며 계산합니다.
+    score.results.forEach(attempts => {
+        if (attempts === 0) { // 0번 실패 = 한 번에 맞춤
+            totalWeightedScore += 1.0;
+            correctCount++;
+        } else if (attempts === 1) { // 1번 실패 = 한 번 재도전
+            totalWeightedScore += 0.8;
+            retriedCount++;
+        } else if (attempts === 2) { // 2번 실패 = 두 번 재도전
+            totalWeightedScore += 0.6;
+            retriedCount++;
+        } else if (attempts === 3) { // 3번 실패 = 세 번 재도전
+            totalWeightedScore += 0.4;
+            retriedCount++;
+        } else { // 4번 이상 실패
+            // 점수는 0점이지만, 재도전 성공 횟수에는 포함됩니다.
+            retriedCount++;
+        }
+    });
+
     const total = totalProblems;
-    const accuracy = total > 0 ? parseFloat(((score.correct / total) * 100).toFixed(1)) : 0;
+    // 새로운 정확도 계산 방식
+    const accuracy = total > 0 ? parseFloat(((totalWeightedScore / total) * 100).toFixed(1)) : 0;
     finalAccuracyValue = accuracy;
 
-    // --- 최종 점수 계산 로직 추가 ---
+    // 최종 점수 계산 로직은 그대로 사용하되, 새로 계산된 accuracy를 사용합니다.
     const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
     let typeMultiplier = 1.0;
     if (selectedType === 'point') {
@@ -1788,12 +1815,12 @@ function showFinalResult() {
         typeMultiplier = 1.05;
     }
     const finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
-    // --- --- ---
 
-    document.getElementById('correct-count').textContent = score.correct;
-    document.getElementById('retried-count').textContent = score.retried;
+    // 계산된 결과를 화면에 표시합니다.
+    document.getElementById('correct-count').textContent = correctCount;
+    document.getElementById('retried-count').textContent = retriedCount;
     document.getElementById('final-accuracy').textContent = `${accuracy}%`;
-    document.getElementById('final-score').textContent = finalScore; // 계산된 최종 점수 표시
+    document.getElementById('final-score').textContent = finalScore;
 }
 
     function handleCanvasMouseMove(event) {
