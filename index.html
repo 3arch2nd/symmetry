@@ -130,7 +130,6 @@ button:hover {
     color: #333;
     font-weight: bold;
 }
-
 .canvas-wrapper {
     position: relative;
     display: block;
@@ -150,7 +149,6 @@ button:hover {
     display: block;
     -webkit-tap-highlight-color: transparent;
 }
-
 .user-dot {
     width: 8px;
     height: 8px;
@@ -199,7 +197,6 @@ button:hover {
 }
 .correct { color: #28a745; }
 .incorrect { color: #dc3545; }
-
 #quantity-control {
     display: flex;
     align-items: center;
@@ -237,14 +234,12 @@ button:hover {
     margin: 0;
     text-align: center;
 }
-
 .footer {
     margin-top: 20px;
     font-size: 12px;
     color: #ccc;
     text-align: center;
 }
-
 .main-layout {
     display: flex;
     flex-direction: row;
@@ -272,7 +267,6 @@ button:hover {
 .right-panel .setting-group, .left-panel .setting-group {
     flex-grow: 1;
 }
-
 #start-quiz-btn {
     width: 100px;
     height: 100px;
@@ -285,12 +279,10 @@ button:hover {
     padding: 0;
     flex-shrink: 0;
 }
-
 .setting-group.start-btn-container {
     border: none;
     background-color: transparent;
 }
-
 .problem-header {
     display: flex;
     justify-content: space-between;
@@ -318,7 +310,6 @@ button:hover {
     text-align: center;
     margin: 0;
 }
-
 .problem-footer {
     display: flex;
     justify-content: flex-end;
@@ -326,7 +317,6 @@ button:hover {
     width: 100%;
     margin-top: 20px;
 }
-
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -347,7 +337,6 @@ button:hover {
     width: 80%;
     max-width: 450px;
     text-align: center;
-    /* 추가된 부분 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -365,7 +354,6 @@ button:hover {
     padding: 0;
 }
 .popup-box .close-btn:hover { color: #6c757d; }
-
 .result-popup #popup-main-message {
     font-size: 1.2em;
     font-weight: bold;
@@ -374,7 +362,6 @@ button:hover {
 }
 .result-popup #popup-detail-message { display: none; }
 .result-popup #popup-next-btn { margin-top: 20px; }
-
 .final-result-layout {
     display: flex;
     flex-direction: row;
@@ -400,7 +387,6 @@ button:hover {
     color: #4b8134;
     margin-top: 10px;
 }
-        /* *** 최종 점수 스타일 추가 *** */
 .score-display {
     margin-top: 20px;
     font-size: 1.1em;
@@ -413,7 +399,6 @@ button:hover {
     display: inline-block;
     margin-left: 5px;
 }
-
 #qr-code-btn {
     position: absolute;
     top: 15px;
@@ -443,7 +428,7 @@ button:hover {
     text-align: center;
 }
 .popup-qr img {
-    max-width: 180px; /* 이 부분을 200px에서 120px로 수정했습니다. */
+    max-width: 180px;
     height: auto;
 }
 .popup-qr p {
@@ -462,7 +447,6 @@ button:hover {
     border: none;
     padding: 0;
 }
-
 #hof-popup-overlay { background-color: rgba(0, 0, 0, 0.2); }
 .hof-input-group { margin: 20px 0; }
 .hof-input-group input {
@@ -480,9 +464,29 @@ button:hover {
 #hof-table { width: 100%; border-collapse: collapse; }
 #hof-table th, #hof-table td { padding: 8px; border-bottom: 1px solid #eee; }
 #hof-table th { background-color: #f8f9fa; }
-
+.confirm-clear-popup p {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+.confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+.confirm-buttons button {
+    padding: 10px 30px;
+    font-weight: bold;
+}
+#confirm-clear-yes-btn {
+    background-color: #e06666;
+    color: white;
+}
+#confirm-clear-yes-btn:hover {
+    background-color: #cc4125;
+}
 .mobile-title, .mobile-home { display: none; }
-
 @media (max-width: 768px) {
     .main-layout { flex-direction: column; }
     .left-panel, .right-panel { width: 100%; margin-top: 20px; }
@@ -491,7 +495,6 @@ button:hover {
     .final-result-layout { flex-direction: column; }
     .result-left { border-right: none; border-bottom: 1px solid #ddd; width: 100%; }
 }
-
 @media (max-width: 480px) {
     .container {
         padding: 15px;
@@ -502,31 +505,6 @@ button:hover {
     .mobile-home { display: inline; }
     .home-button { padding: 8px 10px; }
 }
-
-/* 이 코드를 기존 style 태그 안쪽에 추가해주세요 */
-.confirm-clear-popup p {
-    font-size: 1.1em;
-    margin-bottom: 25px; /* 버튼과의 간격 */
-    line-height: 1.6;
-}
-.confirm-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px; /* 버튼 사이 간격 */
-    width: 100%;
-}
-.confirm-buttons button {
-    padding: 10px 30px; /* 버튼 크기 */
-    font-weight: bold;
-}
-#confirm-clear-yes-btn {
-    background-color: #e06666; /* 빨간색 계열 */
-    color: white;
-}
-#confirm-clear-yes-btn:hover {
-    background-color: #cc4125;
-}
-
 </style>
 </head>
 <body>
@@ -616,7 +594,7 @@ button:hover {
             </div>
         </div>
         <div>
-            <button class="primary-btn" onclick="location.reload()">새로운 학습 시작하기</button>
+            <button id="restart-btn" class="primary-btn">새로운 학습 시작하기</button>
             <button id="show-hof-btn" class="secondary-btn">🏆 명예의 전당 등록하기</button>
         </div>
     </div>
@@ -664,6 +642,16 @@ button:hover {
                 <tbody>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<div id="confirm-clear-popup-overlay" class="popup-overlay" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+    <div class="popup-box confirm-clear-popup">
+        <p>표시한 점과 선분을 모두 지웁니다. <br> 계속할까요?</p>
+        <div class="confirm-buttons">
+            <button id="confirm-clear-yes-btn">네</button>
+            <button id="confirm-clear-no-btn" class="secondary-btn">아니요</button>
         </div>
     </div>
 </div>
@@ -1184,7 +1172,6 @@ button:hover {
             }
 
 } else if (type === 'point') {
-    // *** 이 부분을 수정했습니다! ***
     const numPoints = (selectedDifficulty == 1) ? 4 : getRandomInt(5, 6);
     let initialPoints = [];
     const MAX_POINT_GEN_ATTEMPTS = 50;
@@ -1363,9 +1350,9 @@ button:hover {
         }
         
         currentProblem = 0;
-        score = { results: [] }; // ✨ 새로운 점수 객체로 초기화
-        currentProblemAttempts = 0; // ✨ 시도 횟수 초기화
-        hasSubmittedScore = false; // 새 게임 시작 시 등록 플래그 초기화
+        score = { results: [] };
+        currentProblemAttempts = 0;
+        hasSubmittedScore = false; 
         
         document.getElementById('setup-page').style.display = 'none';
         document.getElementById('problem-page').style.display = 'block';
@@ -1607,9 +1594,8 @@ button:hover {
         if (verticesAreCorrect && isLinesCorrect) {
             showPopup('정답입니다🎉', '', true);
             
-        // '몇 번 틀렸는지(currentProblemAttempts)'를 결과 배열에 추가합니다.
-        score.results.push(currentProblemAttempts); 
-        saveGameState();
+            score.results.push(currentProblemAttempts); 
+            saveGameState();
             
             document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
@@ -1710,32 +1696,24 @@ button:hover {
     }
     
 function checkPointSymmetryLines(currentP) {
-    // 1. 문제에 원래 있던 선들과 사용자가 그린 선들을 모두 합칩니다.
     const allDrawnLines = [...problemLines, ...userLines];
-
-    // 2. 완성된 도형의 정답 선들을 가져옵니다.
     const correctLines = currentP.allLines;
 
-    // 3. 선의 개수가 정답과 다르면 즉시 오답 처리합니다.
     if (allDrawnLines.length !== correctLines.length) {
         return false;
     }
 
-    // 4. 사용자가 그린 모든 선이 정답 선 목록에 포함되어 있는지 확인합니다.
-    const correctLinesCopy = [...correctLines]; // 정답 목록 복사본 생성
+    const correctLinesCopy = [...correctLines]; 
 
     for (const drawnLine of allDrawnLines) {
         const matchIndex = correctLinesCopy.findIndex(correctLine => isSameLine(drawnLine, correctLine));
 
         if (matchIndex === -1) {
-            // 사용자가 그린 선 중에 정답에 없는 선이 있다면 오답입니다.
             return false;
         }
-        // 확인된 정답 선은 복사본에서 제거합니다.
         correctLinesCopy.splice(matchIndex, 1);
     }
 
-    // 5. 모든 검사를 통과하고 복사본에 남은 선이 없으면 정답입니다.
     return correctLinesCopy.length === 0;
 }
     
@@ -1784,69 +1762,51 @@ function checkPointSymmetryLines(currentP) {
         redrawCanvas();
     }
     
-    function renderUserVertices() {
-        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+    function showFinalResult() {
+        saveGameState();
+        document.getElementById('problem-page').style.display = 'none';
+        document.getElementById('final-result-page').style.display = 'block';
 
-        userVertices.forEach((v) => {
-            const dot = document.createElement('div');
-            dot.className = 'user-dot';
-            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
-            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
-            canvasWrapper.appendChild(dot);
+        let totalWeightedScore = 0;
+        let correctCount = 0;
+        let retriedCount = 0;
+
+        score.results.forEach(attempts => {
+            if (attempts === 0) {
+                totalWeightedScore += 1.0;
+                correctCount++;
+            } else if (attempts === 1) {
+                totalWeightedScore += 0.8;
+                retriedCount++;
+            } else if (attempts === 2) {
+                totalWeightedScore += 0.6;
+                retriedCount++;
+            } else if (attempts === 3) {
+                totalWeightedScore += 0.4;
+                retriedCount++;
+            } else {
+                retriedCount++;
+            }
         });
-    }
 
-    // --- showFinalResult 함수 (전체 교체) ---
-function showFinalResult() {
-    clearGameState();
-    document.getElementById('problem-page').style.display = 'none';
-    document.getElementById('final-result-page').style.display = 'block';
+        const total = totalProblems;
+        const accuracy = total > 0 ? parseFloat(((totalWeightedScore / total) * 100).toFixed(1)) : 0;
+        finalAccuracyValue = accuracy;
 
-    let totalWeightedScore = 0; // 가중치가 적용된 점수의 총합
-    let correctCount = 0; // 한 번에 맞춘 문제 수
-    let retriedCount = 0; // 재도전해서 맞춘 문제 수
-
-    // 상세 기록이 담긴 score.results 배열을 하나씩 확인하며 계산합니다.
-    score.results.forEach(attempts => {
-        if (attempts === 0) { // 0번 실패 = 한 번에 맞춤
-            totalWeightedScore += 1.0;
-            correctCount++;
-        } else if (attempts === 1) { // 1번 실패 = 한 번 재도전
-            totalWeightedScore += 0.8;
-            retriedCount++;
-        } else if (attempts === 2) { // 2번 실패 = 두 번 재도전
-            totalWeightedScore += 0.6;
-            retriedCount++;
-        } else if (attempts === 3) { // 3번 실패 = 세 번 재도전
-            totalWeightedScore += 0.4;
-            retriedCount++;
-        } else { // 4번 이상 실패
-            // 점수는 0점이지만, 재도전 성공 횟수에는 포함됩니다.
-            retriedCount++;
+        const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
+        let typeMultiplier = 1.0;
+        if (selectedType === 'point') {
+            typeMultiplier = 1.1;
+        } else if (selectedType === 'both') {
+            typeMultiplier = 1.05;
         }
-    });
+        const finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
 
-    const total = totalProblems;
-    // 새로운 정확도 계산 방식
-    const accuracy = total > 0 ? parseFloat(((totalWeightedScore / total) * 100).toFixed(1)) : 0;
-    finalAccuracyValue = accuracy;
-
-    // 최종 점수 계산 로직은 그대로 사용하되, 새로 계산된 accuracy를 사용합니다.
-    const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
-    let typeMultiplier = 1.0;
-    if (selectedType === 'point') {
-        typeMultiplier = 1.1;
-    } else if (selectedType === 'both') {
-        typeMultiplier = 1.05;
+        document.getElementById('correct-count').textContent = correctCount;
+        document.getElementById('retried-count').textContent = retriedCount;
+        document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+        document.getElementById('final-score').textContent = finalScore;
     }
-    const finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
-
-    // 계산된 결과를 화면에 표시합니다.
-    document.getElementById('correct-count').textContent = correctCount;
-    document.getElementById('retried-count').textContent = retriedCount;
-    document.getElementById('final-accuracy').textContent = `${accuracy}%`;
-    document.getElementById('final-score').textContent = finalScore;
-}
 
     function handleCanvasMouseMove(event) {
         if (document.getElementById('check-answer-btn').style.display === 'none') {
@@ -1963,249 +1923,239 @@ function showFinalResult() {
         document.getElementById('hof-popup-overlay').style.display = 'none';
     }
 
-    // 진행상황 저장
-
     function saveGameState() {
-    // 저장할 모든 데이터를 하나의 객체에 담습니다.
-    const gameState = {
-        problemList: problemList,
-        currentProblem: currentProblem,
-        score: score,
-        userVertices: userVertices,
-        userLines: userLines,
-        canvasMode: canvasMode,
-        // 설정값도 필요하다면 추가합니다.
-        selectedType: selectedType,
-        selectedDifficulty: selectedDifficulty,
-        totalProblems: totalProblems
-    };
-
-    // 객체를 JSON 문자열로 변환하여 localStorage에 저장합니다.
-    localStorage.setItem('quizState', JSON.stringify(gameState));
-    console.log("게임 상태가 저장되었습니다."); // 확인용 로그
-}
-
-function loadGameState() {
-    const savedStateString = localStorage.getItem('quizState');
-    if (!savedStateString) return false;
-
-    const savedState = JSON.parse(savedStateString);
-
-    problemList = savedState.problemList;
-    currentProblem = savedState.currentProblem;
-    score = savedState.score;
-    userVertices = savedState.userVertices || [];
-    userLines = savedState.userLines || [];
-    selectedType = savedState.selectedType;
-    selectedDifficulty = savedState.selectedDifficulty;
-    totalProblems = savedState.totalProblems;
-    
-    return true;
-}
-
-function clearGameState() {
-    localStorage.removeItem('quizState');
-}
-
-// *** 수정된 JavaScript 함수 ***
-
-function submitScore() {
-    const initialInput = document.getElementById('hof-initial');
-    const initial = initialInput.value;
-    const submitBtn = document.getElementById('hof-submit-btn');
-    const messageEl = document.getElementById('hof-message');
-
-    if (!/^[A-Z]{3}$/.test(initial)) {
-        messageEl.textContent = '이니셜은 영어 대문자 3글자로 입력해주세요.';
-        messageEl.style.color = 'red';
-        return;
+        const gameState = {
+            problemList: problemList,
+            currentProblem: currentProblem,
+            score: score,
+            userVertices: userVertices,
+            userLines: userLines,
+            canvasMode: canvasMode,
+            selectedType: selectedType,
+            selectedDifficulty: selectedDifficulty,
+            totalProblems: totalProblems,
+            currentProblemAttempts: currentProblemAttempts,
+            hasSubmittedScore: hasSubmittedScore
+        };
+        localStorage.setItem('quizState', JSON.stringify(gameState));
+        console.log("게임 상태가 저장되었습니다.");
     }
 
-    submitBtn.disabled = true;
-    messageEl.textContent = '등록 중...';
-    messageEl.style.color = '#333';
+    function loadGameState() {
+        const savedStateString = localStorage.getItem('quizState');
+        if (!savedStateString) return false;
 
-    const data = {
-        initial: initial,
-        problems: totalProblems,
-        accuracy: finalAccuracyValue,
-        difficulty: selectedDifficulty,
-        type: selectedType // <-- 이 줄이 추가되었습니다!
-    };
+        const savedState = JSON.parse(savedStateString);
 
-    fetch(webAppUrl, {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.result === 'success') {
-            hasSubmittedScore = true;
-            messageEl.textContent = '성공적으로 등록되었습니다!';
-            messageEl.style.color = '#4B8134';
-            document.querySelector('.hof-input-group').style.display = 'none';
-            setTimeout(showHofPopup, 1500);
-        } else {
-            throw new Error(result.message || '알 수 없는 오류');
+        if (savedState.currentProblem >= savedState.totalProblems && savedState.totalProblems > 0) {
+            return false;
         }
-    })
-    .catch(error => {
-        messageEl.textContent = '등록에 실패했습니다. 다시 시도해주세요.';
-        messageEl.style.color = 'red';
-        submitBtn.disabled = false;
-        console.error('Error submitting score:', error);
-    });
-}
 
-
-window.onload = () => {
-    // ==================================================================
-    // 1. 페이지 시작 시, 저장된 상태를 불러오거나 새로 시작을 결정하는 부분
-    // ==================================================================
-    if (loadGameState()) {
-        // "이어하기": 저장된 상태 불러오기 성공
-        console.log("저장된 게임 상태를 불러옵니다.");
-        document.getElementById('setup-page').style.display = 'none';
-        document.getElementById('problem-page').style.display = 'block';
-        loadProblem(); // 저장된 문제 번호에 맞춰 화면을 다시 그림
-    } else {
-        // "새로 시작": 저장된 상태가 없음
-        console.log("새 게임을 시작합니다.");
-        document.getElementById('problem-quantity').textContent = totalProblems;
-        document.getElementById('mode-line').disabled = true;
-        document.getElementById('setup-page').style.display = 'flex'; // 설정 화면 표시
-    }
-
-    // ==================================================================
-    // 2. 모든 버튼과 캔버스의 이벤트 리스너를 등록하는 부분 (한 번만 실행)
-    // ==================================================================
-    initializeSetupListeners();
-
-    canvas.addEventListener('mousemove', handleCanvasMouseMove);
-    canvas.addEventListener('mouseleave', () => {
-        if (hoveredLine) {
-            hoveredLine = null;
-            redrawCanvas();
-        }
-    });
-
-    canvas.addEventListener('click', (event) => {
-        // (여기는 기존 canvas 클릭 이벤트 코드와 완전히 동일합니다)
-        if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
+        problemList = savedState.problemList;
+        currentProblem = savedState.currentProblem;
+        score = savedState.score;
+        userVertices = savedState.userVertices || [];
+        userLines = savedState.userLines || [];
+        selectedType = savedState.selectedType;
+        selectedDifficulty = savedState.selectedDifficulty;
+        totalProblems = savedState.totalProblems;
+        currentProblemAttempts = savedState.currentProblemAttempts || 0;
+        hasSubmittedScore = savedState.hasSubmittedScore || false;
         
-        if (hoveredLine) {
-            userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
-            hoveredLine = null;
-            handleCanvasMouseMove(event);
-            redrawCanvas();
-            saveGameState(); // <-- 상태 변경 후 저장!
+        return true;
+    }
+
+    function clearGameState() {
+        localStorage.removeItem('quizState');
+    }
+
+    function submitScore() {
+        const initialInput = document.getElementById('hof-initial');
+        const initial = initialInput.value;
+        const submitBtn = document.getElementById('hof-submit-btn');
+        const messageEl = document.getElementById('hof-message');
+
+        if (!/^[A-Z]{3}$/.test(initial)) {
+            messageEl.textContent = '이니셜은 영어 대문자 3글자로 입력해주세요.';
+            messageEl.style.color = 'red';
             return;
         }
 
-        const rect = canvas.getBoundingClientRect();
-        const mouseXRatio = (event.clientX - rect.left) / rect.width;
-        const mouseYRatio = (event.clientY - rect.top) / rect.height;
-        const canvasX = mouseXRatio * canvas.width;
-        const canvasY = mouseYRatio * canvas.height;
-        
-        const gridX = Math.round(canvasX / GRID_SIZE);
-        const gridY = Math.round(canvasY / GRID_SIZE);
-        if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
+        submitBtn.disabled = true;
+        messageEl.textContent = '등록 중...';
+        messageEl.style.color = '#333';
 
-        const clickedGridPoint = { x: gridX, y: gridY };
+        const data = {
+            initial: initial,
+            problems: totalProblems,
+            accuracy: finalAccuracyValue,
+            difficulty: selectedDifficulty,
+            type: selectedType
+        };
 
-        if (canvasMode === 'vertex') {
-            if (isVertexOnProblemBoundary(clickedGridPoint)) {
-                return;
-            }
-
-            const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
-            if (existingIndex > -1) {
-                userVertices.splice(existingIndex, 1);
-                userLines = userLines.filter(line =>
-                    !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
-                );
+        fetch(webAppUrl, {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.result === 'success') {
+                hasSubmittedScore = true;
+                saveGameState(); // 등록 상태 저장
+                messageEl.textContent = '성공적으로 등록되었습니다!';
+                messageEl.style.color = '#4B8134';
+                document.querySelector('.hof-input-group').style.display = 'none';
+                setTimeout(showHofPopup, 1500);
             } else {
-                userVertices.push(clickedGridPoint);
+                throw new Error(result.message || '알 수 없는 오류');
             }
-            redrawCanvas();
+        })
+        .catch(error => {
+            messageEl.textContent = '등록에 실패했습니다. 다시 시도해주세요.';
+            messageEl.style.color = 'red';
+            submitBtn.disabled = false;
+            console.error('Error submitting score:', error);
+        });
+    }
 
-        } else if (canvasMode === 'line') {
-            const targetPoint = findClosestValidLinePoint(clickedGridPoint);
-
-            if (!targetPoint) {
-                return;
+    window.onload = () => {
+        if (loadGameState()) {
+            console.log("저장된 게임 상태를 불러옵니다.");
+            if (currentProblem >= totalProblems && totalProblems > 0) {
+                showFinalResult();
+            } else {
+                document.getElementById('setup-page').style.display = 'none';
+                document.getElementById('problem-page').style.display = 'block';
+                loadProblem();
             }
+        } else {
+            clearGameState();
+            console.log("새 게임을 시작합니다.");
+            document.getElementById('problem-quantity').textContent = totalProblems;
+            document.getElementById('mode-line').disabled = true;
+            document.getElementById('setup-page').style.display = 'flex';
+        }
 
-            if (!tempLineStart) {
-                tempLineStart = targetPoint;
+        initializeSetupListeners();
+        canvas.addEventListener('mousemove', handleCanvasMouseMove);
+        canvas.addEventListener('mouseleave', () => {
+            if (hoveredLine) {
+                hoveredLine = null;
                 redrawCanvas();
-            } else {
-                if (isSamePoint(tempLineStart, targetPoint)) {
-                    tempLineStart = null;
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
+            
+            if (hoveredLine) {
+                userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
+                hoveredLine = null;
+                handleCanvasMouseMove(event);
+                redrawCanvas();
+                saveGameState();
+                return;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            const mouseXRatio = (event.clientX - rect.left) / rect.width;
+            const mouseYRatio = (event.clientY - rect.top) / rect.height;
+            const canvasX = mouseXRatio * canvas.width;
+            const canvasY = mouseYRatio * canvas.height;
+            
+            const gridX = Math.round(canvasX / GRID_SIZE);
+            const gridY = Math.round(canvasY / GRID_SIZE);
+            if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
+
+            const clickedGridPoint = { x: gridX, y: gridY };
+
+            if (canvasMode === 'vertex') {
+                if (isVertexOnProblemBoundary(clickedGridPoint)) {
+                    return;
+                }
+
+                const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
+                if (existingIndex > -1) {
+                    userVertices.splice(existingIndex, 1);
+                    userLines = userLines.filter(line =>
+                        !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
+                    );
                 } else {
-                    const newLine = { p1: tempLineStart, p2: targetPoint };
-                    if (!isLineExists(newLine)) {
-                        userLines.push(newLine);
-                    } else {
-                        userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
-                    }
-                    tempLineStart = null;
+                    userVertices.push(clickedGridPoint);
                 }
                 redrawCanvas();
+
+            } else if (canvasMode === 'line') {
+                const targetPoint = findClosestValidLinePoint(clickedGridPoint);
+
+                if (!targetPoint) {
+                    return;
+                }
+
+                if (!tempLineStart) {
+                    tempLineStart = targetPoint;
+                    redrawCanvas();
+                } else {
+                    if (isSamePoint(tempLineStart, targetPoint)) {
+                        tempLineStart = null;
+                    } else {
+                        const newLine = { p1: tempLineStart, p2: targetPoint };
+                        if (!isLineExists(newLine)) {
+                            userLines.push(newLine);
+                        } else {
+                            userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
+                        }
+                        tempLineStart = null;
+                    }
+                    redrawCanvas();
+                }
             }
-        }
+            
+            saveGameState();
+        });
+
+        document.getElementById('start-quiz-btn').addEventListener('click', () => {
+            clearGameState();
+            startQuiz();
+        });
+
+        document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
         
-        saveGameState(); // <-- 점이나 선을 그리고 지웠으니 상태 변경 후 저장!
-    });
+        document.getElementById('clear-canvas-btn').addEventListener('click', () => {
+            document.getElementById('confirm-clear-popup-overlay').style.display = 'flex';
+        });
 
-    document.getElementById('start-quiz-btn').addEventListener('click', () => {
-        clearGameState(); // <-- 새 게임 시작 시 과거 기록 삭제!
-        startQuiz();
-    });
+        document.querySelector('.home-button').addEventListener('click', () => {
+            if (confirm('진행 상황을 초기화하고 첫 페이지로 돌아갈까요?')) {
+                clearGameState();
+                location.reload();
+            }
+        });
 
-    document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
-    
-document.getElementById('clear-canvas-btn').addEventListener('click', () => {
-    document.getElementById('confirm-clear-popup-overlay').style.display = 'flex';
-});
+        document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
+        document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
+        document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
 
-    // '첫 페이지로' 버튼 처리 (HTML의 onclick 속성은 삭제해주세요)
-    document.querySelector('.home-button').addEventListener('click', () => {
-        if (confirm('진행 상황을 초기화하고 첫 페이지로 돌아갈까요?')) {
-            clearGameState(); // <-- 첫 페이지로 갈 때도 기록 삭제!
+        document.getElementById('confirm-clear-yes-btn').addEventListener('click', () => {
+            clearCanvas(true);
+            saveGameState();
+            document.getElementById('confirm-clear-popup-overlay').style.display = 'none';
+        });
+
+        document.getElementById('confirm-clear-no-btn').addEventListener('click', () => {
+            document.getElementById('confirm-clear-popup-overlay').style.display = 'none';
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            clearGameState();
             location.reload();
-        }
-    });
-
-    document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
-    document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
-    document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
-
-document.getElementById('confirm-clear-yes-btn').addEventListener('click', () => {
-    clearCanvas(true);
-    saveGameState(); // 초기화된 상태를 저장!
-    document.getElementById('confirm-clear-popup-overlay').style.display = 'none'; // 팝업 닫기
-});
-
-document.getElementById('confirm-clear-no-btn').addEventListener('click', () => {
-    document.getElementById('confirm-clear-popup-overlay').style.display = 'none'; // 팝업 닫기
-});
-};
-
+        });
+    };
 </script>
-<div id="confirm-clear-popup-overlay" class="popup-overlay" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
-    <div class="popup-box confirm-clear-popup">
-        <p>표시한 점과 선분을 모두 지웁니다. <br> 계속할까요?</p>
-        <div class="confirm-buttons">
-            <button id="confirm-clear-yes-btn">네</button>
-            <button id="confirm-clear-no-btn" class="secondary-btn">아니요</button>
-        </div>
-    </div>
-</div>
+
 </body>
 </html>
