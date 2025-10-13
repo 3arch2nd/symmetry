@@ -546,7 +546,7 @@ button:hover {
     
     <div id="problem-page">
         <div class="problem-header">
-            <button class="home-button" onclick="location.reload()">
+            <button class="home-button">
                 <span class="desktop-home">🏠 첫 페이지로</span>
                 <span class="mobile-home">🏠</span>
             </button>
@@ -699,6 +699,7 @@ button:hover {
         closePopup();
         currentProblem++;
         loadProblem();
+        saveGameState();
     }
     
     function getRandomInt(min, max) {
@@ -1575,6 +1576,7 @@ button:hover {
             
             if (score.isFirstAttempt) { score.correct++; } else { score.retried++; }
             score.totalAttempted++;
+            saveGameState();
             
             document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
@@ -1763,6 +1765,7 @@ function checkPointSymmetryLines(currentP) {
 
     // --- showFinalResult 함수 (전체 교체) ---
 function showFinalResult() {
+    clearGameState();
     document.getElementById('problem-page').style.display = 'none';
     document.getElementById('final-result-page').style.display = 'block';
     
@@ -1902,6 +1905,50 @@ function showFinalResult() {
         document.getElementById('hof-popup-overlay').style.display = 'none';
     }
 
+    // 진행상황 저장
+
+    function saveGameState() {
+    // 저장할 모든 데이터를 하나의 객체에 담습니다.
+    const gameState = {
+        problemList: problemList,
+        currentProblem: currentProblem,
+        score: score,
+        userVertices: userVertices,
+        userLines: userLines,
+        canvasMode: canvasMode,
+        // 설정값도 필요하다면 추가합니다.
+        selectedType: selectedType,
+        selectedDifficulty: selectedDifficulty,
+        totalProblems: totalProblems
+    };
+
+    // 객체를 JSON 문자열로 변환하여 localStorage에 저장합니다.
+    localStorage.setItem('quizState', JSON.stringify(gameState));
+    console.log("게임 상태가 저장되었습니다."); // 확인용 로그
+}
+
+function loadGameState() {
+    const savedStateString = localStorage.getItem('quizState');
+    if (!savedStateString) return false;
+
+    const savedState = JSON.parse(savedStateString);
+
+    problemList = savedState.problemList;
+    currentProblem = savedState.currentProblem;
+    score = savedState.score;
+    userVertices = savedState.userVertices || [];
+    userLines = savedState.userLines || [];
+    selectedType = savedState.selectedType;
+    selectedDifficulty = savedState.selectedDifficulty;
+    totalProblems = savedState.totalProblems;
+    
+    return true;
+}
+
+function clearGameState() {
+    localStorage.removeItem('quizState');
+}
+
 // *** 수정된 JavaScript 함수 ***
 
 function submitScore() {
@@ -1957,97 +2004,132 @@ function submitScore() {
 }
 
 
-    window.onload = () => {
+window.onload = () => {
+    // ==================================================================
+    // 1. 페이지 시작 시, 저장된 상태를 불러오거나 새로 시작을 결정하는 부분
+    // ==================================================================
+    if (loadGameState()) {
+        // "이어하기": 저장된 상태 불러오기 성공
+        console.log("저장된 게임 상태를 불러옵니다.");
+        document.getElementById('setup-page').style.display = 'none';
+        document.getElementById('problem-page').style.display = 'block';
+        loadProblem(); // 저장된 문제 번호에 맞춰 화면을 다시 그림
+    } else {
+        // "새로 시작": 저장된 상태가 없음
+        console.log("새 게임을 시작합니다.");
         document.getElementById('problem-quantity').textContent = totalProblems;
         document.getElementById('mode-line').disabled = true;
-        
-        initializeSetupListeners();
-        
-        canvas.addEventListener('mousemove', handleCanvasMouseMove);
-        canvas.addEventListener('mouseleave', () => {
-            if (hoveredLine) {
-                hoveredLine = null;
-                redrawCanvas();
-            }
-        });
+        document.getElementById('setup-page').style.display = 'flex'; // 설정 화면 표시
+    }
 
-        canvas.addEventListener('click', (event) => {
-            if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
-            
-            if (hoveredLine) {
-                userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
-                hoveredLine = null;
-                handleCanvasMouseMove(event);
-                redrawCanvas();
+    // ==================================================================
+    // 2. 모든 버튼과 캔버스의 이벤트 리스너를 등록하는 부분 (한 번만 실행)
+    // ==================================================================
+    initializeSetupListeners();
+
+    canvas.addEventListener('mousemove', handleCanvasMouseMove);
+    canvas.addEventListener('mouseleave', () => {
+        if (hoveredLine) {
+            hoveredLine = null;
+            redrawCanvas();
+        }
+    });
+
+    canvas.addEventListener('click', (event) => {
+        // (여기는 기존 canvas 클릭 이벤트 코드와 완전히 동일합니다)
+        if (document.getElementById('check-answer-btn').style.display === 'none' && document.getElementById('next-problem-btn').style.display === 'block') return;
+        
+        if (hoveredLine) {
+            userLines = userLines.filter(line => !isSameLine(line, hoveredLine));
+            hoveredLine = null;
+            handleCanvasMouseMove(event);
+            redrawCanvas();
+            saveGameState(); // <-- 상태 변경 후 저장!
+            return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+        const mouseXRatio = (event.clientX - rect.left) / rect.width;
+        const mouseYRatio = (event.clientY - rect.top) / rect.height;
+        const canvasX = mouseXRatio * canvas.width;
+        const canvasY = mouseYRatio * canvas.height;
+        
+        const gridX = Math.round(canvasX / GRID_SIZE);
+        const gridY = Math.round(canvasY / GRID_SIZE);
+        if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
+
+        const clickedGridPoint = { x: gridX, y: gridY };
+
+        if (canvasMode === 'vertex') {
+            if (isVertexOnProblemBoundary(clickedGridPoint)) {
                 return;
             }
 
-            const rect = canvas.getBoundingClientRect();
-            const mouseXRatio = (event.clientX - rect.left) / rect.width;
-            const mouseYRatio = (event.clientY - rect.top) / rect.height;
-            const canvasX = mouseXRatio * canvas.width;
-            const canvasY = mouseYRatio * canvas.height;
-            
-            const gridX = Math.round(canvasX / GRID_SIZE);
-            const gridY = Math.round(canvasY / GRID_SIZE);
-            if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return;
+            const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
+            if (existingIndex > -1) {
+                userVertices.splice(existingIndex, 1);
+                userLines = userLines.filter(line =>
+                    !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
+                );
+            } else {
+                userVertices.push(clickedGridPoint);
+            }
+            redrawCanvas();
 
-            const clickedGridPoint = { x: gridX, y: gridY };
+        } else if (canvasMode === 'line') {
+            const targetPoint = findClosestValidLinePoint(clickedGridPoint);
 
-            if (canvasMode === 'vertex') {
-                if (isVertexOnProblemBoundary(clickedGridPoint)) {
-                    return;
-                }
+            if (!targetPoint) {
+                return;
+            }
 
-                const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
-                if (existingIndex > -1) {
-                    userVertices.splice(existingIndex, 1);
-                    userLines = userLines.filter(line =>
-                        !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))
-                    );
+            if (!tempLineStart) {
+                tempLineStart = targetPoint;
+                redrawCanvas();
+            } else {
+                if (isSamePoint(tempLineStart, targetPoint)) {
+                    tempLineStart = null;
                 } else {
-                    userVertices.push(clickedGridPoint);
+                    const newLine = { p1: tempLineStart, p2: targetPoint };
+                    if (!isLineExists(newLine)) {
+                        userLines.push(newLine);
+                    } else {
+                        userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
+                    }
+                    tempLineStart = null;
                 }
                 redrawCanvas();
-
-            } else if (canvasMode === 'line') {
-                const targetPoint = findClosestValidLinePoint(clickedGridPoint);
-
-                if (!targetPoint) {
-                    return;
-                }
-
-                if (!tempLineStart) {
-                    tempLineStart = targetPoint;
-                    redrawCanvas();
-                } else {
-                    if (isSamePoint(tempLineStart, targetPoint)) {
-                        tempLineStart = null;
-                    } else {
-                        const newLine = { p1: tempLineStart, p2: targetPoint };
-                        if (!isLineExists(newLine)) {
-                            userLines.push(newLine);
-                        } else {
-                            userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine));
-                        }
-                        tempLineStart = null;
-                    }
-                    redrawCanvas();
-                }
             }
-        });
-
-        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
-        document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
+        }
         
-        document.getElementById('clear-canvas-btn').addEventListener('click', () => clearCanvas(true));
+        saveGameState(); // <-- 점이나 선을 그리고 지웠으니 상태 변경 후 저장!
+    });
 
-        document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
-        document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
-        document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
+    document.getElementById('start-quiz-btn').addEventListener('click', () => {
+        clearGameState(); // <-- 새 게임 시작 시 과거 기록 삭제!
+        startQuiz();
+    });
 
-        document.getElementById('setup-page').style.display = 'flex';
-    };
+    document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
+    
+    document.getElementById('clear-canvas-btn').addEventListener('click', () => {
+        clearCanvas(true);
+        saveGameState(); // <-- 초기화된 상태를 저장!
+    });
+
+    // '첫 페이지로' 버튼 처리 (HTML의 onclick 속성은 삭제해주세요)
+    document.querySelector('.home-button').addEventListener('click', () => {
+        if (confirm('정말로 학습을 중단하고 첫 페이지로 돌아가시겠습니까?')) {
+            clearGameState(); // <-- 첫 페이지로 갈 때도 기록 삭제!
+            location.reload();
+        }
+    });
+
+    document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
+    document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
+    document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
+};
+
 </script>
 
 </body>
