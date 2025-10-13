@@ -2152,7 +2152,7 @@ window.onload = () => {
 
     // '첫 페이지로' 버튼 처리 (HTML의 onclick 속성은 삭제해주세요)
     document.querySelector('.home-button').addEventListener('click', () => {
-        if (confirm('정말로 학습을 중단하고 첫 페이지로 돌아가시겠습니까?')) {
+        if (confirm('진행 상황을 초기화하고 첫 페이지로 돌아갈까요?')) {
             clearGameState(); // <-- 첫 페이지로 갈 때도 기록 삭제!
             location.reload();
         }
