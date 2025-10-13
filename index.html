@@ -502,6 +502,31 @@ button:hover {
     .mobile-home { display: inline; }
     .home-button { padding: 8px 10px; }
 }
+
+/* 이 코드를 기존 style 태그 안쪽에 추가해주세요 */
+.confirm-clear-popup p {
+    font-size: 1.1em;
+    margin-bottom: 25px; /* 버튼과의 간격 */
+    line-height: 1.6;
+}
+.confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* 버튼 사이 간격 */
+    width: 100%;
+}
+.confirm-buttons button {
+    padding: 10px 30px; /* 버튼 크기 */
+    font-weight: bold;
+}
+#confirm-clear-yes-btn {
+    background-color: #e06666; /* 빨간색 계열 */
+    color: white;
+}
+#confirm-clear-yes-btn:hover {
+    background-color: #cc4125;
+}
+
 </style>
 </head>
 <body>
@@ -2145,10 +2170,9 @@ window.onload = () => {
 
     document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
     
-    document.getElementById('clear-canvas-btn').addEventListener('click', () => {
-        clearCanvas(true);
-        saveGameState(); // <-- 초기화된 상태를 저장!
-    });
+document.getElementById('clear-canvas-btn').addEventListener('click', () => {
+    document.getElementById('confirm-clear-popup-overlay').style.display = 'flex';
+});
 
     // '첫 페이지로' 버튼 처리 (HTML의 onclick 속성은 삭제해주세요)
     document.querySelector('.home-button').addEventListener('click', () => {
@@ -2161,9 +2185,27 @@ window.onload = () => {
     document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
     document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
     document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
+
+document.getElementById('confirm-clear-yes-btn').addEventListener('click', () => {
+    clearCanvas(true);
+    saveGameState(); // 초기화된 상태를 저장!
+    document.getElementById('confirm-clear-popup-overlay').style.display = 'none'; // 팝업 닫기
+});
+
+document.getElementById('confirm-clear-no-btn').addEventListener('click', () => {
+    document.getElementById('confirm-clear-popup-overlay').style.display = 'none'; // 팝업 닫기
+});
 };
 
 </script>
-
+<div id="confirm-clear-popup-overlay" class="popup-overlay" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+    <div class="popup-box confirm-clear-popup">
+        <p>표시한 점과 선분을 모두 지웁니다. <br> 계속할까요?</p>
+        <div class="confirm-buttons">
+            <button id="confirm-clear-yes-btn">네</button>
+            <button id="confirm-clear-no-btn" class="secondary-btn">아니요</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
