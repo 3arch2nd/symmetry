@@ -1611,7 +1611,6 @@ button:hover {
                 detailMessage = '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
             }
 
-            // ✨ 여기가 수정된 부분이에요! 순서 변경!
             currentProblemAttempts++;
             saveGameState();
             showPopup('다시 생각해 볼까요?', detailMessage, false);
@@ -2155,6 +2154,19 @@ function checkPointSymmetryLines(currentP) {
         document.getElementById('restart-btn').addEventListener('click', () => {
             clearGameState();
             location.reload();
+        });
+
+        // ✨ 여기가 추가된 부분이에요!
+        const saveOnExit = () => {
+            if (document.getElementById('problem-page').style.display === 'block') {
+                saveGameState();
+            }
+        };
+        window.addEventListener('pagehide', saveOnExit);
+        window.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                saveOnExit();
+            }
         });
     };
 </script>
