@@ -34,7 +34,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 800px;
+    max-width: 760px; /* 변경: 최대 너비 800px -> 760px로 축소 */
     text-align: center;
     margin: 20px auto;
     box-sizing: border-box;
@@ -106,13 +106,13 @@ button:hover {
 }
 .mode-buttons {
     display: flex;
-    gap: 25px;
+    gap: 15px; /* 변경: 버튼 간격 25px -> 15px로 축소 */
     margin-top: 20px;
     width: 100%;
     justify-content: space-around;
 }
 .mode-buttons button {
-    padding: 15px 30px;
+    padding: 20px 30px; /* 변경: 버튼 높이(상하 여백) 15px -> 20px로 증가 */
     font-size: 18px;
     width: 100%;
     max-width: 250px;
@@ -364,11 +364,20 @@ button:hover {
 }
 #timer-display {
     width: 120px;
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
     text-align: right;
     padding-right: 10px;
     color: #333;
+    display: none;
+}
+#problem-counter-display {
+    width: 120px;
+    font-size: 1em; /* 글자 크기를 1.2em에서 1em으로 줄였습니다. */
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    color: #888;
     display: none;
 }
 #timer-display.time-warning {
@@ -402,12 +411,10 @@ button:hover {
     background-color: #f0f0f0;
 }
 
-/* ✨ 변경: 두 버튼의 최소 너비를 동일하게 설정 */
 #check-answer-btn, #next-problem-btn {
     min-width: 180px;
 }
 
-/* ✨ 추가: 다음 문제 버튼에 보이지 않는 테두리를 추가하여 크기 맞춤 */
 #next-problem-btn {
     border: 2px solid transparent;
 }
@@ -668,7 +675,7 @@ button:hover {
             <div class="mode-option">
                 <button id="time-attack-mode-btn">⏱️ 타임어택 모드</button>
                 <small class="mode-description">
-                    정해진 시간 동안<br>최대한 많은 문제를 풀어보세요!
+                    정해진 시간 동안<br>빠르고 정확하게 문제를 풀어보세요!
                 </small>
             </div>
         </div>
@@ -715,11 +722,10 @@ button:hover {
                 <div id="time-attack-settings" style="display: none;">
                     <div class="setting-group">
                         <h3>도전 시간 설정</h3>
-                        <small style="margin-bottom: 10px;">(5분 ~ 60분)</small>
-                        <div id="time-control">
-                            <button id="time-minus">-</button>
-                            <span id="time-limit-display" class="quantity-display">5</span>
-                            <button id="time-plus">+</button>
+                        <div id="time-control" style="margin-top: 10px;">
+                            <button id="time-minus">&lt;</button>
+                            <span id="time-limit-display" class="quantity-display">3분</span>
+                            <button id="time-plus">&gt;</button>
                         </div>
                     </div>
                 </div>
@@ -738,6 +744,7 @@ button:hover {
             </button>
             <h2 id="problem-number">1번째 문제</h2>
             <div id="timer-display"></div>
+            <div id="problem-counter-display"></div>
         </div>
         <p id="problem-instruction">아래 도형은 선대칭도형입니다. 나머지 부분을 완성해 주세요.</p>
         
@@ -746,9 +753,9 @@ button:hover {
         </div>
 
         <div class="canvas-controls">
-            <button id="mode-vertex" class="secondary-btn mode-btn-active" onclick="setCanvasMode('vertex')">1단계: 꼭짓점 찍기</button>
-            <button id="mode-line" class="secondary-btn" onclick="setCanvasMode('line')" disabled>2단계: 선분 잇기</button>
-            <button id="clear-canvas-btn" class="secondary-btn">다시 풀기 (초기화)</button>
+            <button id="mode-vertex" class="secondary-btn mode-btn-active" onclick="setCanvasMode('vertex')">1단계: 꼭짓점</button>
+            <button id="mode-line" class="secondary-btn" onclick="setCanvasMode('line')" disabled>2단계: 선분</button>
+            <button id="clear-canvas-btn" class="secondary-btn">모두 지우기</button>
         </div>
         
         <div class="problem-footer">
@@ -863,8 +870,9 @@ button:hover {
 
 <script>
     const webAppUrl = 'https://soft-wood-cf8e.bbglara.workers.dev/';
-
-    let selectedType = 'line', totalProblems = 5, currentProblem = 0, canvasMode = 'vertex', score = { results: [] }, currentProblemAttempts = 0, selectedDifficulty = 1, finalAccuracyValue = 0, hasSubmittedScore = false, isExitingIntentionally = false, gameMode = 'classic', timeLimitInMinutes = 5, remainingTime = 0, timerInterval = null;
+    
+    const timeOptions = [3, 5, 7];
+    let selectedType = 'line', totalProblems = 5, currentProblem = 0, canvasMode = 'vertex', score = { results: [] }, currentProblemAttempts = 0, selectedDifficulty = 1, finalAccuracyValue = 0, hasSubmittedScore = false, isExitingIntentionally = false, gameMode = 'classic', timeLimitInMinutes = 3, remainingTime = 0, timerInterval = null;
     const canvas = document.getElementById('grid-canvas'), ctx = canvas.getContext('2d'), canvasWrapper = document.querySelector('.canvas-wrapper'), GRID_SIZE = 20, GRID_COUNT = canvas.width / GRID_SIZE, HALF_COUNT = GRID_COUNT / 2, CENTER_POINT = { x: HALF_COUNT, y: HALF_COUNT }, MIN_COORD = 3, MAX_COORD = 17, MIN_DIST = 2, COLLINEARITY_THRESHOLD = 1.0, MIN_ANGLE_COSINE = Math.cos(30 * Math.PI / 180), MAX_ANGLE_COSINE = Math.cos(150 * Math.PI / 180), MIN_SLOPE_DIFF = 2.0;
     let problemVertices = [], problemLines = [], userVertices = [], userLines = [], tempLineStart = null, hoveredLine = null, problemList = [];
 
@@ -897,15 +905,16 @@ button:hover {
         selectedDifficulty = 1; 
         hasSubmittedScore = false; 
         gameMode = 'classic'; 
-        timeLimitInMinutes = 5; 
+        timeLimitInMinutes = 3; 
         remainingTime = 0; 
         problemList = []; 
         userVertices = []; 
         userLines = [];
         
         document.getElementById('problem-quantity').textContent = '5';
-        document.getElementById('time-limit-display').textContent = '5';
+        document.getElementById('time-limit-display').textContent = '3분';
         document.getElementById('timer-display').style.display = 'none';
+        document.getElementById('problem-counter-display').style.display = 'none';
 
         document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
         document.querySelector('#type-select button[data-type="line"]').classList.add('selected');
@@ -930,40 +939,359 @@ button:hover {
     function createSequentialLines(vertices, close = false) { const lines = []; if (vertices.length < 2) return lines; const count = vertices.length; for (let i = 0; i < count; i++) { const p1 = vertices[i], p2 = vertices[(i + 1) % count]; if (!close && i === count - 1) break; lines.push({ p1, p2 }); } return lines; }
     function findPointSymmetricBoundary(points) { if (points.length < 3) return points; const C = CENTER_POINT, centerPoint = points.find(p => isSamePoint(p, C)), nonCenterPoints = points.filter(p => !isSamePoint(p, C)); nonCenterPoints.sort((a, b) => Math.atan2(a.y - C.y, a.x - C.x) - Math.atan2(b.y - C.y, b.x - C.x)); let sortedPoints = []; if (centerPoint) sortedPoints.push(centerPoint); sortedPoints = sortedPoints.concat(nonCenterPoints); return sortedPoints.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v))); }
     function sortSlantedAxisVertices(vertices) { const axisPoints = vertices.filter(v => v.x === v.y).sort((a, b) => a.y - b.y), nonAxisPoints = vertices.filter(v => v.x !== v.y), p1 = axisPoints[0], p2 = axisPoints[1], belowAxis = nonAxisPoints.filter(p => p.y < p.x), aboveAxis = nonAxisPoints.filter(p => p.y > p.x); belowAxis.sort((a,b) => Math.atan2(a.y - p1.y, a.x - p1.x) - Math.atan2(b.y - p1.y, b.x - p1.x)); aboveAxis.sort((a,b) => Math.atan2(b.y - p2.y, b.x - p2.x) - Math.atan2(a.y - p2.y, a.x - p2.x)); return [p1, ...belowAxis, p2, ...aboveAxis]; }
-    function generateRandomProblem(type) { const MAX_ATTEMPTS_PER_POINT = 100; if (type === 'line') { let nVertices, minCoord, maxCoord, isSlantedAxis = false, axisDirection = 'vertical'; if (selectedDifficulty == 2) { isSlantedAxis = Math.random() < 0.5; if (isSlantedAxis) { nVertices = getRandomInt(3, 4); minCoord = 3; maxCoord = 17; axisDirection = 'slanted'; } else { nVertices = getRandomInt(5, 6); minCoord = 2; maxCoord = 18; axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal'; } } else { isSlantedAxis = false; nVertices = 4; minCoord = 3; maxCoord = 17; axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal'; } if (isSlantedAxis) { const p1 = {x: HALF_COUNT - getRandomInt(3, 7), y: HALF_COUNT - getRandomInt(3, 7)}, p2 = {x: HALF_COUNT + getRandomInt(3, 7), y: HALF_COUNT + getRandomInt(3, 7)}; let tempVertices = [p1]; for (let i = 0; i < nVertices - 2; i++) { let newV, success = false, attemptCount = 0; while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) { newV = { x: getRandomInt(minCoord, maxCoord), y: getRandomInt(minCoord, newV.x - 1) }; let isValid = !isTooSharpAngle(tempVertices[tempVertices.length - 1], newV, calculateSymmetricPoint(newV, 'line', true)); if (isValid && !isTooClose(newV, tempVertices) && !isProblemTooLinear(tempVertices, newV)) { tempVertices.push(newV); success = true; } attemptCount++; } } tempVertices.push(p2); let allVertices = [...tempVertices]; if (allVertices.length < 3 || isTooLinear(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0]) || isTooSharpAngle(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0])) return null; let allVerticesSorted = sortSlantedAxisVertices(allVertices); if (allVerticesSorted.length >= 3) for (let i=0; i < allVerticesSorted.length - 2; i++) if (isTooLinear(allVerticesSorted[i], allVerticesSorted[i+1], allVerticesSorted[i+2])) return null; const allLines = createSequentialLines(allVerticesSorted, false), initialLines = allLines.filter(line => ((line.p1.x+line.p2.x)/2)>((line.p1.y+line.p2.y)/2)); let initialVertices = initialLines.reduce((acc, line) => { if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1); if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2); return acc; }, []); if(initialVertices.filter(v => v.x === v.y).length < 2) return null; return { type: 'line', isSlantedAxis: true, axisDirection: 'slanted', initialVertices, initialLines, allVertices: allVerticesSorted, allLines }; } else { let initialVertices; if (axisDirection === 'vertical') { const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) }, axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 2, maxCoord) }; let nonAxisPoints = []; for (let i=0; i<nVertices-2; i++) { let newV, success = false; while (!success) { newV = { x: getRandomInt(minCoord, HALF_COUNT - 1), y: getRandomInt(axisPoint1.y, axisPoint2.y) }; if (!isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]) && (nonAxisPoints.length === 0 || !isTooWeakSlope(nonAxisPoints[nonAxisPoints.length-1], newV))) { nonAxisPoints.push(newV); success = true; } } } nonAxisPoints.sort((a, b) => a.y - b.y); initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2]; } else { const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT }, axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT }; let nonAxisPoints = []; for (let i=0; i<nVertices-2; i++) { let newV, success = false; while (!success) { newV = { x: getRandomInt(axisPoint1.x, axisPoint2.x), y: getRandomInt(minCoord, HALF_COUNT - 1) }; if (!isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]) && (nonAxisPoints.length === 0 || !isTooWeakSlope(nonAxisPoints[nonAxisPoints.length-1], newV))) { nonAxisPoints.push(newV); success = true; } } } nonAxisPoints.sort((a, b) => a.x - b.x); initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2]; } if (initialVertices.length < 2) return null; if (initialVertices.length >= 3) for (let i=0; i<initialVertices.length-2; i++) if(isTooLinear(initialVertices[i], initialVertices[i+1], initialVertices[i+2])) return null; let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse()); allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t,v))); return { type: 'line', isSlantedAxis: false, axisDirection, initialVertices, initialLines: createSequentialLines(initialVertices, false), allVertices, allLines: createSequentialLines(allVertices, true) }; } } else if (type === 'point') { const numPoints = (selectedDifficulty == 1) ? 4 : getRandomInt(5, 6); let initialPoints = []; const isHorizontalAxis = Math.random() < 0.5; let lineStart, lineEnd; if(isHorizontalAxis) { const y = CENTER_POINT.y, halfLength = getRandomInt(3, 7); lineStart = {x: CENTER_POINT.x - halfLength, y: y}; lineEnd = {x: CENTER_POINT.x + halfLength, y: y}; } else { const x = CENTER_POINT.x, halfLength = getRandomInt(3, 7); lineStart = {x: x, y: CENTER_POINT.y - halfLength}; lineEnd = {x: x, y: CENTER_POINT.y + halfLength}; } initialPoints.push(lineStart); let halfVertices = []; for(let i = 0; i < numPoints - 2; i++) { let newV, success = false, attemptCount=0; while(!success && attemptCount < 50) { let x, y; if(isHorizontalAxis) { x = getRandomInt(MIN_COORD, MAX_COORD); y = getRandomInt(MIN_COORD, CENTER_POINT.y-1); } else { x = getRandomInt(MIN_COORD, CENTER_POINT.x-1); y = getRandomInt(MIN_COORD, MAX_COORD); } newV = {x, y}; if(!isTooClose(newV, [...initialPoints, ...halfVertices])) { halfVertices.push(newV); success=true; } attemptCount++; } if(!success) return null; } halfVertices.sort((a, b) => Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x) - Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x)); initialPoints = initialPoints.concat(halfVertices); initialPoints.push(lineEnd); let allVertices = []; let processed = new Set(); initialPoints.forEach(p => { const key = `${p.x},${p.y}`; if (!processed.has(key)) { allVertices.push(p); processed.add(key); const symV = calculateSymmetricPoint(p, 'point'), symKey = `${symV.x},${symV.y}`; if (!processed.has(symKey)) { allVertices.push(symV); processed.add(symKey); } } }); allVertices = findPointSymmetricBoundary(allVertices); if (allVertices.length >= 3) for (let i=0; i<allVertices.length; i++) { const len=allVertices.length, p1=allVertices[(i-1+len)%len], p2=allVertices[i], p3=allVertices[(i+1)%len]; if (isTooLinear(p1,p2,p3) || isTooSharpAngle(p1,p2,p3)) return null; } const allLines = createSequentialLines(allVertices, true); const initialLines = []; const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`)); allLines.forEach(line => { if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) initialLines.push(line); }); return { type: 'point', initialVertices: initialPoints, initialLines, allVertices, allLines }; } return null; }
-
-    function initializeSetupListeners() { document.querySelectorAll('#type-select button').forEach(button => button.addEventListener('click', handleTypeSelect)); document.querySelectorAll('#difficulty-select button').forEach(button => button.addEventListener('click', handleDifficultySelect)); document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5)); document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5)); }
     
+    function generateRandomProblem(type) {
+        const MAX_ATTEMPTS_PER_POINT = 100;
+
+        if (type === 'line') {
+            let nVertices, minCoord, maxCoord;
+            let isSlantedAxis = false;
+            let axisDirection = 'vertical';
+            
+            if (selectedDifficulty == 2) {
+                isSlantedAxis = Math.random() < 0.5;
+                if (isSlantedAxis) {
+                    nVertices = getRandomInt(3, 4);
+                    minCoord = 3;
+                    maxCoord = 17;
+                    axisDirection = 'slanted';
+                } else {
+                    nVertices = getRandomInt(5, 6);
+                    minCoord = 2;
+                    maxCoord = 18;
+                    axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+                }
+            } else {
+                isSlantedAxis = false;
+                nVertices = 4;
+                minCoord = 3;
+                maxCoord = 17;
+                axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+            }
+            
+            if (isSlantedAxis) {
+                const axisMidPoint = { x: HALF_COUNT, y: HALF_COUNT };
+                const axisLength = getRandomInt(3, 7);
+                const p1 = {x: axisMidPoint.x - axisLength, y: axisMidPoint.y - axisLength};
+                const p2 = {x: axisMidPoint.x + axisLength, y: axisMidPoint.y + axisLength};
+                
+                let tempVertices = [p1];
+
+                for (let i = 0; i < nVertices - 2; i++) {
+                    let newV, success = false, attemptCount = 0;
+                    while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                        let x = getRandomInt(minCoord, maxCoord);
+                        let y = getRandomInt(minCoord, x - 1);
+                        newV = { x: x, y: y };
+
+                        let isValid = true;
+                        if (tempVertices.length >= 2) {
+                            if(isTooSharpAngle(tempVertices[tempVertices.length-2], tempVertices[tempVertices.length-1], newV)) {
+                                isValid = false;
+                            }
+                        }
+                        if (tempVertices.length > 0) {
+                            let symV = calculateSymmetricPoint(newV, 'line', true);
+                            if (isTooSharpAngle(tempVertices[tempVertices.length - 1], newV, symV)) {
+                                isValid = false;
+                            }
+                        }
+                        
+                        if (isValid && !isTooClose(newV, tempVertices) && !isProblemTooLinear(tempVertices, newV)) {
+                            tempVertices.push(newV);
+                            success = true;
+                        }
+                        attemptCount++;
+                    }
+                    if (!success) return null;
+                }
+                tempVertices.push(p2);
+                
+                let allVertices = [...tempVertices];
+                if (allVertices.length < 3) return null;
+                
+                if (isTooLinear(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0]) || isTooSharpAngle(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0])) {
+                    return null;
+                }
+
+                let allVerticesSorted = sortSlantedAxisVertices(allVertices);
+                
+                if (allVerticesSorted.length >= 3) {
+                    for (let i = 0; i < allVerticesSorted.length - 2; i++) {
+                        if (isTooLinear(allVerticesSorted[i], allVerticesSorted[i+1], allVerticesSorted[i+2])) {
+                            return null;
+                        }
+                    }
+                }
+                
+                const allLines = createSequentialLines(allVerticesSorted, false);
+                const initialLines = allLines.filter(line => ((line.p1.x + line.p2.x)/2) > ((line.p1.y + line.p2.y)/2));
+                
+                let initialVertices = initialLines.reduce((acc, line) => {
+                    if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1);
+                    if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2);
+                    return acc;
+                }, []);
+                
+                if(initialVertices.filter(v => v.x === v.y).length < 2) {
+                    return null;
+                }
+                
+                return {
+                    type: 'line', isSlantedAxis: true, axisDirection: 'slanted',
+                    initialVertices, initialLines, allVertices: allVerticesSorted, allLines
+                };
+
+            } else { // Not slanted
+                let initialVertices;
+                if (axisDirection === 'vertical') {
+                    const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) };
+                    const axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 2, maxCoord) };
+                    let nonAxisPoints = [];
+                    for (let i = 0; i < nVertices - 2; i++) {
+                        let newV, success = false, attemptCount = 0;
+                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                            newV = { x: getRandomInt(minCoord, HALF_COUNT - 1), y: getRandomInt(axisPoint1.y, axisPoint2.y) };
+                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            if (nonAxisPoints.length > 0 && isTooWeakSlope(nonAxisPoints[nonAxisPoints.length - 1], newV)) {
+                                isValid = false;
+                            }
+                            if (isValid) {
+                                nonAxisPoints.push(newV);
+                                success = true;
+                            }
+                            attemptCount++;
+                        }
+                        if (!success) return null;
+                    }
+                    nonAxisPoints.sort((a, b) => a.y - b.y);
+                    initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
+                } else { // horizontal
+                    const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT };
+                    const axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT };
+                    let nonAxisPoints = [];
+                    for (let i = 0; i < nVertices - 2; i++) {
+                        let newV, success = false, attemptCount = 0;
+                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                            newV = { x: getRandomInt(axisPoint1.x, axisPoint2.x), y: getRandomInt(minCoord, HALF_COUNT - 1) };
+                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            if (nonAxisPoints.length > 0 && isTooWeakSlope(nonAxisPoints[nonAxisPoints.length - 1], newV)) {
+                                isValid = false;
+                            }
+                            if (isValid) {
+                                nonAxisPoints.push(newV);
+                                success = true;
+                            }
+                            attemptCount++;
+                        }
+                        if (!success) return null;
+                    }
+                    nonAxisPoints.sort((a, b) => a.x - b.x);
+                    initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
+                }
+                
+                if (initialVertices.length < 2) return null;
+                if (initialVertices.length >= 3) {
+                    for (let i = 0; i < initialVertices.length - 2; i++) {
+                        if (isTooLinear(initialVertices[i], initialVertices[i+1], initialVertices[i+2])) {
+                            return null;
+                        }
+                    }
+                }
+                
+                let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse());
+                allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
+                
+                return {
+                    type: 'line', isSlantedAxis: false, axisDirection,
+                    initialVertices, initialLines: createSequentialLines(initialVertices, false),
+                    allVertices, allLines: createSequentialLines(allVertices, true)
+                };
+            }
+        } else if (type === 'point') {
+            const numPoints = (selectedDifficulty == 1) ? 4 : getRandomInt(5, 6);
+            let initialPoints = [];
+            const isHorizontalAxis = Math.random() < 0.5;
+            let lineStart, lineEnd;
+
+            if(isHorizontalAxis) {
+                const y = CENTER_POINT.y;
+                const halfLength = getRandomInt(3, 7);
+                lineStart = {x: CENTER_POINT.x - halfLength, y: y};
+                lineEnd = {x: CENTER_POINT.x + halfLength, y: y};
+            } else {
+                const x = CENTER_POINT.x;
+                const halfLength = getRandomInt(3, 7);
+                lineStart = {x: x, y: CENTER_POINT.y - halfLength};
+                lineEnd = {x: x, y: CENTER_POINT.y + halfLength};
+            }
+            initialPoints.push(lineStart);
+            
+            let halfVertices = [];
+            for(let i = 0; i < numPoints - 2; i++) {
+                let newV, success = false, attemptCount = 0;
+                while(!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                    let x, y;
+                    if(isHorizontalAxis) {
+                        x = getRandomInt(MIN_COORD, MAX_COORD);
+                        y = getRandomInt(MIN_COORD, CENTER_POINT.y - 1);
+                    } else {
+                        x = getRandomInt(MIN_COORD, CENTER_POINT.x - 1);
+                        y = getRandomInt(MIN_COORD, MAX_COORD);
+                    }
+                    newV = {x: x, y: y};
+                    
+                    if(!isTooClose(newV, [...initialPoints, ...halfVertices])) {
+                        halfVertices.push(newV);
+                        success = true;
+                    }
+                    attemptCount++;
+                }
+                if(!success) return null;
+            }
+            halfVertices.sort((a, b) => Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x) - Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x));
+            initialPoints = initialPoints.concat(halfVertices);
+            initialPoints.push(lineEnd);
+
+            let allVertices = [];
+            let processed = new Set();
+            initialPoints.forEach(p => {
+                const key = `${p.x},${p.y}`;
+                if (!processed.has(key)) {
+                    allVertices.push(p);
+                    processed.add(key);
+                    const symV = calculateSymmetricPoint(p, 'point');
+                    const symKey = `${symV.x},${symV.y}`;
+                    if (!processed.has(symKey)) {
+                        allVertices.push(symV);
+                        processed.add(symKey);
+                    }
+                }
+            });
+
+            allVertices = findPointSymmetricBoundary(allVertices);
+
+            if (allVertices.length >= 3) {
+                for (let i = 0; i < allVertices.length; i++) {
+                    const len = allVertices.length;
+                    const p1 = allVertices[(i - 1 + len) % len];
+                    const p2 = allVertices[i];
+                    const p3 = allVertices[(i + 1) % len];
+                    if (isTooLinear(p1, p2, p3) || isTooSharpAngle(p1, p2, p3)) {
+                        return null;
+                    }
+                }
+            }
+            
+            const allLines = createSequentialLines(allVertices, true);
+            const initialLines = [];
+            const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`));
+            allLines.forEach(line => {
+                if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) {
+                    initialLines.push(line);
+                }
+            });
+            
+            return {
+                type: 'point', initialVertices: initialPoints, initialLines, allVertices, allLines
+            };
+        }
+        return null;
+    }
+    
+    function initializeSetupListeners() {
+        document.querySelectorAll('#type-select button').forEach(button => {
+            button.addEventListener('click', handleTypeSelect);
+        });
+        document.querySelectorAll('#difficulty-select button').forEach(button => {
+            button.addEventListener('click', handleDifficultySelect);
+        });
+        document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
+        document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
+        document.getElementById('time-minus').addEventListener('click', () => changeTimeLimit(-1));
+        document.getElementById('time-plus').addEventListener('click', () => changeTimeLimit(1));
+    }
+
     function selectGameMode(mode) {
         gameMode = mode;
-        showPage('setup-page');
         const classicSettings = document.getElementById('classic-settings');
         const timeAttackSettings = document.getElementById('time-attack-settings');
-        const setupTitle = document.querySelector('#setup-page h2');
+
         if (mode === 'classic') {
             classicSettings.style.display = 'block';
             timeAttackSettings.style.display = 'none';
-            setupTitle.textContent = '문제 유형 및 개수 설정';
-        } else {
+        } else { // timeAttack
             classicSettings.style.display = 'none';
             timeAttackSettings.style.display = 'block';
-            setupTitle.textContent = '문제 유형 및 시간 설정';
-            document.getElementById('time-limit-display').textContent = timeLimitInMinutes;
         }
+        showPage('setup-page');
+    }
+
+    function changeTimeLimit(direction) {
+        const display = document.getElementById('time-limit-display');
+        const currentIndex = timeOptions.indexOf(timeLimitInMinutes);
+        let nextIndex = currentIndex + direction;
+
+        if (nextIndex < 0) {
+            nextIndex = timeOptions.length - 1;
+        } else if (nextIndex >= timeOptions.length) {
+            nextIndex = 0;
+        }
+
+        timeLimitInMinutes = timeOptions[nextIndex];
+        display.textContent = timeLimitInMinutes + '분';
+    }
+
+    function nextProblem() {
+        closePopup();
+        currentProblem++;
+        
+        currentProblemAttempts = 0;
+        userVertices = [];
+        userLines = [];
+
+        if (gameMode === 'timeAttack') {
+            let newProblem = null;
+            let attempt = 0;
+            const MAX_ATTEMPTS_NEXT = 100;
+            while (!newProblem && attempt < MAX_ATTEMPTS_NEXT) {
+                let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
+                newProblem = generateRandomProblem(type);
+                attempt++;
+            }
+            if (newProblem) {
+                problemList.push(newProblem);
+            } else {
+                alert('새로운 문제를 만드는 데 실패했어요. 결과 화면으로 이동합니다.');
+                showFinalResult();
+                return;
+            }
+        }
+        loadProblem();
+        saveGameState();
+    }
+
+    function handleTypeSelect(event) {
+        document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        selectedType = event.currentTarget.getAttribute('data-type');
     }
     
-    function handleTypeSelect(event) { document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected')); event.currentTarget.classList.add('selected'); selectedType = event.currentTarget.getAttribute('data-type'); }
-    function handleDifficultySelect(event) { document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected')); event.currentTarget.classList.add('selected'); selectedDifficulty = event.currentTarget.getAttribute('data-difficulty'); }
-    function changeQuantity(delta) { const current = parseInt(document.getElementById('problem-quantity').textContent); let newQuantity = current + delta; if (newQuantity < 5) newQuantity = 50; if (newQuantity > 50) newQuantity = 50; document.getElementById('problem-quantity').textContent = newQuantity; totalProblems = newQuantity; }
-    
-    function changeTimeLimit(delta) {
-        let newTime = timeLimitInMinutes + delta;
-        if (newTime < 5) newTime = 5;
-        if (newTime > 60) newTime = 60;
-        timeLimitInMinutes = newTime;
-        document.getElementById('time-limit-display').textContent = newTime;
+    function handleDifficultySelect(event) {
+        document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        selectedDifficulty = event.currentTarget.getAttribute('data-difficulty');
     }
-    
+
+    function changeQuantity(delta) {
+        const current = parseInt(document.getElementById('problem-quantity').textContent);
+        let newQuantity = current + delta;
+        if (newQuantity < 5) newQuantity = 5;
+        if (newQuantity > 50) newQuantity = 50;
+        document.getElementById('problem-quantity').textContent = newQuantity;
+        totalProblems = newQuantity;
+    }
+
     function startQuiz() {
         problemList = [];
         if (gameMode === 'classic') {
@@ -984,49 +1312,31 @@ button:hover {
                 attempt++;
             }
             totalProblems = problemList.length;
-        } else {
+        } else { // timeAttack
             let firstProblem = null;
-            while (!firstProblem) {
+            let attempt = 0;
+            while (!firstProblem && attempt < 200) {
                 let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
                 firstProblem = generateRandomProblem(type);
+                attempt++;
             }
-            problemList.push(firstProblem);
+            if(firstProblem) problemList.push(firstProblem);
         }
         if (problemList.length === 0) {
             alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
             location.reload();
             return;
         }
-        currentProblem = 0; score = { results: [] }; hasSubmittedScore = false; currentProblemAttempts = 0; userVertices = []; userLines = [];
-        showPage('problem-page');
-        if (gameMode === 'timeAttack') startTimer();
-        loadProblem();
-    }
-    
-    function nextProblem() {
-        closePopup();
-        currentProblem++;
-        if (gameMode === 'timeAttack') {
-            let nextP = null;
-            let attempts = 0;
-            while (!nextP && attempts < 100) {
-                let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
-                nextP = generateRandomProblem(type);
-                attempts++;
-            }
-            if (nextP) {
-                problemList.push(nextP);
-            } else {
-                alert('새로운 문제를 만드는 데 실패했습니다. 게임을 종료합니다.');
-                showFinalResult();
-                return;
-            }
-        }
+        currentProblem = 0; 
+        score = { results: [] };
         currentProblemAttempts = 0;
         userVertices = [];
         userLines = [];
+        hasSubmittedScore = false;
+        
+        showPage('problem-page');
+        if (gameMode === 'timeAttack') startTimer();
         loadProblem();
-        saveGameState();
     }
     
     function loadProblem() {
@@ -1034,20 +1344,34 @@ button:hover {
             showFinalResult();
             return;
         }
-        
-        if (currentProblem >= problemList.length) {
-            alert("저장된 게임 정보에 오류가 발견되어 첫 화면으로 돌아갑니다.");
-            resetGame();
-            showPage('mode-selection-page');
+        if (currentProblem >= problemList.length){
+            showFinalResult();
             return;
+        }
+        
+        const timerDisplay = document.getElementById('timer-display');
+        const counterDisplay = document.getElementById('problem-counter-display');
+
+        if (gameMode === 'classic') {
+            counterDisplay.style.display = 'block';
+            timerDisplay.style.display = 'none';
+            counterDisplay.textContent = '남은 문제 ' + (totalProblems - (currentProblem + 1)) + '개';
+        } else {
+            counterDisplay.style.display = 'none';
+            timerDisplay.style.display = 'block';
         }
 
         const currentP = problemList[currentProblem];
         const pType = currentP.type === 'line' ? '선대칭' : '점대칭';
+        
         let problemNumText = `${currentProblem + 1}번째 문제 (${pType})`;
         const pTypeText = currentP.type === 'line' ? '선대칭도형' : '점대칭도형';
         let instructionText = `아래 도형은 ${pTypeText}입니다. 나머지 부분을 완성해 주세요.`;
-        if (window.innerWidth < 480) { problemNumText = `${currentProblem + 1}번째 문제<br>(${pType})`; instructionText = `아래 도형은 ${pTypeText}입니다.<br>나머지 부분을 완성해 주세요.`; }
+
+        if (window.innerWidth < 480) {
+            problemNumText = `${currentProblem + 1}번째 문제<br>(${pType})`;
+            instructionText = `아래 도형은 ${pTypeText}입니다.<br>나머지 부분을 완성해 주세요.`;
+        }
         document.getElementById('problem-number').innerHTML = problemNumText;
         document.getElementById('problem-instruction').innerHTML = instructionText;
         
@@ -1055,33 +1379,187 @@ button:hover {
         document.getElementById('next-problem-btn').style.display = 'none';
         
         closePopup();
+        
         problemVertices = currentP.initialVertices;
         problemLines = currentP.initialLines;
         tempLineStart = null;
         hoveredLine = null;
+        
         setCanvasMode('vertex');
+        
+        redrawCanvas();
     }
     
     function clearCanvas(clearUserDrawing) {
         if (clearUserDrawing) {
-            userVertices = []; userLines = []; tempLineStart = null; hoveredLine = null;
+            userVertices = [];
+            userLines = [];
+            tempLineStart = null;
+            hoveredLine = null;
         }
+        
+        redrawCanvas();
         setCanvasMode('vertex');
         closePopup();
         
         document.getElementById('check-answer-btn').style.display = 'block';
         document.getElementById('next-problem-btn').style.display = 'none';
     }
+    
+    function renderProblemVertices() {
+        document.querySelectorAll('.problem-dot').forEach(dot => dot.remove());
+        problemVertices.forEach((v) => {
+            const dot = document.createElement('div');
+            dot.className = 'problem-dot';
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+            canvasWrapper.appendChild(dot);
+        });
+    }
 
-    function renderProblemVertices() { document.querySelectorAll('.problem-dot').forEach(dot => dot.remove()); problemVertices.forEach((v) => { const dot = document.createElement('div'); dot.className = 'problem-dot'; dot.style.left = `${(v.x / GRID_COUNT) * 100}%`; dot.style.top = `${(v.y / GRID_COUNT) * 100}%`; canvasWrapper.appendChild(dot); }); }
-    function drawGrid() { ctx.strokeStyle = '#333'; ctx.lineWidth = 0.5; ctx.setLineDash([1, 4]); for (let x = 0; x <= canvas.width; x += GRID_SIZE) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); } for (let y = 0; y <= canvas.height; y += GRID_SIZE) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); } ctx.setLineDash([]); if (problemList.length > currentProblem && problemList[currentProblem]) { const currentP = problemList[currentProblem]; ctx.strokeStyle = '#ff0000'; ctx.lineWidth = 2; if (currentP.type === 'line') { if (currentP.isSlantedAxis) { ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(canvas.width, canvas.height); ctx.stroke(); } else if (currentP.axisDirection === 'vertical') { const centerX = canvas.width / 2; ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, canvas.height); ctx.stroke(); } else if (currentP.axisDirection === 'horizontal') { const centerY = canvas.height / 2; ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(canvas.width, centerY); ctx.stroke(); } } else if (currentP.type === 'point') { const centerX = canvas.width / 2, centerY = canvas.height / 2; ctx.beginPath(); ctx.arc(centerX, centerY, 5, 0, Math.PI * 2); ctx.fillStyle = '#ff0000'; ctx.fill(); } } }
-    function drawLines(lines, color) { ctx.strokeStyle = color; ctx.lineWidth = 3; lines.forEach(line => { ctx.beginPath(); ctx.moveTo(line.p1.x * GRID_SIZE, line.p1.y * GRID_SIZE); ctx.lineTo(line.p2.x * GRID_SIZE, line.p2.y * GRID_SIZE); ctx.stroke(); }); }
-    function redrawCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); drawGrid(); drawLines(problemLines, '#007bff'); drawLines(userLines, '#28a745'); if (hoveredLine) { ctx.save(); ctx.strokeStyle = 'rgba(234, 153, 153, 0.5)'; ctx.lineWidth = 8; ctx.shadowColor = 'rgba(234, 153, 153, 0.7)'; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE); ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE); ctx.stroke(); ctx.restore(); } renderProblemVertices(); if (canvasMode === 'line') renderPointsForLineMode(); else renderUserVertices(); }
-    function renderPointsForLineMode() { document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove()); const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v))); allPoints.forEach((v) => { const dot = document.createElement('div'); dot.className = (tempLineStart && isSamePoint(v, tempLineStart)) ? 'selected-line-dot' : 'line-dot'; dot.style.left = `${(v.x / GRID_COUNT) * 100}%`; dot.style.top = `${(v.y / GRID_COUNT) * 100}%`; canvasWrapper.appendChild(dot); }); }
-    function renderUserVertices() { document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove()); userVertices.forEach((v) => { const dot = document.createElement('div'); dot.className = 'user-dot'; dot.style.left = `${(v.x / GRID_COUNT) * 100}%`; dot.style.top = `${(v.y / GRID_COUNT) * 100}%`; canvasWrapper.appendChild(dot); }); }
-    function isVertexOnProblemBoundary(v) { return problemVertices.some(pv => isSamePoint(pv, v)); }
-    function showPopup(mainMessage, detailMessage, isCorrect) { const popupOverlay = document.getElementById('result-popup-overlay'), popupMainMessage = document.getElementById('popup-main-message'), popupNextBtn = document.getElementById('popup-next-btn'); if (isCorrect) { popupMainMessage.innerHTML = mainMessage; popupMainMessage.className = 'correct'; popupNextBtn.style.display = 'block'; } else { popupMainMessage.innerHTML = `${mainMessage}<br><span style="font-size: 80%;">${detailMessage}</span>`; popupMainMessage.className = 'incorrect'; popupNextBtn.style.display = 'none'; } popupOverlay.style.display = 'flex'; }
-    function closePopup() { document.getElementById('result-popup-overlay').style.display = 'none'; }
+    function drawGrid() {
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 0.5;
+        
+        ctx.setLineDash([1, 4]);
+        
+        for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+        
+        ctx.setLineDash([]);
+
+        if (problemList.length > currentProblem && problemList[currentProblem]) {
+            const currentP = problemList[currentProblem];
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 2;
+            if (currentP.type === 'line') {
+                if (currentP.isSlantedAxis) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(canvas.width, canvas.height);
+                    ctx.stroke();
+                } else if (currentP.axisDirection === 'vertical') {
+                    const centerX = canvas.width / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, 0);
+                    ctx.lineTo(centerX, canvas.height);
+                    ctx.stroke();
+                } else if (currentP.axisDirection === 'horizontal') {
+                    const centerY = canvas.height / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, centerY);
+                    ctx.lineTo(canvas.width, centerY);
+                    ctx.stroke();
+                }
+            } else if (currentP.type === 'point') {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ff0000';
+                ctx.fill();
+            }
+        }
+    }
+
+    function drawLines(lines, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        lines.forEach(line => {
+            ctx.beginPath();
+            ctx.moveTo(line.p1.x * GRID_SIZE, line.p1.y * GRID_SIZE);
+            ctx.lineTo(line.p2.x * GRID_SIZE, line.p2.y * GRID_SIZE);
+            ctx.stroke();
+        });
+    }
+
+    function redrawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+
+        drawLines(problemLines, '#007bff');
+        drawLines(userLines, '#28a745');
+        
+        if (hoveredLine) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(234, 153, 153, 0.5)';
+            ctx.lineWidth = 8;
+            ctx.shadowColor = 'rgba(234, 153, 153, 0.7)';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
+            ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        renderProblemVertices();
+
+        if (canvasMode === 'line') {
+            renderPointsForLineMode();
+        } else {
+             renderUserVertices();
+        }
+    }
+
+    function renderPointsForLineMode() {
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+
+        const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
+        
+        allPoints.forEach((v) => {
+            const dot = document.createElement('div');
+            dot.className = (tempLineStart && isSamePoint(v, tempLineStart)) ? 'selected-line-dot' : 'line-dot';
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+            canvasWrapper.appendChild(dot);
+        });
+    }
+
+    function renderUserVertices() {
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+
+        userVertices.forEach((v) => {
+            const dot = document.createElement('div');
+            dot.className = 'user-dot';
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+            canvasWrapper.appendChild(dot);
+        });
+    }
+
+    function isVertexOnProblemBoundary(v) {
+        return problemVertices.some(pv => isSamePoint(pv, v));
+    }
+    
+    function showPopup(mainMessage, detailMessage, isCorrect) {
+        const popupOverlay = document.getElementById('result-popup-overlay');
+        const popupMainMessage = document.getElementById('popup-main-message');
+        const popupDetailMessage = document.getElementById('popup-detail-message');
+        const popupNextBtn = document.getElementById('popup-next-btn');
+
+        if (isCorrect) {
+            popupMainMessage.innerHTML = mainMessage;
+            popupMainMessage.className = 'correct';
+            popupDetailMessage.style.display = 'none';
+            popupNextBtn.style.display = 'block';
+        } else {
+            popupMainMessage.innerHTML = `${mainMessage}<br><span style="font-size: 80%;">${detailMessage}</span>`;
+            popupMainMessage.className = 'incorrect';
+            popupDetailMessage.style.display = 'none';
+            popupNextBtn.style.display = 'none';
+        }
+        
+        popupOverlay.style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('result-popup-overlay').style.display = 'none';
+    }
     
     function checkAnswer() {
         const currentP = problemList[currentProblem];
@@ -1093,8 +1571,10 @@ button:hover {
             else if (problemType === 'point') isLinesCorrect = checkPointSymmetryLines(currentP);
         }
         if (verticesAreCorrect && isLinesCorrect) {
+            if (score.results.length === currentProblem) {
+                score.results.push(currentProblemAttempts);
+            }
             showPopup('정답입니다🎉', '', true);
-            score.results.push(currentProblemAttempts);
             saveGameState();
             document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
@@ -1120,10 +1600,11 @@ button:hover {
     function setCanvasMode(mode) { canvasMode = mode; const vertexBtn = document.getElementById('mode-vertex'), lineBtn = document.getElementById('mode-line'); vertexBtn.classList.remove('mode-btn-active'); lineBtn.classList.remove('mode-btn-active'); const canStartLineDrawing = userVertices.length >= 1 || problemVertices.length > 1; if (mode === 'vertex') { vertexBtn.classList.add('mode-btn-active'); tempLineStart = null; } else { lineBtn.classList.add('mode-btn-active'); vertexBtn.disabled = false; } document.getElementById('mode-line').disabled = !canStartLineDrawing; redrawCanvas(); }
     
     function getTargetTimeForProblem(problem) {
+        const isDiff2 = selectedDifficulty == 2;
         if (problem.type === 'line') {
-            return selectedDifficulty == 1 ? 20 : 30;
-        } else {
-            return selectedDifficulty == 1 ? 45 : 60;
+            return isDiff2 ? 30 : 20;
+        } else { // point
+            return isDiff2 ? 60 : 45;
         }
     }
 
@@ -1148,10 +1629,6 @@ button:hover {
         finalAccuracyValue = accuracy;
         
         const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
-        let typeMultiplier = 1.0;
-        if (selectedType === 'point') typeMultiplier = 1.1;
-        else if (selectedType === 'both') typeMultiplier = 1.05;
-
         let finalScore;
         
         if (gameMode === 'timeAttack') {
@@ -1171,16 +1648,16 @@ button:hover {
                 }
                 const averageTargetTime = totalTargetTime / totalProblemsSolved;
                 
-                let speedMultiplier = averageTargetTime / averageTimePerProblem;
-                speedMultiplier = Math.max(0.5, Math.min(speedMultiplier, 2.5));
-                
-                const baseScore = accuracy * 100;
-                finalScore = Math.round(baseScore * speedMultiplier * difficultyMultiplier * typeMultiplier);
+                const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
+                finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
-        } else {
+        } else { // Classic Mode
             document.getElementById('time-attack-avg-time').style.display = 'none';
+            let typeMultiplier = 1.0;
+            if (selectedType === 'point') typeMultiplier = 1.1;
+            else if (selectedType === 'both') typeMultiplier = 1.05;
             finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
         }
 
@@ -1264,8 +1741,8 @@ button:hover {
         }
 
         const isClassicInProgress = savedState.gameMode === 'classic' &&
-                                      savedState.totalProblems > 0 &&
-                                      savedState.currentProblem < savedState.totalProblems;
+                                        savedState.totalProblems > 0 &&
+                                        savedState.currentProblem < savedState.totalProblems;
 
         const isTimeAttackInProgress = savedState.gameMode === 'timeAttack' &&
                                              savedState.remainingTime > 0;
@@ -1376,8 +1853,6 @@ button:hover {
         initializeSetupListeners();
         document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
         document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
-        document.getElementById('time-minus').addEventListener('click', () => changeTimeLimit(-5));
-        document.getElementById('time-plus').addEventListener('click', () => changeTimeLimit(5));
         document.getElementById('back-to-mode-select-btn').addEventListener('click', () => showPage('mode-selection-page'));
         
         canvas.addEventListener('mousemove', handleCanvasMouseMove);
@@ -1434,7 +1909,7 @@ button:hover {
         const progressBar = checkAnswerBtn.querySelector('.progress-bar');
         let pressTimer = null;
         let isPressing = false;
-        const PRESS_AND_HOLD_DURATION = 1000;
+        const PRESS_AND_HOLD_DURATION = 400;
 
         const startPress = (event) => {
             if (event.type === 'mousedown' && event.button !== 0) return;
