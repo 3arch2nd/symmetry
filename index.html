@@ -106,13 +106,32 @@ button:hover {
 }
 .mode-buttons {
     display: flex;
-    gap: 15px;
+    gap: 25px;
     margin-top: 20px;
+    width: 100%;
+    justify-content: space-around;
 }
 .mode-buttons button {
     padding: 15px 30px;
     font-size: 18px;
+    width: 100%;
+    max-width: 250px;
 }
+
+/* ✨ 추가: 모드 선택 옵션 스타일 */
+.mode-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+.mode-description {
+    font-size: 16px;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
 #setup-page {
     display: flex;
     flex-direction: column;
@@ -612,8 +631,18 @@ button:hover {
         </h1>
         <h2>모드를 선택하세요.</h2>
         <div class="mode-buttons">
-            <button id="classic-mode-btn" class="primary-btn">🎓 클래식 모드</button>
-            <button id="time-attack-mode-btn" class="primary-btn">⏱️ 타임어택 모드</button>
+            <div class="mode-option">
+                <button id="classic-mode-btn" class="primary-btn">🎓 클래식 모드</button>
+                <small class="mode-description">
+                    무작위로 생성되는 새로운 문제를<br>원하는 만큼 연습하세요!
+                </small>
+            </div>
+            <div class="mode-option">
+                <button id="time-attack-mode-btn" class="primary-btn">⏱️ 타임어택 모드</button>
+                <small class="mode-description">
+                    정해진 시간 동안<br>최대한 많은 문제를 풀어보세요!
+                </small>
+            </div>
         </div>
     </div>
     
@@ -624,8 +653,6 @@ button:hover {
             <span class="mobile-title">선대칭/점대칭도형<br>완전 정복</span>
         </h1>
         <h2 style="text-align: center;">문제 유형 및 설정</h2>
-        <small>무작위로 생성되는 새로운 문제를 <br> 원하는 만큼 연습할 수 있습니다.</small>
-
         <div class="main-layout">
             <div class="left-panel">
                 <div class="setting-group">
@@ -855,7 +882,26 @@ button:hover {
     function generateRandomProblem(type) { const MAX_ATTEMPTS_PER_POINT = 100; if (type === 'line') { let nVertices, minCoord, maxCoord, isSlantedAxis = false, axisDirection = 'vertical'; if (selectedDifficulty == 2) { isSlantedAxis = Math.random() < 0.5; if (isSlantedAxis) { nVertices = getRandomInt(3, 4); minCoord = 3; maxCoord = 17; axisDirection = 'slanted'; } else { nVertices = getRandomInt(5, 6); minCoord = 2; maxCoord = 18; axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal'; } } else { isSlantedAxis = false; nVertices = 4; minCoord = 3; maxCoord = 17; axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal'; } if (isSlantedAxis) { const p1 = {x: HALF_COUNT - getRandomInt(3, 7), y: HALF_COUNT - getRandomInt(3, 7)}, p2 = {x: HALF_COUNT + getRandomInt(3, 7), y: HALF_COUNT + getRandomInt(3, 7)}; let tempVertices = [p1]; for (let i = 0; i < nVertices - 2; i++) { let newV, success = false, attemptCount = 0; while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) { newV = { x: getRandomInt(minCoord, maxCoord), y: getRandomInt(minCoord, newV.x - 1) }; let isValid = !isTooSharpAngle(tempVertices[tempVertices.length - 1], newV, calculateSymmetricPoint(newV, 'line', true)); if (isValid && !isTooClose(newV, tempVertices) && !isProblemTooLinear(tempVertices, newV)) { tempVertices.push(newV); success = true; } attemptCount++; } } tempVertices.push(p2); let allVertices = [...tempVertices]; if (allVertices.length < 3 || isTooLinear(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0]) || isTooSharpAngle(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0])) return null; let allVerticesSorted = sortSlantedAxisVertices(allVertices); if (allVerticesSorted.length >= 3) for (let i=0; i < allVerticesSorted.length - 2; i++) if (isTooLinear(allVerticesSorted[i], allVerticesSorted[i+1], allVerticesSorted[i+2])) return null; const allLines = createSequentialLines(allVerticesSorted, false), initialLines = allLines.filter(line => ((line.p1.x+line.p2.x)/2)>((line.p1.y+line.p2.y)/2)); let initialVertices = initialLines.reduce((acc, line) => { if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1); if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2); return acc; }, []); if(initialVertices.filter(v => v.x === v.y).length < 2) return null; return { type: 'line', isSlantedAxis: true, axisDirection: 'slanted', initialVertices, initialLines, allVertices: allVerticesSorted, allLines }; } else { let initialVertices; if (axisDirection === 'vertical') { const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) }, axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 2, maxCoord) }; let nonAxisPoints = []; for (let i=0; i<nVertices-2; i++) { let newV, success = false; while (!success) { newV = { x: getRandomInt(minCoord, HALF_COUNT - 1), y: getRandomInt(axisPoint1.y, axisPoint2.y) }; if (!isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]) && (nonAxisPoints.length === 0 || !isTooWeakSlope(nonAxisPoints[nonAxisPoints.length-1], newV))) { nonAxisPoints.push(newV); success = true; } } } nonAxisPoints.sort((a, b) => a.y - b.y); initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2]; } else { const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT }, axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT }; let nonAxisPoints = []; for (let i=0; i<nVertices-2; i++) { let newV, success = false; while (!success) { newV = { x: getRandomInt(axisPoint1.x, axisPoint2.x), y: getRandomInt(minCoord, HALF_COUNT - 1) }; if (!isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]) && (nonAxisPoints.length === 0 || !isTooWeakSlope(nonAxisPoints[nonAxisPoints.length-1], newV))) { nonAxisPoints.push(newV); success = true; } } } nonAxisPoints.sort((a, b) => a.x - b.x); initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2]; } if (initialVertices.length < 2) return null; if (initialVertices.length >= 3) for (let i=0; i<initialVertices.length-2; i++) if(isTooLinear(initialVertices[i], initialVertices[i+1], initialVertices[i+2])) return null; let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse()); allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t,v))); return { type: 'line', isSlantedAxis: false, axisDirection, initialVertices, initialLines: createSequentialLines(initialVertices, false), allVertices, allLines: createSequentialLines(allVertices, true) }; } } else if (type === 'point') { const numPoints = (selectedDifficulty == 1) ? 4 : getRandomInt(5, 6); let initialPoints = []; const isHorizontalAxis = Math.random() < 0.5; let lineStart, lineEnd; if(isHorizontalAxis) { const y = CENTER_POINT.y, halfLength = getRandomInt(3, 7); lineStart = {x: CENTER_POINT.x - halfLength, y: y}; lineEnd = {x: CENTER_POINT.x + halfLength, y: y}; } else { const x = CENTER_POINT.x, halfLength = getRandomInt(3, 7); lineStart = {x: x, y: CENTER_POINT.y - halfLength}; lineEnd = {x: x, y: CENTER_POINT.y + halfLength}; } initialPoints.push(lineStart); let halfVertices = []; for(let i = 0; i < numPoints - 2; i++) { let newV, success = false, attemptCount=0; while(!success && attemptCount < 50) { let x, y; if(isHorizontalAxis) { x = getRandomInt(MIN_COORD, MAX_COORD); y = getRandomInt(MIN_COORD, CENTER_POINT.y-1); } else { x = getRandomInt(MIN_COORD, CENTER_POINT.x-1); y = getRandomInt(MIN_COORD, MAX_COORD); } newV = {x, y}; if(!isTooClose(newV, [...initialPoints, ...halfVertices])) { halfVertices.push(newV); success=true; } attemptCount++; } if(!success) return null; } halfVertices.sort((a, b) => Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x) - Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x)); initialPoints = initialPoints.concat(halfVertices); initialPoints.push(lineEnd); let allVertices = []; let processed = new Set(); initialPoints.forEach(p => { const key = `${p.x},${p.y}`; if (!processed.has(key)) { allVertices.push(p); processed.add(key); const symV = calculateSymmetricPoint(p, 'point'), symKey = `${symV.x},${symV.y}`; if (!processed.has(symKey)) { allVertices.push(symV); processed.add(symKey); } } }); allVertices = findPointSymmetricBoundary(allVertices); if (allVertices.length >= 3) for (let i=0; i<allVertices.length; i++) { const len=allVertices.length, p1=allVertices[(i-1+len)%len], p2=allVertices[i], p3=allVertices[(i+1)%len]; if (isTooLinear(p1,p2,p3) || isTooSharpAngle(p1,p2,p3)) return null; } const allLines = createSequentialLines(allVertices, true); const initialLines = []; const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`)); allLines.forEach(line => { if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) initialLines.push(line); }); return { type: 'point', initialVertices: initialPoints, initialLines, allVertices, allLines }; } return null; }
 
     function initializeSetupListeners() { document.querySelectorAll('#type-select button').forEach(button => button.addEventListener('click', handleTypeSelect)); document.querySelectorAll('#difficulty-select button').forEach(button => button.addEventListener('click', handleDifficultySelect)); document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5)); document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5)); }
-    function selectGameMode(mode) { gameMode = mode; showPage('setup-page'); const classicSettings = document.getElementById('classic-settings'), timeAttackSettings = document.getElementById('time-attack-settings'), setupTitle = document.querySelector('#setup-page h2'), setupSmall = document.querySelector('#setup-page small'); if (mode === 'classic') { classicSettings.style.display = 'block'; timeAttackSettings.style.display = 'none'; setupTitle.textContent = '문제 유형 및 개수 설정'; setupSmall.innerHTML = '무작위로 생성되는 새로운 문제를 <br> 원하는 만큼 연습할 수 있습니다.'; } else { classicSettings.style.display = 'none'; timeAttackSettings.style.display = 'block'; setupTitle.textContent = '문제 유형 및 시간 설정'; setupSmall.innerHTML = '정해진 시간 동안 <br> 최대한 많은 문제를 풀어보세요!'; document.getElementById('time-limit-display').textContent = timeLimitInMinutes; } }
+    
+    // ✨ 변경: selectGameMode 함수에서 더 이상 사용하지 않는 small 태그 관련 코드를 삭제
+    function selectGameMode(mode) {
+        gameMode = mode;
+        showPage('setup-page');
+        const classicSettings = document.getElementById('classic-settings');
+        const timeAttackSettings = document.getElementById('time-attack-settings');
+        const setupTitle = document.querySelector('#setup-page h2');
+        if (mode === 'classic') {
+            classicSettings.style.display = 'block';
+            timeAttackSettings.style.display = 'none';
+            setupTitle.textContent = '문제 유형 및 개수 설정';
+        } else {
+            classicSettings.style.display = 'none';
+            timeAttackSettings.style.display = 'block';
+            setupTitle.textContent = '문제 유형 및 시간 설정';
+            document.getElementById('time-limit-display').textContent = timeLimitInMinutes;
+        }
+    }
+    
     function handleTypeSelect(event) { document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected')); event.currentTarget.classList.add('selected'); selectedType = event.currentTarget.getAttribute('data-type'); }
     function handleDifficultySelect(event) { document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected')); event.currentTarget.classList.add('selected'); selectedDifficulty = event.currentTarget.getAttribute('data-difficulty'); }
     function changeQuantity(delta) { const current = parseInt(document.getElementById('problem-quantity').textContent); let newQuantity = current + delta; if (newQuantity < 5) newQuantity = 5; if (newQuantity > 50) newQuantity = 50; document.getElementById('problem-quantity').textContent = newQuantity; totalProblems = newQuantity; }
@@ -1101,11 +1147,11 @@ button:hover {
         }
 
         const isClassicInProgress = savedState.gameMode === 'classic' &&
-                                    savedState.totalProblems > 0 &&
-                                    savedState.currentProblem < savedState.totalProblems;
+                                      savedState.totalProblems > 0 &&
+                                      savedState.currentProblem < savedState.totalProblems;
 
         const isTimeAttackInProgress = savedState.gameMode === 'timeAttack' &&
-                                           savedState.remainingTime > 0;
+                                             savedState.remainingTime > 0;
 
         if (isClassicInProgress || isTimeAttackInProgress) {
             problemList = savedState.problemList;
