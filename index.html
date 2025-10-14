@@ -756,7 +756,7 @@ button:hover {
             <div class="mode-option">
                 <button id="time-attack-mode-btn">⏱️ 타임어택 <span>모드</span></button>
                 <small class="mode-description">
-                    정해진 시간 동안<br>빠르고 정확하게!
+                    정해진 시간 동안<br>빠르고 정확하게 풀어보세요!
                 </small>
             </div>
         </div>
@@ -1852,7 +1852,16 @@ function updateSettingsOverlay() {
                 const averageTargetTime = totalTargetTime / totalProblemsSolved;
                 
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
-                finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
+
+let timeBonusMultiplier = 1.0;
+        if (timeLimitInMinutes === 5) {
+            timeBonusMultiplier = 1.05; // 5분 선택 시 5% 보너스
+        } else if (timeLimitInMinutes === 7) {
+            timeBonusMultiplier = 1.1; // 7분 선택 시 10% 보너스
+        }
+        
+        finalScore = Math.round(speedRatio * (accuracy / 100) * 5000 * timeBonusMultiplier);
+        // [변경 끝]
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
