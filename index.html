@@ -118,6 +118,24 @@ button:hover {
     max-width: 250px;
 }
 
+#classic-mode-btn {
+    background-color: #ffc107;
+    color: #333;
+    font-weight: bold;
+}
+#classic-mode-btn:hover {
+    background-color: #fdb827;
+}
+#time-attack-mode-btn {
+    background-color: #e06666;
+    color: white;
+    font-weight: bold;
+}
+#time-attack-mode-btn:hover {
+    background-color: #cc4125;
+}
+
+
 .mode-option {
     display: flex;
     flex-direction: column;
@@ -383,6 +401,17 @@ button:hover {
 #check-answer-btn:hover {
     background-color: #f0f0f0;
 }
+
+/* ✨ 변경: 두 버튼의 최소 너비를 동일하게 설정 */
+#check-answer-btn, #next-problem-btn {
+    min-width: 180px;
+}
+
+/* ✨ 추가: 다음 문제 버튼에 보이지 않는 테두리를 추가하여 크기 맞춤 */
+#next-problem-btn {
+    border: 2px solid transparent;
+}
+
 #check-answer-btn .progress-bar {
     position: absolute;
     top: 0;
@@ -403,9 +432,10 @@ button:hover {
     align-items: center;
 }
 .check-answer-guide {
-    font-size: 0.8em; /* 버튼 글씨의 80% 크기 */
-    color: #888;      /* 회색 글씨 */
-    margin-top: 8px;  /* 버튼과의 간격 */
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 8px;
+    transition: color 0.3s ease;
 }
 
 .popup-overlay {
@@ -630,13 +660,13 @@ button:hover {
         <h2>모드를 선택하세요.</h2>
         <div class="mode-buttons">
             <div class="mode-option">
-                <button id="classic-mode-btn" class="primary-btn">🎓 클래식 모드</button>
+                <button id="classic-mode-btn">🎓 클래식 모드</button>
                 <small class="mode-description">
                     무작위로 생성되는 새로운 문제를<br>원하는 만큼 연습하세요!
                 </small>
             </div>
             <div class="mode-option">
-                <button id="time-attack-mode-btn" class="primary-btn">⏱️ 타임어택 모드</button>
+                <button id="time-attack-mode-btn">⏱️ 타임어택 모드</button>
                 <small class="mode-description">
                     정해진 시간 동안<br>최대한 많은 문제를 풀어보세요!
                 </small>
@@ -720,16 +750,16 @@ button:hover {
             <button id="mode-line" class="secondary-btn" onclick="setCanvasMode('line')" disabled>2단계: 선분 잇기</button>
             <button id="clear-canvas-btn" class="secondary-btn">다시 풀기 (초기화)</button>
         </div>
-
+        
         <div class="problem-footer">
             <div id="check-answer-container">
                 <button id="check-answer-btn" class="primary-btn">
                     <span class="progress-bar"></span>
                     <span class="button-text">정답 확인하기</span>
                 </button>
+                <button id="next-problem-btn" class="primary-btn" style="display: none;">다음 문제 도전하기</button>
                 <small class="check-answer-guide">꾹 누르고 있으면 채점됩니다!</small>
             </div>
-            <button id="next-problem-btn" class="primary-btn" style="display: none;">다음 문제 도전하기</button>
         </div>
     </div>
 
@@ -853,13 +883,11 @@ button:hover {
         }
     }
     
-    // ✨ 변경: resetGame 함수에 UI 초기화 로직 추가
     function resetGame() {
         stopTimer();
         clearGameState();
         isExitingIntentionally = false;
         
-        // 내부 변수 초기화
         selectedType = 'line'; 
         totalProblems = 5; 
         currentProblem = 0; 
@@ -875,12 +903,10 @@ button:hover {
         userVertices = []; 
         userLines = [];
         
-        // 화면 표시(UI) 초기화
         document.getElementById('problem-quantity').textContent = '5';
         document.getElementById('time-limit-display').textContent = '5';
         document.getElementById('timer-display').style.display = 'none';
 
-        // ✨ 추가: 설정 페이지의 버튼들을 기본값으로 초기화
         document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
         document.querySelector('#type-select button[data-type="line"]').classList.add('selected');
 
@@ -928,7 +954,7 @@ button:hover {
     
     function handleTypeSelect(event) { document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected')); event.currentTarget.classList.add('selected'); selectedType = event.currentTarget.getAttribute('data-type'); }
     function handleDifficultySelect(event) { document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected')); event.currentTarget.classList.add('selected'); selectedDifficulty = event.currentTarget.getAttribute('data-difficulty'); }
-    function changeQuantity(delta) { const current = parseInt(document.getElementById('problem-quantity').textContent); let newQuantity = current + delta; if (newQuantity < 5) newQuantity = 5; if (newQuantity > 50) newQuantity = 50; document.getElementById('problem-quantity').textContent = newQuantity; totalProblems = newQuantity; }
+    function changeQuantity(delta) { const current = parseInt(document.getElementById('problem-quantity').textContent); let newQuantity = current + delta; if (newQuantity < 5) newQuantity = 50; if (newQuantity > 50) newQuantity = 50; document.getElementById('problem-quantity').textContent = newQuantity; totalProblems = newQuantity; }
     
     function changeTimeLimit(delta) {
         let newTime = timeLimitInMinutes + delta;
@@ -1025,7 +1051,7 @@ button:hover {
         document.getElementById('problem-number').innerHTML = problemNumText;
         document.getElementById('problem-instruction').innerHTML = instructionText;
         
-        document.getElementById('check-answer-container').style.display = 'flex';
+        document.getElementById('check-answer-btn').style.display = 'block';
         document.getElementById('next-problem-btn').style.display = 'none';
         
         closePopup();
@@ -1043,7 +1069,7 @@ button:hover {
         setCanvasMode('vertex');
         closePopup();
         
-        document.getElementById('check-answer-container').style.display = 'flex';
+        document.getElementById('check-answer-btn').style.display = 'block';
         document.getElementById('next-problem-btn').style.display = 'none';
     }
 
@@ -1070,7 +1096,7 @@ button:hover {
             showPopup('정답입니다🎉', '', true);
             score.results.push(currentProblemAttempts);
             saveGameState();
-            document.getElementById('check-answer-container').style.display = 'none';
+            document.getElementById('check-answer-btn').style.display = 'none';
             document.getElementById('next-problem-btn').style.display = 'block';
             return true;
         } else {
@@ -1081,7 +1107,7 @@ button:hover {
             currentProblemAttempts++;
             saveGameState();
             showPopup('다시 생각해 볼까요?', detailMessage, false);
-            document.getElementById('check-answer-container').style.display = 'flex';
+            document.getElementById('check-answer-btn').style.display = 'block';
             document.getElementById('next-problem-btn').style.display = 'none';
             return false;
         }
@@ -1164,7 +1190,7 @@ button:hover {
         document.getElementById('final-score').textContent = finalScore;
     }
 
-    function handleCanvasMouseMove(event) { if (document.getElementById('check-answer-container').style.display === 'none') { if (hoveredLine) { hoveredLine = null; canvas.style.cursor = 'default'; redrawCanvas(); } return; } const rect = canvas.getBoundingClientRect(); const mouseXRatio = (event.clientX - rect.left) / rect.width, mouseYRatio = (event.clientY - rect.top) / rect.height; const canvasX = mouseXRatio * canvas.width, canvasY = mouseYRatio * canvas.height, mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE }; let bestLine = null, minDistSq = 0.25; for (const line of userLines) { const p1 = line.p1, p2 = line.p2, lineLengthSq = distSq(p1, p2); if (lineLengthSq === 0) continue; let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq; if (t > 0.2 && t < 0.8) { const closestPointOnLine = { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) }; const distanceSq = distSq(mousePoint, closestPointOnLine); if (distanceSq < minDistSq) { minDistSq = distanceSq; bestLine = line; } } } if (!isSameLine(hoveredLine, bestLine)) { hoveredLine = bestLine; redrawCanvas(); } if (hoveredLine) canvas.style.cursor = 'pointer'; else if (canvasMode === 'line') canvas.style.cursor = 'pointer'; else canvas.style.cursor = 'crosshair'; }
+    function handleCanvasMouseMove(event) { if (document.getElementById('check-answer-btn').style.display === 'none') { if (hoveredLine) { hoveredLine = null; canvas.style.cursor = 'default'; redrawCanvas(); } return; } const rect = canvas.getBoundingClientRect(); const mouseXRatio = (event.clientX - rect.left) / rect.width, mouseYRatio = (event.clientY - rect.top) / rect.height; const canvasX = mouseXRatio * canvas.width, canvasY = mouseYRatio * canvas.height, mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE }; let bestLine = null, minDistSq = 0.25; for (const line of userLines) { const p1 = line.p1, p2 = line.p2, lineLengthSq = distSq(p1, p2); if (lineLengthSq === 0) continue; let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq; if (t > 0.2 && t < 0.8) { const closestPointOnLine = { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) }; const distanceSq = distSq(mousePoint, closestPointOnLine); if (distanceSq < minDistSq) { minDistSq = distanceSq; bestLine = line; } } } if (!isSameLine(hoveredLine, bestLine)) { hoveredLine = bestLine; redrawCanvas(); } if (hoveredLine) canvas.style.cursor = 'pointer'; else if (canvasMode === 'line') canvas.style.cursor = 'pointer'; else canvas.style.cursor = 'crosshair'; }
     function showQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'flex'; }
     function closeQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'none'; }
     
@@ -1358,7 +1384,7 @@ button:hover {
         canvas.addEventListener('mouseleave', () => { if (hoveredLine) { hoveredLine = null; redrawCanvas(); } });
 
         canvas.addEventListener('click', (event) => {
-            if (document.getElementById('check-answer-container').style.display === 'none') return;
+            if (document.getElementById('check-answer-btn').style.display === 'none') return;
             if (hoveredLine) { userLines = userLines.filter(line => !isSameLine(line, hoveredLine)); hoveredLine = null; handleCanvasMouseMove(event); redrawCanvas(); saveGameState(); return; }
             const rect = canvas.getBoundingClientRect(); const mouseXRatio = (event.clientX - rect.left) / rect.width; const mouseYRatio = (event.clientY - rect.top) / rect.height; const gridX = Math.round(mouseXRatio * canvas.width / GRID_SIZE); const gridY = Math.round(mouseYRatio * canvas.height / GRID_SIZE); if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return; const clickedGridPoint = { x: gridX, y: gridY };
             if (canvasMode === 'vertex') {
