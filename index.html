@@ -113,7 +113,7 @@ button:hover {
 }
 .mode-buttons button {
     padding: 20px 30px;
-    font-size: 18px;
+    font-size: 20px; /* [수정] PC 기본 폰트 크기 증가 */
     width: 100%;
     max-width: 250px;
 }
@@ -552,7 +552,6 @@ button:hover {
     display: inline-block;
     margin-left: 5px;
 }
-/* [추가] 결과 페이지 버튼 레이아웃을 명확하게 지정합니다. */
 .result-buttons {
     display: flex;
     justify-content: center;
@@ -712,8 +711,16 @@ button:hover {
         margin-top: 10px;
     }
     .mode-buttons button {
-        padding: 15px 20px;
-        font-size: 16px;
+        padding: 15px 10px;
+        font-size: 1.3em;
+        line-height: 1.3;
+    }
+    /* [추가] 모바일에서만 '모드' 글자가 줄바꿈되도록 합니다. */
+    .mode-buttons button span {
+        display: block;
+    }
+    .mode-description {
+        font-size: 14px;
     }
 
     .desktop-title { display: none; }
@@ -741,13 +748,13 @@ button:hover {
         <h2>모드를 선택하세요.</h2>
         <div class="mode-buttons">
             <div class="mode-option">
-                <button id="classic-mode-btn">📝 클래식 모드</button>
+                <button id="classic-mode-btn">🎓 클래식 <span>모드</span></button>
                 <small class="mode-description">
                     무작위로 생성되는 문제를<br>원하는 만큼 연습하세요!
                 </small>
             </div>
             <div class="mode-option">
-                <button id="time-attack-mode-btn">⏱️ 타임어택 모드</button>
+                <button id="time-attack-mode-btn">⏱️ 타임어택 <span>모드</span></button>
                 <small class="mode-description">
                     정해진 시간 동안<br>빠르고 정확하게 풀어보세요!
                 </small>
