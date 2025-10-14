@@ -1852,16 +1852,8 @@ function updateSettingsOverlay() {
                 const averageTargetTime = totalTargetTime / totalProblemsSolved;
                 
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
-
-let timeBonusMultiplier = 1.0;
-        if (timeLimitInMinutes === 5) {
-            timeBonusMultiplier = 1.05; // 5분 선택 시 5% 보너스
-        } else if (timeLimitInMinutes === 7) {
-            timeBonusMultiplier = 1.1; // 7분 선택 시 10% 보너스
-        }
         
-        finalScore = Math.round(speedRatio * (accuracy / 100) * 5000 * timeBonusMultiplier);
-        // [변경 끝]
+finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
