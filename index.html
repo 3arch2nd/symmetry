@@ -790,37 +790,37 @@ button:hover {
                 </div>
             </div>
             <div class="right-panel">
-                 <div class="settings-wrapper">
-                    <div id="classic-settings">
-                        <div class="setting-group">
-                            <h3>문제 개수 설정</h3>
-                            <small style="margin-bottom: 10px;">(최소 5, 최대 50문제)</small>
-                            <div id="quantity-control">
-                                <button id="quantity-minus">-</button>
-                                <span id="problem-quantity" class="quantity-display">5</span>
-                                <button id="quantity-plus">+</button>
+                    <div class="settings-wrapper">
+                        <div id="classic-settings">
+                            <div class="setting-group">
+                                <h3>문제 개수 설정</h3>
+                                <small style="margin-bottom: 10px;">(최소 5, 최대 50문제)</small>
+                                <div id="quantity-control">
+                                    <button id="quantity-minus">-</button>
+                                    <span id="problem-quantity" class="quantity-display">5</span>
+                                    <button id="quantity-plus">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="time-attack-settings" style="display: none;">
-                        <div class="setting-group">
-                            <h3>도전 시간 설정</h3>
-                            <div id="time-control" style="margin-top: 10px;">
-                                <button id="time-minus">&lt;</button>
-                                <span id="time-limit-display" class="quantity-display">3분</span>
-                                <button id="time-plus">&gt;</button>
+                        <div id="time-attack-settings" style="display: none;">
+                            <div class="setting-group">
+                                <h3>도전 시간 설정</h3>
+                                <div id="time-control" style="margin-top: 10px;">
+                                    <button id="time-minus">&lt;</button>
+                                    <span id="time-limit-display" class="quantity-display">3분</span>
+                                    <button id="time-plus">&gt;</button>
+                                </div>
                             </div>
                         </div>
+                        <div id="settings-overlay" style="display: none;">
+                            <p id="overlay-message"></p>
+                        </div>
                     </div>
-                    <div id="settings-overlay" style="display: none;">
-                        <p id="overlay-message"></p>
+                    <div class="setting-group start-btn-container">
+                        <button id="start-quiz-btn" class="primary-btn">시작!</button>
                     </div>
-                </div>
-                <div class="setting-group start-btn-container">
-                    <button id="start-quiz-btn" class="primary-btn">시작!</button>
                 </div>
             </div>
-        </div>
     </div>
     
     <div id="problem-page">
@@ -959,7 +959,7 @@ button:hover {
     const webAppUrl = 'https://soft-wood-cf8e.bbglara.workers.dev/';
     
     const timeOptions = [3, 5, 7];
-    let selectedType = 'line', totalProblems = 5, currentProblem = 0, canvasMode = 'vertex', score = { results: [] }, currentProblemAttempts = 0, selectedDifficulty = '1', finalAccuracyValue = 0, hasSubmittedScore = false, isExitingIntentionally = false, gameMode = 'classic', timeLimitInMinutes = 3, remainingTime = 0, timerInterval = null;
+    let selectedType = 'line', totalProblems = 5, currentProblem = 0, canvasMode = 'vertex', score = { results: [] }, currentProblemAttempts = 0, selectedDifficulty = '1', finalAccuracyValue = 0, finalScoreValue = 0, hasSubmittedScore = false, isExitingIntentionally = false, gameMode = 'classic', timeLimitInMinutes = 3, remainingTime = 0, timerInterval = null;
     const canvas = document.getElementById('grid-canvas'), ctx = canvas.getContext('2d'), canvasWrapper = document.querySelector('.canvas-wrapper');
     let GRID_SIZE, GRID_COUNT, HALF_COUNT, CENTER_POINT, MIN_COORD, MAX_COORD;
     const COLLINEARITY_THRESHOLD = 1.0, MIN_ANGLE_COSINE = Math.cos(30 * Math.PI / 180), MAX_ANGLE_COSINE = Math.cos(150 * Math.PI / 180), MIN_SLOPE_DIFF = 2.0, MIN_DIST = 2;
@@ -1382,7 +1382,7 @@ function updateSettingsOverlay() {
         userLines = [];
 
         if (gameMode === 'timeAttack') {
-             if (timerInterval) { // End of game is handled by timer
+            if (timerInterval) { // End of game is handled by timer
                 let newProblem = null;
                 let attempt = 0;
                 const MAX_ATTEMPTS_NEXT = 100;
@@ -1449,72 +1449,78 @@ function updateSettingsOverlay() {
         return newProblem;
     }
 
-    function startQuiz() {
-        clearGameState();
+function startQuiz() {
+    // 1. Clear all previous game state to prevent carryover issues.
+    currentProblem = 0;
+    score = { results: [] };
+    currentProblemAttempts = 0;
+    userVertices = [];
+    userLines = [];
+    tempLineStart = null;
+    hoveredLine = null;
+    problemList = [];
+    hasSubmittedScore = false;
+
+    // 2. Set quiz parameters based on mode and difficulty.
+    if (selectedDifficulty === 'practice') {
+        if (gameMode === 'timeAttack') {
+            timeLimitInMinutes = 2; // Fixed time limit for practice mode
+        }
+        totalProblems = 3; // Fixed number of problems for practice mode
         
-        problemList = [];
+        // Generate a specific set of practice problems
+        if (selectedType === 'line') {
+            problemList.push(generateProblemWithRetry('line', 3));
+            problemList.push(generateProblemWithRetry('line', 4));
+            problemList.push(generateProblemWithRetry('line', 5));
+        } else if (selectedType === 'point') {
+            problemList.push(generateProblemWithRetry('point', 4));
+            problemList.push(generateProblemWithRetry('point', 4));
+            problemList.push(generateProblemWithRetry('point', 4));
+        } else { // both
+            problemList.push(generateProblemWithRetry('line', 3));
+            problemList.push(generateProblemWithRetry('line', 4));
+            problemList.push(generateProblemWithRetry('point', 4));
+        }
+        problemList = problemList.filter(p => p !== null);
+        totalProblems = problemList.length; // Finalize total problems based on successful generation
+
+    } else { // Normal Mode
+        let problemsToGenerate = (gameMode === 'classic') ? totalProblems : 1;
+        let attempt = 0;
+        const MAX_ATTEMPTS = problemsToGenerate * 20;
         let generatedVertexStrings = new Set();
         
-        if (selectedDifficulty === 'practice') {
-            if (gameMode === 'timeAttack') {
-                timeLimitInMinutes = 2; // 연습 모드는 2분 고정
-            }
-            totalProblems = 3;
-            if (selectedType === 'line') {
-                problemList.push(generateProblemWithRetry('line', 3));
-                problemList.push(generateProblemWithRetry('line', 4));
-                problemList.push(generateProblemWithRetry('line', 5));
-            } else if (selectedType === 'point') {
-                problemList.push(generateProblemWithRetry('point', 4));
-                problemList.push(generateProblemWithRetry('point', 4));
-                problemList.push(generateProblemWithRetry('point', 4));
-            } else { // both
-                problemList.push(generateProblemWithRetry('line', 3));
-                problemList.push(generateProblemWithRetry('line', 4));
-                problemList.push(generateProblemWithRetry('point', 4));
-            }
-            problemList = problemList.filter(p => p !== null);
-            totalProblems = problemList.length;
-
-        } else { // Normal Mode
-            let problemsToGenerate = (gameMode === 'classic') ? totalProblems : 1;
-            let attempt = 0;
-            const MAX_ATTEMPTS = problemsToGenerate * 20;
-            while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
-                let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
-                const newProblem = generateRandomProblem(type);
-                if (newProblem && newProblem.initialVertices.length >= 2) {
-                    const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
-                    if (!generatedVertexStrings.has(vertexString)) {
-                        problemList.push(newProblem);
-                        generatedVertexStrings.add(vertexString);
-                    }
+        // Generate problems dynamically
+        while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
+            let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
+            const newProblem = generateRandomProblem(type);
+            if (newProblem && newProblem.initialVertices.length >= 2) {
+                const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
+                if (!generatedVertexStrings.has(vertexString)) {
+                    problemList.push(newProblem);
+                    generatedVertexStrings.add(vertexString);
                 }
-                attempt++;
             }
-             if (gameMode === 'classic') {
-                totalProblems = problemList.length;
-            }
+            attempt++;
         }
-
-
-        if (problemList.length === 0) {
-            alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
-            location.reload();
-            return;
+        if (gameMode === 'classic') {
+            totalProblems = problemList.length; // Adjust totalProblems to the actual number generated
         }
-
-        currentProblem = 0; 
-        score = { results: [] };
-        currentProblemAttempts = 0;
-        userVertices = [];
-        userLines = [];
-        hasSubmittedScore = false;
-        
-        showPage('problem-page');
-        if (gameMode === 'timeAttack') startTimer();
-        loadProblem();
     }
+
+    // 3. Handle problem generation failure.
+    if (problemList.length === 0) {
+        alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
+        location.reload();
+        return;
+    }
+    
+    // 4. Start the quiz.
+    showPage('problem-page');
+    if (gameMode === 'timeAttack') startTimer();
+    loadProblem();
+}
     
     function loadProblem() {
         const isTimed = gameMode === 'timeAttack';
@@ -1688,7 +1694,7 @@ function updateSettingsOverlay() {
         if (canvasMode === 'line') {
             renderPointsForLineMode();
         } else {
-             renderUserVertices();
+            renderUserVertices();
         }
     }
 
@@ -1853,7 +1859,7 @@ function updateSettingsOverlay() {
                 
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
         
-finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
+                finalScore = Math.round(speedRatio * accuracy * 50);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
@@ -1864,9 +1870,9 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
                 if (selectedType === 'point') typeMultiplier = 1.1;
                 else if (selectedType === 'both') typeMultiplier = 1.05;
                 finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
-            }
+             }
         }
-
+        finalScoreValue = finalScore;
         document.getElementById('correct-count').textContent = correctCount;
         document.getElementById('retried-count').textContent = retriedCount;
         document.getElementById('final-accuracy').textContent = `${accuracy}%`;
@@ -1935,7 +1941,7 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
         if (document.getElementById('problem-page').style.display === 'block' && problemList.length === 0) {
             return;
         }
-        const gameState = { problemList, currentProblem, score, userVertices, userLines, canvasMode, selectedType, selectedDifficulty, totalProblems, currentProblemAttempts, hasSubmittedScore, gameMode, timeLimitInMinutes, remainingTime };
+        const gameState = { problemList, currentProblem, score, userVertices, userLines, canvasMode, selectedType, selectedDifficulty, totalProblems, currentProblemAttempts, finalScoreValue, hasSubmittedScore, gameMode, timeLimitInMinutes, remainingTime };
         localStorage.setItem('quizState', JSON.stringify(gameState));
     }
     
@@ -1949,11 +1955,11 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
         }
         
         const isClassicInProgress = savedState.gameMode === 'classic' &&
-                                      savedState.totalProblems > 0 &&
-                                      savedState.currentProblem < savedState.totalProblems;
+                                     savedState.totalProblems > 0 &&
+                                     savedState.currentProblem < savedState.totalProblems;
 
         const isTimeAttackInProgress = savedState.gameMode === 'timeAttack' &&
-                                           savedState.remainingTime > 0;
+                                          savedState.remainingTime > 0;
 
         if (isClassicInProgress || isTimeAttackInProgress) {
             problemList = savedState.problemList;
@@ -1964,6 +1970,7 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
             selectedDifficulty = savedState.selectedDifficulty;
             totalProblems = savedState.totalProblems;
             currentProblemAttempts = savedState.currentProblemAttempts;
+            finalScoreValue = savedState.finalScoreValue;
             hasSubmittedScore = savedState.hasSubmittedScore;
             gameMode = savedState.gameMode;
             timeLimitInMinutes = savedState.timeLimitInMinutes;
@@ -1981,7 +1988,7 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
                            (savedState.gameMode === 'timeAttack' && savedState.remainingTime <= 0);
 
         if (isFinished) {
-            Object.assign(window, savedState); // This is fine for finished state
+            Object.assign(window, savedState); 
             return 'finished';
         }
         
@@ -2005,10 +2012,7 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
         messageEl.style.color = '#333'; 
         const data = { 
             initial, 
-            problems: totalProblems, 
-            accuracy: finalAccuracyValue, 
-            difficulty: selectedDifficulty, 
-            type: selectedType,
+            score: finalScoreValue, 
             mode: gameMode
         }; 
         fetch(webAppUrl, { 
@@ -2065,8 +2069,10 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
             document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
             document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
             document.getElementById('back-to-mode-select-btn').addEventListener('click', () => {
-                resetGame();
-                showPage('mode-selection-page');
+                if (confirm('진행 상황이 사라집니다. 정말로 첫 페이지로 돌아갈까요?')) {
+                    resetGame();
+                    showPage('mode-selection-page');
+                }
             });
             
             canvas.addEventListener('mousemove', handleCanvasMouseMove);
