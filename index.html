@@ -2019,10 +2019,10 @@ function startQuiz() {
         const data = { 
             initial, 
             score: finalScoreValue, 
-            problems: problemList.length, // ⭐⭐⭐ 수정된 부분: Apps Script에 problems를 전달합니다.
-            accuracy: finalAccuracyValue, // ⭐⭐⭐ 수정된 부분: Apps Script에 accuracy를 전달합니다.
-            difficulty: selectedDifficulty, // ⭐⭐⭐ 수정된 부분: Apps Script에 difficulty를 전달합니다.
-            type: selectedType, // ⭐⭐⭐ 수정된 부분: Apps Script에 type을 전달합니다.
+            problems: problemList.length, 
+            accuracy: finalAccuracyValue, 
+            difficulty: selectedDifficulty, 
+            type: selectedType, 
             mode: gameMode
         }; 
         fetch(webAppUrl, { 
