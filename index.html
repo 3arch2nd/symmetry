@@ -14,7 +14,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
-/* 기본 스타일 */
 body {
     font-family: 'Gowun Dodum', sans-serif;
     display: flex;
@@ -113,7 +112,7 @@ button:hover {
 }
 .mode-buttons button {
     padding: 20px 30px;
-    font-size: 20px; /* [수정] PC 기본 폰트 크기 증가 */
+    font-size: 20px;
     width: 100%;
     max-width: 250px;
 }
@@ -398,7 +397,7 @@ button:hover {
 }
 #problem-counter-display {
     width: 120px;
-    font-size: 1em; /* 글자 크기를 1.2em에서 1em으로 줄였습니다. */
+    font-size: 1em;
     font-weight: bold;
     text-align: right;
     padding-right: 10px;
@@ -637,7 +636,7 @@ button:hover {
 #hof-table-classic, #hof-table-timeattack { width: 100%; border-collapse: collapse; }
 #hof-table-classic th, #hof-table-classic td,
 #hof-table-timeattack th, #hof-table-timeattack td { padding: 8px; border-bottom: 1px solid #eee; }
-#hof-table-classic th, #hof-table-timeattack th { background-color: #f8f9fa; }
+#hof-table-classic th, #hof-table-classic td { background-color: #f8f9fa; }
 
 .confirm-clear-popup p {
     font-size: 1.1em;
@@ -664,7 +663,6 @@ button:hover {
 .mobile-title, .mobile-home { display: none; }
 
 
-/* 💻📱 반응형 웹 디자인 (모바일 최적화) 📱💻 */
 @media (max-width: 768px) {
     .main-layout { flex-direction: column; }
     
@@ -715,7 +713,6 @@ button:hover {
         font-size: 1.3em;
         line-height: 1.3;
     }
-    /* [추가] 모바일에서만 '모드' 글자가 줄바꿈되도록 합니다. */
     .mode-buttons button span {
         display: block;
     }
@@ -1154,7 +1151,7 @@ button:hover {
                     initialVertices, initialLines, allVertices: allVerticesSorted, allLines
                 };
 
-            } else { // Not slanted
+            } else {
                 let initialVertices;
                 if (axisDirection === 'vertical') {
                     const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) };
@@ -1178,7 +1175,7 @@ button:hover {
                     }
                     nonAxisPoints.sort((a, b) => a.y - b.y);
                     initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
-                } else { // horizontal
+                } else {
                     const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT };
                     const axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT };
                     let nonAxisPoints = [];
@@ -1334,7 +1331,7 @@ function updateSettingsOverlay() {
         overlay.style.display = 'flex';
         if (gameMode === 'classic') {
             message.innerHTML = '문제 개수는<br>3개로 고정됩니다.';
-        } else { // timeAttack
+        } else {
             message.innerHTML = '시간은 2분으로<br>고정됩니다.';
         }
     } else {
@@ -1350,7 +1347,7 @@ function updateSettingsOverlay() {
         if (gameMode === 'classic') {
             classicSettings.style.display = 'block';
             timeAttackSettings.style.display = 'none';
-        } else { // timeAttack
+        } else {
             classicSettings.style.display = 'none';
             timeAttackSettings.style.display = 'block';
         }
@@ -1382,7 +1379,7 @@ function updateSettingsOverlay() {
         userLines = [];
 
         if (gameMode === 'timeAttack') {
-            if (timerInterval) { // End of game is handled by timer
+            if (timerInterval) {
                 let newProblem = null;
                 let attempt = 0;
                 const MAX_ATTEMPTS_NEXT = 100;
@@ -1394,13 +1391,11 @@ function updateSettingsOverlay() {
                 if (newProblem) {
                     problemList.push(newProblem);
                 } else {
-                    // Could not generate new problem, end game
                     stopTimer();
                     showFinalResult();
                     return;
                 }
             } else {
-                // Timer already stopped, just show results
                 showFinalResult();
                 return;
             }
@@ -1450,7 +1445,6 @@ function updateSettingsOverlay() {
     }
 
 function startQuiz() {
-    // 1. Clear all previous game state to prevent carryover issues.
     currentProblem = 0;
     score = { results: [] };
     currentProblemAttempts = 0;
@@ -1461,14 +1455,12 @@ function startQuiz() {
     problemList = [];
     hasSubmittedScore = false;
 
-    // 2. Set quiz parameters based on mode and difficulty.
     if (selectedDifficulty === 'practice') {
         if (gameMode === 'timeAttack') {
-            timeLimitInMinutes = 2; // Fixed time limit for practice mode
+            timeLimitInMinutes = 2;
         }
-        totalProblems = 3; // Fixed number of problems for practice mode
+        totalProblems = 3;
         
-        // Generate a specific set of practice problems
         if (selectedType === 'line') {
             problemList.push(generateProblemWithRetry('line', 3));
             problemList.push(generateProblemWithRetry('line', 4));
@@ -1477,21 +1469,20 @@ function startQuiz() {
             problemList.push(generateProblemWithRetry('point', 4));
             problemList.push(generateProblemWithRetry('point', 4));
             problemList.push(generateProblemWithRetry('point', 4));
-        } else { // both
+        } else {
             problemList.push(generateProblemWithRetry('line', 3));
             problemList.push(generateProblemWithRetry('line', 4));
             problemList.push(generateRandomProblem('point', 4));
         }
         problemList = problemList.filter(p => p !== null);
-        totalProblems = problemList.length; // Finalize total problems based on successful generation
+        totalProblems = problemList.length;
 
-    } else { // Normal Mode
+    } else {
         let problemsToGenerate = (gameMode === 'classic') ? totalProblems : 1;
         let attempt = 0;
         const MAX_ATTEMPTS = problemsToGenerate * 20;
         let generatedVertexStrings = new Set();
         
-        // Generate problems dynamically
         while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
             let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
             const newProblem = generateRandomProblem(type);
@@ -1505,18 +1496,16 @@ function startQuiz() {
             attempt++;
         }
         if (gameMode === 'classic') {
-            totalProblems = problemList.length; // Adjust totalProblems to the actual number generated
+            totalProblems = problemList.length;
         }
     }
 
-    // 3. Handle problem generation failure.
     if (problemList.length === 0) {
         alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
         location.reload();
         return;
     }
     
-    // 4. Start the quiz.
     showPage('problem-page');
     if (gameMode === 'timeAttack') startTimer();
     loadProblem();
@@ -1541,14 +1530,14 @@ function startQuiz() {
         if (isTimed) {
             counterDisplay.style.display = 'none';
             timerDisplay.style.display = 'block';
-        } else { // Classic
+        } else {
             counterDisplay.style.display = 'block';
             timerDisplay.style.display = 'none';
             counterDisplay.textContent = '남은 문제 ' + (totalProblems - (currentProblem + 1)) + '개';
         }
 
         const currentP = problemList[currentProblem];
-        if(!currentP) { // Failsafe for empty problem
+        if(!currentP) {
             console.error("Problem could not be loaded.", { currentProblem, problemList });
             showFinalResult();
             return;
@@ -1795,7 +1784,7 @@ function startQuiz() {
         const isDiff2 = selectedDifficulty == 2;
         if (problem.type === 'line') {
             return isDiff2 ? 20 : 10;
-        } else { // point
+        } else {
             return isDiff2 ? 90 : 60;
         }
     }
@@ -1811,7 +1800,6 @@ function startQuiz() {
         saveGameState();
         showPage('final-result-page');
 
-        // 정확도와 최종 점수 계산 로직
         let correctCount = 0;
         let retriedCount = 0;
         let totalWeightedScore = 0;
@@ -1865,7 +1853,7 @@ function startQuiz() {
                          } else {
                              totalTargetTime += 60;
                          }
-                    } else { // 'line' 또는 'both'
+                    } else {
                         if (selectedDifficulty == 2) {
                              totalTargetTime += 20;
                         } else {
@@ -1882,7 +1870,7 @@ function startQuiz() {
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
-        } else { // Classic Mode or Practice
+        } else {
             document.getElementById('time-attack-avg-time').style.display = 'none';
              if (!isPractice) {
                  let typeMultiplier = 1.0;
@@ -2191,7 +2179,6 @@ function startQuiz() {
             console.error("오류가 발생하여 앱을 초기화합니다:", error);
             
             clearGameState(); 
-            // location.reload() might be too aggressive, let's try resetting state and UI first
             try {
                 resetGame();
                 showPage('mode-selection-page');
