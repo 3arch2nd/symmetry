@@ -1480,7 +1480,7 @@ function startQuiz() {
         } else { // both
             problemList.push(generateProblemWithRetry('line', 3));
             problemList.push(generateProblemWithRetry('line', 4));
-            problemList.push(generateProblemWithRetry('point', 4));
+            problemList.push(generateRandomProblem('point', 4));
         }
         problemList = problemList.filter(p => p !== null);
         totalProblems = problemList.length; // Finalize total problems based on successful generation
@@ -1811,7 +1811,7 @@ function startQuiz() {
         saveGameState();
         showPage('final-result-page');
 
-        // **1. 정확도 계산 로직 수정**
+        // 정확도와 최종 점수 계산 로직 수정
         let correctCount = 0;
         let retriedCount = 0;
         let totalWeightedScore = 0;
@@ -1821,13 +1821,11 @@ function startQuiz() {
                 totalWeightedScore += 1.0;
             } else {
                 retriedCount++;
-                // 재도전 문제에 대한 가중치 점수
-                // 1번 재도전: 0.6, 2번 재도전: 0.4, 3번 재도전: 0.2
                 totalWeightedScore += Math.max(0, 1.0 - attempts * 0.4);
             }
         });
         
-        const total = score.results.length; // 실제 해결한 문제 수로 변경
+        const total = score.results.length; 
         const accuracy = total > 0 ? parseFloat(((totalWeightedScore / total) * 100).toFixed(1)) : 0;
         finalAccuracyValue = accuracy;
         
@@ -1857,18 +1855,20 @@ function startQuiz() {
                 document.getElementById('avg-time-display').textContent = 'N/A';
             } else {
                 const totalTimeSpent = (timeLimitInMinutes * 60) - remainingTime;
-                const averageTimePerProblem = totalTimeSpent / totalProblemsSolved;
+                // ⭐⭐⭐ 수정된 부분: 0으로 나누기 방지
+                const averageTimePerProblem = totalProblemsSolved > 0 ? totalTimeSpent / totalProblemsSolved : 0;
                 
                 let totalTargetTime = 0;
                 for (let i = 0; i < totalProblemsSolved; i++) {
                     totalTargetTime += getTargetTimeForProblem(problemList[i]);
                 }
-                const averageTargetTime = totalTargetTime / totalProblemsSolved;
+                const averageTargetTime = totalProblemsSolved > 0 ? totalTargetTime / totalProblemsSolved : 0;
                 
+                // ⭐⭐⭐ 수정된 부분: 0으로 나누기 방지
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
         
-                // 최종 점수 계산 로직 변경
-                finalScore = Math.round(speedRatio * accuracy * 50);
+                // ⭐⭐⭐ 수정된 부분: 최종 점수 계산식
+                finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
