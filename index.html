@@ -1810,21 +1810,29 @@ function startQuiz() {
 
         saveGameState();
         showPage('final-result-page');
-        let totalWeightedScore = 0, correctCount = 0, retriedCount = 0;
+
+        // **1. 정확도 계산 로직 수정**
+        let correctCount = 0;
+        let retriedCount = 0;
+        let totalWeightedScore = 0;
         score.results.forEach(attempts => {
-            if (attempts === 0) { totalWeightedScore += 1.0; correctCount++; }
-            else if (attempts === 1) { totalWeightedScore += 0.6; retriedCount++; }
-            else if (attempts === 2) { totalWeightedScore += 0.4; retriedCount++; }
-            else if (attempts === 3) { totalWeightedScore += 0.2; retriedCount++; }
-            else { retriedCount++; }
+            if (attempts === 0) {
+                correctCount++;
+                totalWeightedScore += 1.0;
+            } else {
+                retriedCount++;
+                // 재도전 문제에 대한 가중치 점수
+                // 1번 재도전: 0.6, 2번 재도전: 0.4, 3번 재도전: 0.2
+                totalWeightedScore += Math.max(0, 1.0 - attempts * 0.4);
+            }
         });
         
-        const total = totalProblems > 0 ? totalProblems : score.results.length;
+        const total = score.results.length; // 실제 해결한 문제 수로 변경
         const accuracy = total > 0 ? parseFloat(((totalWeightedScore / total) * 100).toFixed(1)) : 0;
         finalAccuracyValue = accuracy;
         
         const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
-        let finalScore;
+        let finalScore = 0;
         
         const isPractice = selectedDifficulty === 'practice';
 
@@ -1859,6 +1867,7 @@ function startQuiz() {
                 
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
         
+                // 최종 점수 계산 로직 변경
                 finalScore = Math.round(speedRatio * accuracy * 50);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
