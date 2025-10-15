@@ -2051,6 +2051,7 @@ finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
             const gameState = loadGameState();
             
             if (gameState === 'finished') {
+                score = { results: [] };
                 showFinalResult();
             } else if (gameState === 'in-progress') {
                 showPage('problem-page');
