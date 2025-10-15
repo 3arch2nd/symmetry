@@ -1,637 +1,637 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>선대칭/점대칭도형 완전 정복</title>
-    <meta property="og:title" content="선대칭/점대칭도형 완전 정복">
-    <meta property="og:description" content="선대칭, 점대칭도형 문제를 연습해보세요!">
-    <meta property="og:image" content="https://3arch2nd.github.io/symmetry/thumb.png">
-    <meta property="og:url" content="https://3arch2nd.github.io/symmetry/">
-    <meta property="og:type" content="website">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
-    <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>선대칭/점대칭도형 완전 정복</title>
+    <meta property="og:title" content="선대칭/점대칭도형 완전 정복">
+    <meta property="og:description" content="선대칭, 점대칭도형 문제를 연습해보세요!">
+    <meta property="og:image" content="https://3arch2nd.github.io/symmetry/thumb.png">
+    <meta property="og:url" content="https://3arch2nd.github.io/symmetry/">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
 /* 기본 스타일 */
 body {
-    font-family: 'Gowun Dodum', sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #f4f7f6;
-    color: #333;
-    text-align: center;
+    font-family: 'Gowun Dodum', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    text-align: center;
 }
 .container {
-    position: relative;
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 760px;
-    text-align: center;
-    margin: 20px auto;
-    box-sizing: border-box;
+    position: relative;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 760px;
+    text-align: center;
+    margin: 20px auto;
+    box-sizing: border-box;
 }
 h1 {
-    color: #4b8134;
-    margin-bottom: 20px;
-    font-size: 2em;
+    color: #4b8134;
+    margin-bottom: 20px;
+    font-size: 2em;
 }
 h2 {
-    margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 small {
-    display: block;
-    font-size: 18px;
-    color: #6c757d;
-    margin-bottom: 20px;
-    line-height: 1.5;
+    display: block;
+    font-size: 18px;
+    color: #6c757d;
+    margin-bottom: 20px;
+    line-height: 1.5;
 }
 button {
-    font-family: 'Gowun Dodum', sans-serif;
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s, transform 0.1s;
+    font-family: 'Gowun Dodum', sans-serif;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.1s;
 }
 button:hover {
-    transform: translateY(-1px);
+    transform: translateY(-1px);
 }
 .primary-btn {
-    background-color: #a0c179;
-    color: white;
+    background-color: #a0c179;
+    color: white;
 }
 .primary-btn:hover {
-    background-color: #8cb24b;
+    background-color: #8cb24b;
 }
 .secondary-btn {
-    background-color: #e9e9e9;
-    color: #333;
-    border: none;
+    background-color: #e9e9e9;
+    color: #333;
+    border: none;
 }
 .secondary-btn:hover {
-    background-color: #d9d9d9;
+    background-color: #d9d9d9;
 }
 #clear-canvas-btn {
-    background-color: #e06666;
-    color: white;
+    background-color: #e06666;
+    color: white;
 }
 #clear-canvas-btn:hover {
-    background-color: #cc4125;
+    background-color: #cc4125;
 }
 .mode-btn-active {
-    background-color: #ffc107;
-    color: #333;
-    font-weight: bold;
+    background-color: #ffc107;
+    color: #333;
+    font-weight: bold;
 }
 #mode-selection-page, #setup-page, #problem-page, #final-result-page {
-    display: none;
+    display: none;
 }
 #mode-selection-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
 }
 .mode-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-    width: 100%;
-    justify-content: space-around;
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: space-around;
 }
 .mode-buttons button {
-    padding: 20px 30px;
-    font-size: 20px; /* [수정] PC 기본 폰트 크기 증가 */
-    width: 100%;
-    max-width: 250px;
+    padding: 20px 30px;
+    font-size: 20px; /* [수정] PC 기본 폰트 크기 증가 */
+    width: 100%;
+    max-width: 250px;
 }
 
 #classic-mode-btn {
-    background-color: #ffc107;
-    color: #333;
-    font-weight: bold;
+    background-color: #ffc107;
+    color: #333;
+    font-weight: bold;
 }
 #classic-mode-btn:hover {
-    background-color: #fdb827;
+    background-color: #fdb827;
 }
 #time-attack-mode-btn {
-    background-color: #e06666;
-    color: white;
-    font-weight: bold;
+    background-color: #e06666;
+    color: white;
+    font-weight: bold;
 }
 #time-attack-mode-btn:hover {
-    background-color: #cc4125;
+    background-color: #cc4125;
 }
 
 
 .mode-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
 }
 .mode-description {
-    font-size: 16px;
-    color: #6c757d;
-    line-height: 1.5;
+    font-size: 16px;
+    color: #6c757d;
+    line-height: 1.5;
 }
 
 #setup-page {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 .setting-group {
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    flex-grow: 1;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    flex-grow: 1;
 }
 .option-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 5px;
-    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
 }
 .option-buttons button {
-    flex-grow: 1;
-    padding: 10px 20px;
+    flex-grow: 1;
+    padding: 10px 20px;
 }
 .option-buttons button.selected {
-    background-color: #ffc107;
-    color: #333;
-    font-weight: bold;
+    background-color: #ffc107;
+    color: #333;
+    font-weight: bold;
 }
 .canvas-wrapper {
-    position: relative;
-    display: block;
-    margin: 0 auto 20px auto;
-    width: 100%;
-    max-width: 400px;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    border: 2px solid #333;
-    box-sizing: border-box;
+    position: relative;
+    display: block;
+    margin: 0 auto 20px auto;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border: 2px solid #333;
+    box-sizing: border-box;
 }
 #grid-canvas {
-    background-color: white;
-    cursor: crosshair;
-    width: 100%;
-    height: 100%;
-    display: block;
-    -webkit-tap-highlight-color: transparent;
+    background-color: white;
+    cursor: crosshair;
+    width: 100%;
+    height: 100%;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
 }
 .user-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #dc3545;
-    border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    box-shadow: 0 0 3px rgba(0,0,0,0.5);
-    z-index: 10;
+    width: 8px;
+    height: 8px;
+    background-color: #dc3545;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    z-index: 10;
 }
 .problem-dot, .line-dot {
-    width: 8px;
-    height: 8px;
-    background-color: black;
-    border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    box-shadow: 0 0 3px rgba(0,0,0,0.5);
-    z-index: 10;
+    width: 8px;
+    height: 8px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    z-index: 10;
 }
 .selected-line-dot {
-    width: 10px;
-    height: 10px;
-    background-color: #ff0000;
-    border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    box-shadow: 0 0 5px rgba(255,0,0,0.8);
-    z-index: 11;
+    width: 10px;
+    height: 10px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow: 0 0 5px rgba(255,0,0,0.8);
+    z-index: 11;
 }
 .canvas-controls {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 .correct, .incorrect {
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
-    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 15px;
 }
 .correct { color: #28a745; }
 .incorrect { color: #dc3545; }
 #quantity-control, #time-control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
 }
 #quantity-control button, #time-control button {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    padding: 0;
-    margin: 0;
-    font-size: 20px;
-    font-weight: bold;
-    line-height: 30px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #333;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 30px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #333;
 }
 #quantity-control button:hover, #time-control button:hover {
-    background-color: #e0e0e0;
+    background-color: #e0e0e0;
 }
 .quantity-display {
-    display: inline-block;
-    width: auto;
-    min-width: 40px;
-    height: auto;
-    background-color: transparent;
-    border-radius: 0;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    box-shadow: none;
-    vertical-align: baseline;
-    margin: 0;
-    text-align: center;
+    display: inline-block;
+    width: auto;
+    min-width: 40px;
+    height: auto;
+    background-color: transparent;
+    border-radius: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    box-shadow: none;
+    vertical-align: baseline;
+    margin: 0;
+    text-align: center;
 }
 .footer {
-    margin-top: 20px;
-    font-size: 12px;
-    color: #ccc;
-    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #ccc;
+    text-align: center;
 }
 .main-layout {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    width: 100%;
-    max-width: 800px;
-    align-items: stretch;
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+    align-items: stretch;
+    flex-wrap: wrap;
 }
 .main-layout h3 {
-    text-align: center;
+    text-align: center;
 }
 .left-panel {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 .right-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 .settings-wrapper {
-    position: relative;
-    flex-grow: 1;
+    position: relative;
+    flex-grow: 1;
 }
 .right-panel .setting-group, .left-panel .setting-group {
-    flex-grow: 1;
+    flex-grow: 1;
 }
 #start-quiz-btn {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    flex-shrink: 0;
 }
 .setting-group.start-btn-container {
-    border: none;
-    background-color: transparent;
-    padding: 0;
+    border: none;
+    background-color: transparent;
+    padding: 0;
 }
 #settings-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    border-radius: 8px;
-    z-index: 10;
-    padding: 10px;
-    box-sizing: border-box;
-    font-size: 1.1em;
-    font-weight: bold;
-    line-height: 1.5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 8px;
+    z-index: 10;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 1.1em;
+    font-weight: bold;
+    line-height: 1.5;
 }
 .problem-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 .home-button {
-    background-color: #e9e9e9;
-    color: #333;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    background-color: #e9e9e9;
+    color: #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
 }
 .home-button:hover {
-    background-color: #d9d9d9;
+    background-color: #d9d9d9;
 }
 #problem-number {
-    flex-grow: 1;
-    text-align: center;
-    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    margin: 0;
 }
 #timer-display {
-    width: 120px;
-    font-size: 1.2em;
-    font-weight: bold;
-    text-align: right;
-    padding-right: 10px;
-    color: #333;
-    display: none;
+    width: 120px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    color: #333;
+    display: none;
 }
 #problem-counter-display {
-    width: 120px;
-    font-size: 1em; /* 글자 크기를 1.2em에서 1em으로 줄였습니다. */
-    font-weight: bold;
-    text-align: right;
-    padding-right: 10px;
-    color: #888;
-    display: none;
+    width: 120px;
+    font-size: 1em; /* 글자 크기를 1.2em에서 1em으로 줄였습니다. */
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    color: #888;
+    display: none;
 }
 #timer-display.time-warning {
-    color: #dc3545;
-    animation: pulse 1s infinite;
+    color: #dc3545;
+    animation: pulse 1s infinite;
 }
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 .problem-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
 }
 #check-answer-btn {
-    position: relative;
-    overflow: hidden;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: white;
-    color: black;
-    border: 2px solid #999;
+    position: relative;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: white;
+    color: black;
+    border: 2px solid #999;
 }
 #check-answer-btn:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
 #check-answer-btn, #next-problem-btn {
-    min-width: 180px;
+    min-width: 180px;
 }
 
 #next-problem-btn {
-    border: 2px solid transparent;
+    border: 2px solid transparent;
 }
 
 #check-answer-btn .progress-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #a0c179;
-    transform: translateX(-100%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #a0c179;
+    transform: translateX(-100%);
 }
 #check-answer-btn .button-text {
-    position: relative;
-    z-index: 1;
+    position: relative;
+    z-index: 1;
 }
 
 #check-answer-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .check-answer-guide {
-    font-size: 0.8em;
-    color: #888;
-    margin-top: 8px;
-    transition: color 0.3s ease;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 8px;
+    transition: color 0.3s ease;
 }
 
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
 }
 .popup-box {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    position: relative;
-    width: 80%;
-    max-width: 450px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    width: 80%;
+    max-width: 450px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .popup-box .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
 }
 .popup-box .close-btn:hover { color: #6c757d; }
 .result-popup #popup-main-message {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 0;
-    line-height: 1.5;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0;
+    line-height: 1.5;
 }
 .result-popup #popup-detail-message { display: none; }
 .result-popup #popup-next-btn { margin-top: 20px; }
 .final-result-layout {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    margin: 30px 0;
-    gap: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin: 30px 0;
+    gap: 20px;
 }
 .result-left, .result-right {
-    flex: 1;
-    padding: 20px;
+    flex: 1;
+    padding: 20px;
 }
 .result-left {
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 .result-right p {
-    font-size: 1.1em;
-    margin: 15px 0;
+    font-size: 1.1em;
+    margin: 15px 0;
 }
 #final-accuracy {
-    font-size: 4em;
-    font-weight: bold;
-    color: #4b8134;
-    margin-top: 10px;
+    font-size: 4em;
+    font-weight: bold;
+    color: #4b8134;
+    margin-top: 10px;
 }
 .score-display {
-    margin-top: 20px;
-    font-size: 1.1em;
-    font-weight: bold;
+    margin-top: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
 }
 #final-score {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: #4b8134;
-    display: inline-block;
-    margin-left: 5px;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #4b8134;
+    display: inline-block;
+    margin-left: 5px;
 }
 .result-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
 }
 #qr-code-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 5px 10px;
-    font-size: 14px;
-    z-index: 20;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
+    font-size: 14px;
+    z-index: 20;
 }
 #qr-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
 }
 .popup-qr {
-    background-color: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    position: relative;
-    text-align: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    text-align: center;
 }
 .popup-qr img {
-    max-width: 180px;
-    height: auto;
+    max-width: 180px;
+    height: auto;
 }
 .popup-qr p {
-    margin-top: 15px;
-    color: #666;
+    margin-top: 15px;
+    color: #666;
 }
 .close-btn-qr {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
 }
 #hof-popup-overlay { background-color: rgba(0, 0, 0, 0.2); }
 .popup-hof { max-width: 700px; }
 .hof-input-group { margin: 20px 0; }
 .hof-input-group input {
-    font-family: 'Gowun Dodum', sans-serif;
-    font-size: 18px;
-    padding: 8px;
-    width: 80px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-right: 10px;
-    text-transform: uppercase;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 18px;
+    padding: 8px;
+    width: 80px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+    text-transform: uppercase;
 }
 .hof-columns {
-    display: flex;
-    gap: 20px;
-    width: 100%;
+    display: flex;
+    gap: 20px;
+    width: 100%;
 }
 .hof-column {
-    flex: 1;
+    flex: 1;
 }
 .hof-column h3 {
-    margin-top: 0;
+    margin-top: 0;
 }
 .hof-table-container { max-height: 300px; overflow-y: auto; margin-top: 20px;}
 #hof-table-classic, #hof-table-timeattack { width: 100%; border-collapse: collapse; }
@@ -640,322 +640,1571 @@ button:hover {
 #hof-table-classic th, #hof-table-timeattack th { background-color: #f8f9fa; }
 
 .confirm-clear-popup p {
-    font-size: 1.1em;
-    margin-bottom: 25px;
-    line-height: 1.6;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    line-height: 1.6;
 }
 .confirm-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
 }
 .confirm-buttons button {
-    padding: 10px 30px;
-    font-weight: bold;
+    padding: 10px 30px;
+    font-weight: bold;
 }
 #confirm-clear-yes-btn {
-    background-color: #e06666;
-    color: white;
+    background-color: #e06666;
+    color: white;
 }
 #confirm-clear-yes-btn:hover {
-    background-color: #cc4125;
+    background-color: #cc4125;
 }
 .mobile-title, .mobile-home { display: none; }
 
 
 /* 💻📱 반응형 웹 디자인 (모바일 최적화) 📱💻 */
 @media (max-width: 768px) {
-    .main-layout { flex-direction: column; }
-    
-    .left-panel { 
-        flex-direction: row; 
-        gap: 10px;
-        margin-top: 0;
-    }
+    .main-layout { flex-direction: column; }
+    
+    .left-panel { 
+        flex-direction: row; 
+        gap: 10px;
+        margin-top: 0;
+    }
 
-    .right-panel { 
-        width: 100%; 
-        margin-top: 20px; 
-    }
-    
-    .option-buttons { flex-direction: column; }
-    .problem-footer { justify-content: center; }
-    .final-result-layout { flex-direction: column; }
-    .result-left { border-right: none; border-bottom: 1px solid #ddd; width: 100%; }
-    .hof-columns { flex-direction: column; }
+    .right-panel { 
+        width: 100%; 
+        margin-top: 20px; 
+    }
+    
+    .option-buttons { flex-direction: column; }
+    .problem-footer { justify-content: center; }
+    .final-result-layout { flex-direction: column; }
+    .result-left { border-right: none; border-bottom: 1px solid #ddd; width: 100%; }
+    .hof-columns { flex-direction: column; }
 }
 
 @media (max-width: 480px) {
-    .container {
-        padding: 15px;
-    }
-    
-    h1 { font-size: 1.6em; }
-    h2 { font-size: 1.2em; }
-    small { font-size: 16px; line-height: 1.4; }
+    .container {
+        padding: 15px;
+    }
+    
+    h1 { font-size: 1.6em; }
+    h2 { font-size: 1.2em; }
+    small { font-size: 16px; line-height: 1.4; }
 
-    #mode-selection-page h1, 
-    #setup-page h1 {
-        padding-top: 30px;
-        margin-bottom: 10px;
-    }
+    #mode-selection-page h1, 
+    #setup-page h1 {
+        padding-top: 30px;
+        margin-bottom: 10px;
+    }
 
-    #mode-selection-page {
-        gap: 10px;
-    }
-    #mode-selection-page h2 {
-        margin-bottom: 10px;
-    }
-    .mode-buttons {
-        margin-top: 10px;
-    }
-    .mode-buttons button {
-        padding: 15px 10px;
-        font-size: 1.3em;
-        line-height: 1.3;
-    }
-    /* [추가] 모바일에서만 '모드' 글자가 줄바꿈되도록 합니다. */
-    .mode-buttons button span {
-        display: block;
-    }
-    .mode-description {
-        font-size: 14px;
-    }
+    #mode-selection-page {
+        gap: 10px;
+    }
+    #mode-selection-page h2 {
+        margin-bottom: 10px;
+    }
+    .mode-buttons {
+        margin-top: 10px;
+    }
+    .mode-buttons button {
+        padding: 15px 10px;
+        font-size: 1.3em;
+        line-height: 1.3;
+    }
+    /* [추가] 모바일에서만 '모드' 글자가 줄바꿈되도록 합니다. */
+    .mode-buttons button span {
+        display: block;
+    }
+    .mode-description {
+        font-size: 14px;
+    }
 
-    .desktop-title { display: none; }
-    .mobile-title { display: inline; }
-    .desktop-home { display: none; }
-    .mobile-home { display: inline; }
-    .home-button { padding: 8px 10px; }
-    #back-to-mode-select-btn {
-        top: 10px !important;
-        left: 10px !important;
-    }
+    .desktop-title { display: none; }
+    .mobile-title { display: inline; }
+    .desktop-home { display: none; }
+    .mobile-home { display: inline; }
+    .home-button { padding: 8px 10px; }
+    #back-to-mode-select-btn {
+        top: 10px !important;
+        left: 10px !important;
+    }
 }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <button id="qr-code-btn" class="secondary-btn">QR 코드</button>
-    
-    <div id="mode-selection-page">
-        <h1>
-            <span class="desktop-title">선대칭/점대칭도형 완전 정복</span>
-            <span class="mobile-title">선대칭/점대칭도형<br>완전 정복</span>
-        </h1>
-        <h2>모드를 선택하세요.</h2>
-        <div class="mode-buttons">
-            <div class="mode-option">
-                <button id="classic-mode-btn">🎓 클래식 <span>모드</span></button>
-                <small class="mode-description">
-                    무작위로 생성되는 문제를<br>원하는 만큼 연습하세요!
-                </small>
-            </div>
-            <div class="mode-option">
-                <button id="time-attack-mode-btn">⏱️ 타임어택 <span>모드</span></button>
-                <small class="mode-description">
-                    정해진 시간 동안<br>빠르고 정확하게!
-                </small>
-            </div>
-        </div>
-    </div>
-    
-    <div id="setup-page">
-        <button id="back-to-mode-select-btn" class="home-button" style="position: absolute; top: 20px; left: 20px;">모드 선택으로</button>
-        <h1>
-            <span class="desktop-title">선대칭/점대칭도형 완전 정복</span>
-            <span class="mobile-title">선대칭/점대칭도형<br>완전 정복</span>
-        </h1>
-        <h2 style="text-align: center;">문제 유형 및 설정</h2>
+    <button id="qr-code-btn" class="secondary-btn">QR 코드</button>
+    
+    <div id="mode-selection-page">
+        <h1>
+            <span class="desktop-title">선대칭/점대칭도형 완전 정복</span>
+            <span class="mobile-title">선대칭/점대칭도형<br>완전 정복</span>
+        </h1>
+        <h2>모드를 선택하세요.</h2>
+        <div class="mode-buttons">
+            <div class="mode-option">
+                <button id="classic-mode-btn">🎓 클래식 <span>모드</span></button>
+                <small class="mode-description">
+                    무작위로 생성되는 문제를<br>원하는 만큼 연습하세요!
+                </small>
+            </div>
+            <div class="mode-option">
+                <button id="time-attack-mode-btn">⏱️ 타임어택 <span>모드</span></button>
+                <small class="mode-description">
+                    정해진 시간 동안<br>빠르고 정확하게!
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div id="setup-page">
+        <button id="back-to-mode-select-btn" class="home-button" style="position: absolute; top: 20px; left: 20px;">모드 선택으로</button>
+        <h1>
+            <span class="desktop-title">선대칭/점대칭도형 완전 정복</span>
+            <span class="mobile-title">선대칭/점대칭도형<br>완전 정복</span>
+        </h1>
+        <h2 style="text-align: center;">문제 유형 및 설정</h2>
 
-        <div class="main-layout">
-            <div class="left-panel">
-                <div class="setting-group">
-                    <h3>문제 유형 선택</h3>
-                    <div id="type-select" class="option-buttons">
-                        <button data-type="line" class="selected">선대칭도형</button>
-                        <button data-type="point">점대칭도형</button>
-                        <button data-type="both">둘 다 할래요</button>
-                    </div>
-                </div>
-                <div class="setting-group">
-                    <h3>난이도 선택</h3>
-                    <div id="difficulty-select" class="option-buttons">
-                        <button data-difficulty="practice">연습</button>
-                        <button data-difficulty="1" class="selected">★</button>
-                        <button data-difficulty="2">★★</button>
-                    </div>
-                </div>
-            </div>
-            <div class="right-panel">
-                    <div class="settings-wrapper">
-                        <div id="classic-settings">
-                            <div class="setting-group">
-                                <h3>문제 개수 설정</h3>
-                                <small style="margin-bottom: 10px;">(최소 5, 최대 50문제)</small>
-                                <div id="quantity-control">
-                                    <button id="quantity-minus">-</button>
-                                    <span id="problem-quantity" class="quantity-display">5</span>
-                                    <button id="quantity-plus">+</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="time-attack-settings" style="display: none;">
-                            <div class="setting-group">
-                                <h3>도전 시간 설정</h3>
-                                <div id="time-control" style="margin-top: 10px;">
-                                    <button id="time-minus">&lt;</button>
-                                    <span id="time-limit-display" class="quantity-display">3분</span>
-                                    <button id="time-plus">&gt;</button>
-                                </div>
-                        </div>
-                        <div id="settings-overlay" style="display: none;">
-                            <p id="overlay-message"></p>
-                        </div>
-                    </div>
-                    <div class="setting-group start-btn-container">
-                        <button id="start-quiz-btn" class="primary-btn">시작!</button>
-                    </div>
-                </div>
-            </div>
-    </div>
-    
-    <div id="problem-page">
-        <div class="problem-header">
-            <button class="home-button">
-                <span class="desktop-home">🏠 첫 페이지로</span>
-                <span class="mobile-home">🏠</span>
-            </button>
-            <h2 id="problem-number">1번째 문제</h2>
-            <div id="timer-display"></div>
-            <div id="problem-counter-display"></div>
-        </div>
-        <p id="problem-instruction">아래 도형은 선대칭도형입니다. 나머지 부분을 완성해 주세요.</p>
-        
-        <div class="canvas-wrapper">
-            <canvas id="grid-canvas" width="400" height="400"></canvas>
-        </div>
+        <div class="main-layout">
+            <div class="left-panel">
+                <div class="setting-group">
+                    <h3>문제 유형 선택</h3>
+                    <div id="type-select" class="option-buttons">
+                        <button data-type="line" class="selected">선대칭도형</button>
+                        <button data-type="point">점대칭도형</button>
+                        <button data-type="both">둘 다 할래요</button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <h3>난이도 선택</h3>
+                    <div id="difficulty-select" class="option-buttons">
+                        <button data-difficulty="practice">연습</button>
+                        <button data-difficulty="1" class="selected">★</button>
+                        <button data-difficulty="2">★★</button>
+                    </div>
+                </div>
+            </div>
+            <div class="right-panel">
+                    <div class="settings-wrapper">
+                        <div id="classic-settings">
+                            <div class="setting-group">
+                                <h3>문제 개수 설정</h3>
+                                <small style="margin-bottom: 10px;">(최소 5, 최대 50문제)</small>
+                                <div id="quantity-control">
+                                    <button id="quantity-minus">-</button>
+                                    <span id="problem-quantity" class="quantity-display">5</span>
+                                    <button id="quantity-plus">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="time-attack-settings" style="display: none;">
+                            <div class="setting-group">
+                                <h3>도전 시간 설정</h3>
+                                <div id="time-control" style="margin-top: 10px;">
+                                    <button id="time-minus">&lt;</button>
+                                    <span id="time-limit-display" class="quantity-display">3분</span>
+                                    <button id="time-plus">&gt;</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="settings-overlay" style="display: none;">
+                            <p id="overlay-message"></p>
+                        </div>
+                    </div>
+                    <div class="setting-group start-btn-container">
+                        <button id="start-quiz-btn" class="primary-btn">시작!</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+    
+    <div id="problem-page">
+        <div class="problem-header">
+            <button class="home-button">
+                <span class="desktop-home">🏠 첫 페이지로</span>
+                <span class="mobile-home">🏠</span>
+            </button>
+            <h2 id="problem-number">1번째 문제</h2>
+            <div id="timer-display"></div>
+            <div id="problem-counter-display"></div>
+        </div>
+        <p id="problem-instruction">아래 도형은 선대칭도형입니다. 나머지 부분을 완성해 주세요.</p>
+        
+        <div class="canvas-wrapper">
+            <canvas id="grid-canvas" width="400" height="400"></canvas>
+        </div>
 
-        <div class="canvas-controls">
-            <button id="mode-vertex" class="secondary-btn mode-btn-active" onclick="setCanvasMode('vertex')">1단계: 꼭짓점</button>
-            <button id="mode-line" class="secondary-btn" onclick="setCanvasMode('line')" disabled>2단계: 선분</button>
-            <button id="clear-canvas-btn" class="secondary-btn">모두 지우기</button>
-        </div>
-        
-        <div class="problem-footer">
-            <div id="check-answer-container">
-                <button id="check-answer-btn" class="primary-btn">
-                    <span class="progress-bar"></span>
-                    <span class="button-text">정답 확인하기</span>
-                </button>
-                <button id="next-problem-btn" class="primary-btn" style="display: none;">다음 문제 도전하기</button>
-                <small class="check-answer-guide">꾹 누르고 있으면 채점됩니다!</small>
-            </div>
-        </div>
-    </div>
+        <div class="canvas-controls">
+            <button id="mode-vertex" class="secondary-btn mode-btn-active" onclick="setCanvasMode('vertex')">1단계: 꼭짓점</button>
+            <button id="mode-line" class="secondary-btn" onclick="setCanvasMode('line')" disabled>2단계: 선분</button>
+            <button id="clear-canvas-btn" class="secondary-btn">모두 지우기</button>
+        </div>
+        
+        <div class="problem-footer">
+            <div id="check-answer-container">
+                <button id="check-answer-btn" class="primary-btn">
+                    <span class="progress-bar"></span>
+                    <span class="button-text">정답 확인하기</span>
+                </button>
+                <button id="next-problem-btn" class="primary-btn" style="display: none;">다음 문제 도전하기</button>
+                <small class="check-answer-guide">꾹 누르고 있으면 채점됩니다!</small>
+            </div>
+        </div>
+    </div>
 
-    <div id="final-result-page">
-        <h2 id="final-result-title">학습 완료</h2>
-        <div class="final-result-layout">
-            <div class="result-left">
-                <p>나의 정확도</p>
-                <div id="final-accuracy">0%</div>
-            </div>
-            <div class="result-right">
-                <p>한 번에 맞춘 문제: <span id="correct-count">0</span>개</p>
-                <p>다시 도전해 맞춘 문제: <span id="retried-count">0</span>개</p>
-                <p id="time-attack-avg-time" style="display: none;">문제당 평균 속도: <span id="avg-time-display">0</span>초</p>
-                <p class="score-display">최종 점수: <span id="final-score">0</span>점</p>
-            </div>
-        </div>
-        <div class="result-buttons">
-            <button id="restart-btn" class="primary-btn">새로운 학습 시작하기</button>
-            <button id="show-hof-btn" class="secondary-btn">명예의 전당 등록하기</button>
-        </div>
-    </div>
+    <div id="final-result-page">
+        <h2 id="final-result-title">학습 완료</h2>
+        <div class="final-result-layout">
+            <div class="result-left">
+                <p>나의 정확도</p>
+                <div id="final-accuracy">0%</div>
+            </div>
+            <div class="result-right">
+                <p>한 번에 맞춘 문제: <span id="correct-count">0</span>개</p>
+                <p>다시 도전해 맞춘 문제: <span id="retried-count">0</span>개</p>
+                <p id="time-attack-avg-time" style="display: none;">문제당 평균 속도: <span id="avg-time-display">0</span>초</p>
+                <p class="score-display">최종 점수: <span id="final-score">0</span>점</p>
+            </div>
+        </div>
+        <div class="result-buttons">
+            <button id="restart-btn" class="primary-btn">새로운 학습 시작하기</button>
+            <button id="show-hof-btn" class="secondary-btn">명예의 전당 등록하기</button>
+        </div>
+    </div>
 </div>
 <div class="footer">
-    휴르쌤
+    Copyright © 2025 휴르쌤. All rights reserved.
 </div>
 
 <div id="result-popup-overlay" class="popup-overlay" style="display: none;">
-    <div class="result-popup popup-box">
-        <button class="close-btn" onclick="closePopup()">&times;</button>
-        <div class="popup-content">
-            <p id="popup-main-message"></p>
-            <p id="popup-detail-message"></p>
-            <button id="popup-next-btn" class="primary-btn" onclick="nextProblem()">다음 문제 도전하기</button>
-        </div>
-    </div>
+    <div class="result-popup popup-box">
+        <button class="close-btn" onclick="closePopup()">&times;</button>
+        <div class="popup-content">
+            <p id="popup-main-message"></p>
+            <p id="popup-detail-message"></p>
+            <button id="popup-next-btn" class="primary-btn" onclick="nextProblem()">다음 문제 도전하기</button>
+        </div>
+    </div>
 </div>
 
 <div id="qr-popup-overlay" class="popup-overlay" style="display: none;">
-    <div class="popup-qr popup-box">
-        <button class="close-btn" onclick="closeQrPopup()">&times;</button>
-        <img src="https://i.imgur.com/g4yS8yx.png" alt="QR Code">
-    </div>
+    <div class="popup-qr popup-box">
+        <button class="close-btn" onclick="closeQrPopup()">&times;</button>
+        <img src="https://i.imgur.com/g4yS8yx.png" alt="QR Code">
+    </div>
 </div>
 
 <div id="hof-popup-overlay" class="popup-overlay" style="display: none;">
-    <div class="popup-hof popup-box">
-        <button class="close-btn" onclick="closeHofPopup()">&times;</button>
-        <h3>🏆 명예의 전당🏆</h3>
-        <div class="hof-input-group">
-            <input type="text" id="hof-initial" placeholder="AAA" maxlength="3" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '')">
-            <button id="hof-submit-btn" class="primary-btn">등록</button>
-        </div>
-        <div id="hof-message"></div>
-        <div class="hof-columns">
-            <div class="hof-column">
-                <h3>🎓 클래식 모드</h3>
-                <div class="hof-table-container">
-                    <table id="hof-table-classic">
-                        <thead>
-                            <tr>
-                                <th>순위</th>
-                                <th>이니셜</th>
-                                <th>점수</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="hof-column">
-                <h3>⏱️ 타임어택 모드</h3>
-                <div class="hof-table-container">
-                    <table id="hof-table-timeattack">
-                        <thead>
-                            <tr>
-                                <th>순위</th>
-                                <th>이니셜</th>
-                                <th>점수</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="popup-hof popup-box">
+        <button class="close-btn" onclick="closeHofPopup()">&times;</button>
+        <h3>🏆 명예의 전당🏆</h3>
+        <div class="hof-input-group">
+            <input type="text" id="hof-initial" placeholder="AAA" maxlength="3" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '')">
+            <button id="hof-submit-btn" class="primary-btn">등록</button>
+        </div>
+        <div id="hof-message"></div>
+        <div class="hof-columns">
+            <div class="hof-column">
+                <h3>🎓 클래식 모드</h3>
+                <div class="hof-table-container">
+                    <table id="hof-table-classic">
+                        <thead>
+                            <tr>
+                                <th>순위</th>
+                                <th>이니셜</th>
+                                <th>점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="hof-column">
+                <h3>⏱️ 타임어택 모드</h3>
+                <div class="hof-table-container">
+                    <table id="hof-table-timeattack">
+                        <thead>
+                            <tr>
+                                <th>순위</th>
+                                <th>이니셜</th>
+                                <th>점수</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="confirm-clear-popup-overlay" class="popup-overlay" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
-    <div class="popup-box confirm-clear-popup">
-        <p>표시한 점과 선분을 모두 지웁니다. <br> 계속할까요?</p>
-        <div class="confirm-buttons">
-            <button id="confirm-clear-yes-btn">네</button>
-            <button id="confirm-clear-no-btn" class="secondary-btn">아니요</button>
-        </div>
-    </div>
+    <div class="popup-box confirm-clear-popup">
+        <p>표시한 점과 선분을 모두 지웁니다. <br> 계속할까요?</p>
+        <div class="confirm-buttons">
+            <button id="confirm-clear-yes-btn">네</button>
+            <button id="confirm-clear-no-btn" class="secondary-btn">아니요</button>
+        </div>
+    </div>
 </div>
 
 <script>
-var _0x27f5=['querySelector','remove','addEventListener','click','style','display','flex','classList','add','selected','getAttribute','textContent','value','toUpperCase','replace','disabled','none','innerHTML','startQuiz','loadProblem','home-button','confirm','resetGame','showPage','mousemove','mouseleave','touchstart','passive','mousedown','button','preventDefault','transition','transform','setTimeout','isPressing','checkAnswer','clearTimeout','querySelector','.progress-bar','translateX(-100%)','0.2s\x20ease-out','mouseup','touchend','quizState','problemList','score','gameMode','totalProblems','currentProblem','remainingTime','in-progress','push','results','length','showFinalResult','finished','Object.keys','forEach','hasOwnProperty','loadGameState','initialVertices','error','location','reload','bind','createElement','className','top','left','appendChild','grid-canvas','getContext','2d','canvas-wrapper','width','height','body','minHeight','100vh','margin','0','backgroundColor','f4f7f6','color','333','textAlign','center','position','relative','padding','30px','borderRadius','12px','boxShadow','0\x206px\x2020px\x20rgba(0,0,0,0.1)','90%','maxWidth','760px','20px\x20auto','boxSizing','border-box','color','4b8134','2em','marginBottom','20px','5px','fontSize','18px','6c757d','1.5','hover','translateY(-1px)','primary-btn','a0c179','white','8cb24b','secondary-btn','e9e9e9','d9d9d9','e06666','cc4125','mode-btn-active','ffc107','333','bold','block','flex-direction','column','justify-content','space-around','gap','15px','marginTop','20px','100%','classic-mode-btn','fdb827','e06666','time-attack-mode-btn','cc4125','row','5px','10px\x2020px','crosshair','relative','inline-block','aspect-ratio','1\x20/\x201','2px\x20solid\x20#333','user-dot','8px','#dc3545','50%','translate(-50%,-50%)','pointer-events','none','box-shadow','0\x200\x203px\x20rgba(0,0,0,0.5)','zIndex','10','problem-dot,line-dot','black','selected-line-dot','10px','#ff0000','0\x200\x205px\x20rgba(255,0,0,0.8)','11','flex','wrap','center','10px','padding','10px','8px','font-weight','correct','28a745','incorrect','dc3545','quantity-control','align-items','15px','width','30px','height','border-radius','line-height','30px','background-color','f0f0f0','1px\x20solid\x20#ccc','e0e0e0','40px','24px','text-align','vertical-align','baseline','auto','20px','12px','ccc','flex-direction','row','20px','800px','align-items','stretch','wrap','text-align','center','flex','2','left-panel','1','settings-wrapper','flex-grow','start-btn-container','border','none','transparent','100px','display','flex','justify-content','align-items','center','padding','0','flex-shrink','absolute','top','left','width','height','background-color','rgba(0,0,0,0.6)','color','white','border-radius','1.1em','line-height','space-between','8px\x2012px','14px','5px','cursor','pointer','text-decoration','none','0.3s','d9d9d9','flex-grow','120px','1.2em','right','none','1em','888','time-warning','animation','pulse\x201s\x20infinite','0%','scale(1)','50%','scale(1.05)','100%','scale(1)','flex','center','100%','marginTop','20px','hidden','relative','overflow','-webkit-user-select','none','-moz-user-select','-ms-user-select','user-select','white','black','2px\x20solid\x20#999','f0f0f0','min-width','180px','border','2px\x20solid\x20transparent','progress-bar','position','absolute','0','left','100%','a0c179','translateX(-100%)','button-text','zIndex','1','flex-direction','column','align-items','center','0.8em','888','8px','color','0.3s\x20ease','fixed','100%','flex','center','z-index','100','background-color','white','30px','12px','box-shadow','0\x204px\x2015px\x20rgba(0,0,0,0.2)','position','relative','80%','maxWidth','450px','text-align','center','display','flex','flex-direction','column','top','10px','right','15px','28px','bold','333','background','none','border','none','padding','0','6c757d','1.2em','fontWeight','marginBottom','0','lineHeight','popup-detail-message','block','marginTop','20px','row','space-around','30px\x200','20px','1','padding','20px','border-right','1px\x20solid\x20#ddd','1.1em','15px\x200','4em','font-weight','4b8134','10px','1.4em','marginLeft','5px','flex','center','10px','flex-wrap','absolute','top','15px','right','15px','5px\x2010px','14px','20','fixed','top','0','left','0','100%','height','background-color','rgba(255,255,255,0.8)','flex','center','align-items','center','z-index','200','background-color','white','40px','12px','box-shadow','0\x204px\x2015px\x20rgba(0,0,0,0.2)','position','relative','center','180px','auto','marginTop','15px','666','10px','right','15px','28px','bold','333','cursor','pointer','background','none','border','none','padding','0','hof-popup-overlay','rgba(0,0,0,0.2)','700px','20px\x200','18px','8px','80px','text-align','center','1px\x20solid\x20#ccc','borderRadius','4px','marginRight','10px','text-transform','uppercase','flex','20px','100%','1','hof-table-container','max-height','300px','overflow-y','auto','marginTop','20px','100%','collapse','8px','border-bottom','1px\x20solid\x20#eee','background-color','f8f9fa','1.1em','25px','line-height','1.6','15px','width','100%','10px\x2030px','e06666','white','cc4125','mobile-title,mobile-home','none','flex-direction','column','left-panel','flex-direction','row','10px','marginTop','right-panel','width','100%','marginTop','20px','option-buttons','flex-direction','column','problem-footer','justify-content','center','final-result-layout','flex-direction','column','result-left','border-right','none','border-bottom','1px\x20solid\20#ddd','width','100%','hof-columns','flex-direction','column','padding','15px','fontSize','1.6em','1.2em','16px','1.4','desktop-title','inline','desktop-home','none','mobile-home','inline','10px\x20!important','left','10px\x20!important'];const webAppUrl='https://soft-wood-cf8e.bbglara.workers.dev/';const timeOptions=[3,5,7];let selectedType='line',totalProblems=5,currentProblem=0,canvasMode='vertex',score={results:[]},currentProblemAttempts=0,selectedDifficulty='1',finalAccuracyValue=0,finalScoreValue=0,hasSubmittedScore=!1,isExitingIntentionally=!1,gameMode='classic',timeLimitInMinutes=3,remainingTime=0,timerInterval=null;const canvas=document[_0x27f5[0]]('grid-canvas'),ctx=canvas[_0x27f5[1]]('2d'),canvasWrapper=document[_0x27f5[2]]('.canvas-wrapper');let GRID_SIZE,GRID_COUNT,HALF_COUNT,CENTER_POINT,MIN_COORD,MAX_COORD;const COLLINEARITY_THRESHOLD=1,MIN_ANGLE_COSINE=Math.cos(30*Math.PI/180),MAX_ANGLE_COSINE=Math.cos(150*Math.PI/180),MIN_SLOPE_DIFF=2,MIN_DIST=2;let problemVertices=[],problemLines=[],userVertices=[],userLines=[],tempLineStart=null,hoveredLine=null,problemList=[];function setupGrid(){GRID_COUNT=16;MIN_COORD=2;MAX_COORD=14;GRID_SIZE=canvas[_0x27f5[3]]/GRID_COUNT;HALF_COUNT=GRID_COUNT/2;CENTER_POINT={x:HALF_COUNT,y:HALF_COUNT}}const allPages=['mode-selection-page','setup-page','problem-page','final-result-page'];function showPage(_0x550d53){allPages[_0x27f5[4]](_0x2774x2=>{const _0x1c8b32=document[_0x27f5[0]](_0x2774x2);if(_0x1c8b32){const _0x199321=(_0x2774x2==='mode-selection-page'||_0x2774x2==='setup-page')?_0x27f5[5]:_0x27f5[6];_0x1c8b32[_0x27f5[7]][_0x27f5[8]]=_0x2774x2===_0x550d53?_0x199321:_0x27f5[9]}const _0x298453=document[_0x27f5[0]]('qr-code-btn');if(_0x298453){_0x298453[_0x27f5[7]][_0x27f5[8]]=_0x550d53==='mode-selection-page'||_0x550d53==='setup-page'?_0x27f5[6]:_0x27f5[9]}}}function resetGame(){stopTimer();clearGameState();isExitingIntentionally=!1;selectedType='line';totalProblems=5;currentProblem=0;canvasMode='vertex';score={results:[]};currentProblemAttempts=0;selectedDifficulty='1';hasSubmittedScore=!1;gameMode='classic';timeLimitInMinutes=3;remainingTime=0;problemList=[];userVertices=[];userLines=[];document[_0x27f5[0]]('problem-quantity')[_0x27f5[10]]='5';document[_0x27f5[0]]('time-limit-display')[_0x27f5[10]]='3분';document[_0x27f5[0]]('timer-display')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];document[_0x27f5[0]]('problem-counter-display')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];document[_0x27f5[2]]('#type-select\x20button')[_0x27f5[4]](_0x2774x5=>_0x2774x5[_0x27f5[11]][_0x27f5[12]]('selected'));document[_0x27f5[0]]('#type-select\x20button[data-type="line"]')[_0x27f5[11]][_0x27f5[13]]('selected');document[_0x27f5[2]]('#difficulty-select\x20button')[_0x27f5[4]](_0x2774x5=>_0x2774x5[_0x27f5[11]][_0x27f5[12]]('selected'));document[_0x27f5[0]]('#difficulty-select\x20button[data-difficulty="1"]')[_0x27f5[11]][_0x27f5[13]]('selected');setupGrid();document[_0x27f5[0]]('classic-settings')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[6];document[_0x27f5[0]]('time-attack-settings')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];updateSettingsOverlay()}function isSamePoint(_0x2774x7,_0x2774x8){if(!_0x2774x7||!_0x2774x8)return!1;return _0x2774x7[_0x27f5[14]]===_0x2774x8[_0x27f5[14]]&&_0x2774x7.y===_0x2774x8.y}function isSameLine(_0x2774x9,_0x2774xa){if(!_0x2774x9||!_0x2774xa)return!1;const _0x2774xb=_0x2774x9[_0x27f5[15]],_0x2774xc=_0x2774x9.p2,_0x2774xd=_0x2774xa[_0x27f5[15]],_0x2774xe=_0x2774xa.p2;return(isSamePoint(_0x2774xb,_0x2774xd)&&isSamePoint(_0x2774xc,_0x2774xe))||(isSamePoint(_0x2774xb,_0x2774xe)&&isSamePoint(_0x2774xc,_0x2774xd))}function isLineExists(_0x2774x10){return userLines[_0x27f5[16]](_0x2774x11=>isSameLine(_0x2774x11,_0x2774x10))}function getRandomInt(_0x2774x12,_0x2774x13){_0x2774x12=Math.ceil(_0x2774x12);_0x2774x13=Math.floor(_0x2774x13);return Math.floor(Math.random()*(_0x2774x13-_0x2774x12+1))+_0x2774x12}function isTooClose(_0x2774x15,_0x2774x16,minDist=MIN_DIST){const minDistSq=minDist**2;for(const _0x2774x18 of _0x2774x16){const _0x2774x19=(_0x2774x15[_0x27f5[14]]-_0x2774x18[_0x27f5[14]])**2+(_0x2774x15.y-_0x2774x18.y)**2;if(_0x2774x19<minDistSq)return!0}return!1}function isTooLinear(_0x2774x1a,_0x2774x1b,_0x2774x1c){const _0x2774x1d=(_0x2774x1b.y-_0x2774x1a.y)*(_0x2774x1c[_0x27f5[14]]-_0x2774x1b[_0x27f5[14]])-(_0x2774x1c.y-_0x2774x1b.y)*(_0x2774x1b[_0x27f5[14]]-_0x2774x1a[_0x27f5[14]]);return Math.abs(_0x2774x1d)<COLLINEARITY_THRESHOLD}function isTooSharpAngle(_0x2774x1f,_0x2774x20,_0x2774x21){const _0x2774x22=_0x2774x1f[_0x27f5[14]]-_0x2774x20[_0x27f5[14]],_0x2774x23=_0x2774x1f.y-_0x2774x20.y,_0x2774x24=_0x2774x21[_0x27f5[14]]-_0x2774x20[_0x27f5[14]],_0x2774x25=_0x2774x21.y-_0x2774x20.y,dotProduct=_0x2774x22*_0x2774x24+_0x2774x23*_0x2774x25,mag1=Math.sqrt(_0x2774x22*_0x2774x22+_0x2774x23*_0x2774x23),mag2=Math.sqrt(_0x2774x24*_0x2774x24+_0x2774x25*_0x2774x25);if(mag1===0||mag2===0)return!0;const cosine=dotProduct/(mag1*mag2);return cosine>MIN_ANGLE_COSINE||cosine<MAX_ANGLE_COSINE}function isTooWeakSlope(_0x2774x27,_0x2774x28){const _0x2774x29=Math.abs(_0x2774x28[_0x27f5[14]]-_0x2774x27[_0x27f5[14]]),_0x2774x2a=Math.abs(_0x2774x28.y-_0x2774x27.y);return(_0x2774x29<=MIN_SLOPE_DIFF||_0x2774x2a<=MIN_SLOPE_DIFF)||(_0x2774x29>0&&_0x2774x2a>0&&Math.abs(_0x2774x2a/_0x2774x29)<1)}function isProblemTooLinear(_0x2774x2b,_0x2774x2c){if(_0x2774x2b[_0x27f5[17]]<2)return!1;const _0x2774x2d=_0x2774x2b[_0x2774x2b[_0x27f5[17]]-2],_0x2774x2e=_0x2774x2b[_0x2774x2b[_0x27f5[17]]-1];for(let _0x2774x2f=0;_0x2774x2f<_0x2774x2b[_0x27f5[17]]-1;_0x2774x2f++)if(isTooLinear(_0x2774x2b[_0x2774x2f],_0x2774x2e,_0x2774x2c))return!0;return isTooLinear(_0x2774x2d,_0x2774x2e,_0x2774x2c)}function isProblemTooSharp(_0x2774x31,_0x2774x32){if(_0x2774x31[_0x27f5[17]]<2)return!1;const _0x2774x33=_0x2774x31[_0x2774x31[_0x27f5[17]]-2],_0x2774x34=_0x2774x31[_0x2774x31[_0x27f5[17]]-1];const _0x2774x35=_0x2774x36=>_0x2774x36[_0x27f5[14]]===HALF_COUNT||_0x2774x36.y===HALF_COUNT||_0x2774x36[_0x27f5[14]]===_0x2774x36.y;if(_0x2774x35(_0x2774x33)&&_0x2774x35(_0x2774x34)&&_0x2774x35(_0x2774x32))return!1;for(let _0x2774x37=1;_0x2774x37<_0x2774x31[_0x27f5[17]];_0x2774x37++)if(isTooSharpAngle(_0x2774x31[_0x2774x37-1],_0x2774x31[_0x2774x37],_0x2774x32))return!0;return isTooSharpAngle(_0x2774x33,_0x2774x34,_0x2774x32)}function distSq(_0x2774x39,_0x2774x3a){return(_0x2774x39[_0x27f5[14]]-_0x2774x3a[_0x27f5[14]])**2+(_0x2774x39.y-_0x2774x3a.y)**2}function calculateSymmetricPoint(_0x2774x3c,_0x2774x3d,isSlantedAxis=!1,axisDirection=_0x27f5[18]){let _0x2774x3e,_0x2774x3f;const C=HALF_COUNT;if(_0x2774x3d===_0x27f5[19]){if(isSlantedAxis){_0x2774x3e=_0x2774x3c.y;_0x2774x3f=_0x2774x3c[_0x27f5[14]]}else if(axisDirection===_0x27f5[20]){_0x2774x3e=_0x2774x3c[_0x27f5[14]];_0x2774x3f=2*C-_0x2774x3c.y}else{_0x2774x3e=2*C-_0x2774x3c[_0x27f5[14]];_0x2774x3f=_0x2774x3c.y}}else if(_0x2774x3d===_0x27f5[21]){_0x2774x3e=2*C-_0x2774x3c[_0x27f5[14]];_0x2774x3f=2*C-_0x2774x3c.y}else return _0x2774x3c;return{x:Math.round(_0x2774x3e),y:Math.round(_0x2774x3f)}}function createSequentialLines(_0x2774x41,close=!1){const _0x2774x42=[];if(_0x2774x41[_0x27f5[17]]<2)return _0x2774x42;const count=_0x2774x41[_0x27f5[17]];for(let _0x2774x44=0;_0x2774x44<count;_0x2774x44++){const _0x2774x45=_0x2774x41[_0x2774x44],_0x2774x46=_0x2774x41[(_0x2774x44+1)%count];if(!close&&_0x2774x44===count-1)break;_0x2774x42[_0x27f5[22]]({p1:_0x2774x45,p2:_0x2774x46})}return _0x2774x42}function findPointSymmetricBoundary(_0x2774x48){if(_0x2774x48[_0x27f5[17]]<3)return _0x2774x48;const C=CENTER_POINT,centerPoint=_0x2774x48[_0x27f5[23]](_0x2774x4a=>isSamePoint(_0x2774x4a,C)),nonCenterPoints=_0x2774x48[_0x27f5[24]](_0x2774x4a=>!isSamePoint(_0x2774x4a,C));nonCenterPoints.sort((_0x2774x4a,_0x2774x4c)=>Math.atan2(_0x2774x4a.y-C.y,_0x2774x4a[_0x27f5[14]]-C[_0x27f5[14]])-Math.atan2(_0x2774x4c.y-C.y,_0x2774x4c[_0x27f5[14]]-C[_0x27f5[14]]));let sortedPoints=[];if(centerPoint)sortedPoints[_0x27f5[22]](centerPoint);sortedPoints=sortedPoints.concat(nonCenterPoints);return sortedPoints[_0x27f5[24]]((_0x2774x4e,i,self)=>i===self[_0x27f5[23]]((_0x2774x51)=>isSamePoint(_0x2774x51,_0x2774x4e)))}function sortSlantedAxisVertices(_0x2774x53){const axisPoints=_0x2774x53[_0x27f5[24]](_0x2774x54=>_0x2774x54[_0x27f5[14]]===_0x2774x54.y).sort((_0x2774x54,_0x2774x56)=>_0x2774x54.y-_0x2774x56.y),nonAxisPoints=_0x2774x53[_0x27f5[24]](_0x2774x54=>_0x2774x54[_0x27f5[14]]!==_0x2774x54.y),p1=axisPoints[0],p2=axisPoints[1],belowAxis=nonAxisPoints[_0x27f5[24]](_0x2774x54=>_0x2774x54.y<_0x2774x54[_0x27f5[14]]),aboveAxis=nonAxisPoints[_0x27f5[24]](_0x2774x54=>_0x2774x54.y>_0x2774x54[_0x27f5[14]]);belowAxis.sort((_0x2774x54,_0x2774x56)=>Math.atan2(_0x2774x54.y-p1.y,_0x2774x54[_0x27f5[14]]-p1[_0x27f5[14]])-Math.atan2(_0x2774x56.y-p1.y,_0x2774x56[_0x27f5[14]]-p1[_0x27f5[14]]));aboveAxis.sort((_0x2774x54,_0x2774x56)=>Math.atan2(_0x2774x56.y-p2.y,_0x2774x56[_0x27f5[14]]-p2[_0x27f5[14]])-Math.atan2(_0x2774x54.y-p2.y,_0x2774x54[_0x27f5[14]]-p2[_0x27f5[14]]));return[p1,...belowAxis,p2,...aboveAxis]}function generateRandomProblem(_0x2774x5a,forceVertices=null){const MAX_ATTEMPTS_PER_POINT=100;if(_0x2774x5a===_0x27f5[19]){let _0x2774x5c,minCoord,maxCoord;let isSlantedAxis=!1;let axisDirection=_0x27f5[18];const difficulty=selectedDifficulty==='practice'?'1':selectedDifficulty;if(forceVertices){_0x2774x5c=forceVertices;minCoord=MIN_COORD;maxCoord=MAX_COORD;isSlantedAxis=!1;axisDirection=Math.random()<0.5?_0x27f5[18]:_0x27f5[20]}else if(difficulty==2){isSlantedAxis=Math.random()<0.5;if(isSlantedAxis){_0x2774x5c=getRandomInt(3,4);minCoord=MIN_COORD;maxCoord=MAX_COORD;axisDirection='slanted'}else{_0x2774x5c=getRandomInt(5,6);minCoord=MIN_COORD-1;maxCoord=MAX_COORD+1;axisDirection=Math.random()<0.5?_0x27f5[18]:_0x27f5[20]}}else{isSlantedAxis=!1;_0x2774x5c=4;minCoord=MIN_COORD;maxCoord=MAX_COORD;axisDirection=Math.random()<0.5?_0x27f5[18]:_0x27f5[20]}if(isSlantedAxis){const axisMidPoint={x:HALF_COUNT,y:HALF_COUNT};const axisLength=getRandomInt(Math.floor(GRID_COUNT*0.15),Math.floor(GRID_COUNT*0.35));const p1={x:axisMidPoint.x-axisLength,y:axisMidPoint.y-axisLength};const p2={x:axisMidPoint.x+axisLength,y:axisMidPoint.y+axisLength};let tempVertices=[p1];for(let i=0;i<_0x2774x5c-2;i++){let newV,success=!1,attemptCount=0;while(!success&&attemptCount<MAX_ATTEMPTS_PER_POINT){let x=getRandomInt(minCoord,maxCoord);let y=getRandomInt(minCoord,x-1);newV={x:x,y:y};let isValid=!0;if(tempVertices[_0x27f5[17]]>=2){if(isTooSharpAngle(tempVertices[tempVertices[_0x27f5[17]]-2],tempVertices[tempVertices[_0x27f5[17]]-1],newV)){isValid=!1}}if(tempVertices[_0x27f5[17]]>0){let symV=calculateSymmetricPoint(newV,_0x27f5[19],!0);if(isTooSharpAngle(tempVertices[tempVertices[_0x27f5[17]]-1],newV,symV)){isValid=!1}}if(isValid&&!isTooClose(newV,tempVertices)&&!isProblemTooLinear(tempVertices,newV)){tempVertices[_0x27f5[22]](newV);success=!0}attemptCount++}if(!success)return null}tempVertices[_0x27f5[22]](p2);let allVertices=[...tempVertices];if(allVertices[_0x27f5[17]]<3)return null;if(isTooLinear(allVertices[allVertices[_0x27f5[17]]-2],allVertices[allVertices[_0x27f5[17]]-1],allVertices[0])||isTooSharpAngle(allVertices[allVertices[_0x27f5[17]]-2],allVertices[allVertices[_0x27f5[17]]-1],allVertices[0])){return null}let allVerticesSorted=sortSlantedAxisVertices(allVertices);if(allVerticesSorted[_0x27f5[17]]>=3){for(let i=0;i<allVerticesSorted[_0x27f5[17]]-2;i++){if(isTooLinear(allVerticesSorted[i],allVerticesSorted[i+1],allVerticesSorted[i+2])){return null}}}const allLines=createSequentialLines(allVerticesSorted,!1);const initialLines=allLines[_0x27f5[24]](_0x2774x66=>((_0x2774x66[_0x27f5[15]][_0x27f5[14]]+_0x2774x66.p2[_0x27f5[14]])/2)>((_0x2774x66[_0x27f5[15]].y+_0x2774x66.p2.y)/2));let initialVertices=initialLines[_0x27f5[25]]((_0x2774x68,_0x2774x69)=>{if(!_0x2774x68[_0x27f5[16]](_0x2774x6a=>isSamePoint(_0x2774x6a,_0x2774x69[_0x27f5[15]])))_0x2774x68[_0x27f5[22]](_0x2774x69[_0x27f5[15]]);if(!_0x2774x68[_0x27f5[16]](_0x2774x6a=>isSamePoint(_0x2774x6a,_0x2774x69.p2)))_0x2774x68[_0x27f5[22]](_0x2774x69.p2);return _0x2774x68},[]);if(initialVertices[_0x27f5[24]](_0x2774x6d=>_0x2774x6d[_0x27f5[14]]===_0x2774x6d.y)[_0x27f5[17]]<2){return null}return{type:_0x27f5[19],isSlantedAxis:!0,axisDirection:_0x27f5[26],initialVertices:initialVertices,initialLines:initialLines,allVertices:allVerticesSorted,allLines:allLines}}else{let initialVertices;if(axisDirection===_0x27f5[18]){const axisPoint1={x:HALF_COUNT,y:getRandomInt(minCoord,HALF_COUNT-2)};const axisPoint2={x:HALF_COUNT,y:getRandomInt(HALF_COUNT+2,maxCoord)};let nonAxisPoints=[];for(let i=0;i<_0x2774x5c-2;i++){let newV,success=!1,attemptCount=0;while(!success&&attemptCount<MAX_ATTEMPTS_PER_POINT){newV={x:getRandomInt(minCoord,HALF_COUNT-1),y:getRandomInt(axisPoint1.y,axisPoint2.y)};let isValid=!isTooClose(newV,[...nonAxisPoints,axisPoint1,axisPoint2]);if(nonAxisPoints[_0x27f5[17]]>0&&isTooWeakSlope(nonAxisPoints[nonAxisPoints[_0x27f5[17]]-1],newV)){isValid=!1}if(isValid){nonAxisPoints[_0x27f5[22]](newV);success=!0}attemptCount++}if(!success)return null}nonAxisPoints.sort((_0x2774x73,_0x2774x74)=>_0x2774x73.y-_0x2774x74.y);initialVertices=[axisPoint1,...nonAxisPoints,axisPoint2]}else{const axisPoint1={x:getRandomInt(minCoord,HALF_COUNT-2),y:HALF_COUNT};const axisPoint2={x:getRandomInt(HALF_COUNT+2,maxCoord),y:HALF_COUNT};let nonAxisPoints=[];for(let i=0;i<_0x2774x5c-2;i++){let newV,success=!1,attemptCount=0;while(!success&&attemptCount<MAX_ATTEMPTS_PER_POINT){newV={x:getRandomInt(axisPoint1.x,axisPoint2.x),y:getRandomInt(minCoord,HALF_COUNT-1)};let isValid=!isTooClose(newV,[...nonAxisPoints,axisPoint1,axisPoint2]);if(nonAxisPoints[_0x27f5[17]]>0&&isTooWeakSlope(nonAxisPoints[nonAxisPoints[_0x27f5[17]]-1],newV)){isValid=!1}if(isValid){nonAxisPoints[_0x27f5[22]](newV);success=!0}attemptCount++}if(!success)return null}nonAxisPoints.sort((_0x2774x7b,_0x2774x7c)=>_0x2774x7b[_0x27f5[14]]-_0x2774x7c[_0x27f5[14]]);initialVertices=[axisPoint1,...nonAxisPoints,axisPoint2]}if(initialVertices[_0x27f5[17]]<2)return null;if(initialVertices[_0x27f5[17]]>=3){for(let i=0;i<initialVertices[_0x27f5[17]]-2;i++){if(isTooLinear(initialVertices[i],initialVertices[i+1],initialVertices[i+2])){return null}}}let allVertices=initialVertices.concat(initialVertices[_0x27f5[27]](_0x2774x81=>calculateSymmetricPoint(_0x2774x81,_0x27f5[19],!1,axisDirection))[_0x27f5[28]]());allVertices=allVertices[_0x27f5[24]]((_0x2774x83,i,self)=>i===self[_0x27f5[23]]((_0x2774x86)=>isSamePoint(_0x2774x86,_0x2774x83)));return{type:_0x27f5[19],isSlantedAxis:!1,axisDirection:axisDirection,initialVertices:initialVertices,initialLines:createSequentialLines(initialVertices,!1),allVertices:allVertices,allLines:createSequentialLines(allVertices,!0)}}}else if(_0x2774x5a===_0x27f5[21]){const difficulty=selectedDifficulty==='practice'?'1':selectedDifficulty;const numPoints=forceVertices?forceVertices:difficulty==1?4:getRandomInt(5,6);let initialPoints=[];const isHorizontalAxis=Math.random()<0.5;let lineStart,lineEnd;if(isHorizontalAxis){const y=CENTER_POINT.y;const halfLength=getRandomInt(Math.floor(GRID_COUNT*0.15),Math.floor(GRID_COUNT*0.35));lineStart={x:CENTER_POINT.x-halfLength,y:y};lineEnd={x:CENTER_POINT.x+halfLength,y:y}}else{const x=CENTER_POINT.x;const halfLength=getRandomInt(Math.floor(GRID_COUNT*0.15),Math.floor(GRID_COUNT*0.35));lineStart={x:x,y:CENTER_POINT.y-halfLength};lineEnd={x:x,y:CENTER_POINT.y+halfLength}}initialPoints[_0x27f5[22]](lineStart);let halfVertices=[];for(let i=0;i<numPoints-2;i++){let newV,success=!1,attemptCount=0;while(!success&&attemptCount<MAX_ATTEMPTS_PER_POINT){let x,y;if(isHorizontalAxis){x=getRandomInt(MIN_COORD,MAX_COORD);y=getRandomInt(MIN_COORD,CENTER_POINT.y-1)}else{x=getRandomInt(MIN_COORD,CENTER_POINT[_0x27f5[14]]-1);y=getRandomInt(MIN_COORD,MAX_COORD)}newV={x:x,y:y};if(!isTooClose(newV,[...initialPoints,...halfVertices])){halfVertices[_0x27f5[22]](newV);success=!0}attemptCount++}if(!success)return null}halfVertices.sort((_0x2774x98,_0x2774x99)=>Math.atan2(_0x2774x98.y-CENTER_POINT.y,_0x2774x98[_0x27f5[14]]-CENTER_POINT[_0x27f5[14]])-Math.atan2(_0x2774x99.y-CENTER_POINT.y,_0x2774x99[_0x27f5[14]]-CENTER_POINT[_0x27f5[14]]));initialPoints=initialPoints.concat(halfVertices);initialPoints[_0x27f5[22]](lineEnd);let allVertices=[];let processed=new Set;initialPoints[_0x27f5[4]](_0x2774x9b=>{const key=`${_0x2774x9b[_0x27f5[14]]},${_0x2774x9b.y}`;if(!processed[_0x27f5[29]](key)){allVertices[_0x27f5[22]](_0x2774x9b);processed[_0x27f5[13]](key);const symV=calculateSymmetricPoint(_0x2774x9b,_0x27f5[21]);const symKey=`${symV[_0x27f5[14]]},${symV.y}`;if(!processed[_0x27f5[29]](symKey)){allVertices[_0x27f5[22]](symV);processed[_0x27f5[13]](symKey)}}});allVertices=findPointSymmetricBoundary(allVertices);if(allVertices[_0x27f5[17]]>=3){for(let i=0;i<allVertices[_0x27f5[17]];i++){const len=allVertices[_0x27f5[17]];const p1=allVertices[(i-1+len)%len];const p2=allVertices[i];const p3=allVertices[(i+1)%len];if(isTooLinear(p1,p2,p3)||isTooSharpAngle(p1,p2,p3)){return null}}}const allLines=createSequentialLines(allVertices,!0);const initialLines=[];const initialSet=new Set(initialPoints[_0x27f5[27]](_0x2774xaf=>`${_0x2774xaf[_0x27f5[14]]},${_0x2774xaf.y}`));allLines[_0x27f5[4]](_0x2774xb1=>{if(initialSet[_0x27f5[29]](`${_0x2774xb1[_0x27f5[15]][_0x27f5[14]]},${_0x2774xb1[_0x27f5[15]].y}`)&&initialSet[_0x27f5[29]](`${_0x2774xb1.p2[_0x27f5[14]]},${_0x2774xb1.p2.y}`)){initialLines[_0x27f5[22]](_0x2774xb1)}});return{type:_0x27f5[21],initialVertices:initialPoints,initialLines:initialLines,allVertices:allVertices,allLines:allLines}}}return null}function initializeSetupListeners(){document[_0x27f5[2]]('#type-select\x20button')[_0x27f5[4]](_0x2774xb3=>{_0x2774xb3[_0x27f5[29]]('click',handleTypeSelect)});document[_0x27f5[2]]('#difficulty-select\x20button')[_0x27f5[4]](_0x2774xb3=>{_0x2774xb3[_0x27f5[29]]('click',handleDifficultySelect)});document[_0x27f5[0]]('quantity-minus')[_0x27f5[29]]('click',()=>changeQuantity(-5));document[_0x27f5[0]]('quantity-plus')[_0x27f5[29]]('click',()=>changeQuantity(5));document[_0x27f5[0]]('time-minus')[_0x27f5[29]]('click',()=>changeTimeLimit(-1));document[_0x27f5[0]]('time-plus')[_0x27f5[29]]('click',()=>changeTimeLimit(1))}function updateSettingsOverlay(){const _0x2774xb5=document[_0x27f5[0]]('settings-overlay');const _0x2774xb6=document[_0x27f5[0]]('overlay-message');const isPractice=selectedDifficulty==='practice';if(isPractice){_0x2774xb5[_0x27f5[7]][_0x27f5[8]]='flex';if(gameMode==='classic'){_0x2774xb6[_0x27f5[10]]='문제\x20개수는<br>3개로\x20고정됩니다.'}else{_0x2774xb6[_0x27f5[10]]='시간은\x202분으로<br>고정됩니다.'}}else{_0x2774xb5[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}}function selectGameMode(_0x2774xb8){gameMode=_0x2774xb8;const _0x2774xb9=document[_0x27f5[0]]('classic-settings');const _0x2774xba=document[_0x27f5[0]]('time-attack-settings');if(gameMode===_0x27f5[30]){_0x2774xb9[_0x27f5[7]][_0x27f5[8]]='block';_0x2774xba[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}else{_0x2774xb9[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];_0x2774xba[_0x27f5[7]][_0x27f5[8]]='block'}updateSettingsOverlay();showPage('setup-page')}function changeTimeLimit(_0x2774xbd){const _0x2774xbe=document[_0x27f5[0]]('time-limit-display');const _0x2774xbf=timeOptions[_0x27f5[23]](timeLimitInMinutes);let _0x2774xc0=_0x2774xbf+_0x2774xbd;if(_0x2774xc0<0){_0x2774xc0=timeOptions[_0x27f5[17]]-1}else if(_0x2774xc0>=timeOptions[_0x27f5[17]]){_0x2774xc0=0}timeLimitInMinutes=timeOptions[_0x2774xc0];_0x2774xbe[_0x27f5[10]]=timeLimitInMinutes+'분'}function nextProblem(){closePopup();currentProblem++;currentProblemAttempts=0;userVertices=[];userLines=[];if(gameMode==='timeAttack'){if(timerInterval){let newProblem=null;let attempt=0;const MAX_ATTEMPTS_NEXT=100;while(!newProblem&&attempt<MAX_ATTEMPTS_NEXT){let type=selectedType===_0x27f5[31]?(Math.random()<0.5?_0x27f5[19]:_0x27f5[21]):selectedType;newProblem=generateRandomProblem(type);attempt++}if(newProblem){problemList[_0x27f5[22]](newProblem)}else{stopTimer();showFinalResult();return}}else{showFinalResult();return}}if(gameMode==='classic'&&currentProblem>=totalProblems){showFinalResult();return}loadProblem();saveGameState()}function handleTypeSelect(_0x2774xc4){document[_0x27f5[2]]('#type-select\x20button')[_0x27f5[4]](_0x2774xc5=>_0x2774xc5[_0x27f5[11]][_0x27f5[12]]('selected'));_0x2774xc4.currentTarget[_0x27f5[11]][_0x27f5[13]]('selected');selectedType=_0x2774xc4.currentTarget[_0x27f5[10]](_0x27f5[32])}function handleDifficultySelect(_0x2774xc7){document[_0x27f5[2]]('#difficulty-select\x20button')[_0x27f5[4]](_0x2774xc8=>_0x2774xc8[_0x27f5[11]][_0x27f5[12]]('selected'));_0x2774xc7.currentTarget[_0x27f5[11]][_0x27f5[13]]('selected');selectedDifficulty=_0x2774xc7.currentTarget[_0x27f5[10]](_0x27f5[33])}function changeQuantity(_0x2774xc9){const current=parseInt(document[_0x27f5[0]]('problem-quantity')[_0x27f5[10]]);let newQuantity=current+_0x2774xc9;if(newQuantity<5)newQuantity=5;if(newQuantity>50)newQuantity=50;document[_0x27f5[0]]('problem-quantity')[_0x27f5[10]]=newQuantity;totalProblems=newQuantity}function generateProblemWithRetry(_0x2774xcc,forceVertices=null){let newProblem=null;let attempt=0;const MAX_ATTEMPTS=100;while(!newProblem&&attempt<MAX_ATTEMPTS){newProblem=generateRandomProblem(_0x2774xcc,forceVertices);attempt++}return newProblem}function startQuiz(){currentProblem=0;score={results:[]};currentProblemAttempts=0;userVertices=[];userLines=[];tempLineStart=null;hoveredLine=null;problemList=[];hasSubmittedScore=!1;if(selectedDifficulty==='practice'){if(gameMode==='timeAttack'){timeLimitInMinutes=2}totalProblems=3;if(selectedType===_0x27f5[19]){problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[19],3));problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[19],4));problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[19],5))}else if(selectedType===_0x27f5[21]){problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[21],4));problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[21],4));problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[21],4))}else{problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[19],3));problemList[_0x27f5[22]](generateProblemWithRetry(_0x27f5[19],4));problemList[_0x27f5[22]](generateRandomProblem(_0x27f5[21],4))}problemList=problemList[_0x27f5[24]](_0x2774xd3=>_0x2774xd3!==null);totalProblems=problemList[_0x27f5[17]]}else{let problemsToGenerate=gameMode===_0x27f5[30]?totalProblems:1;let attempt=0;const MAX_ATTEMPTS=problemsToGenerate*20;let generatedVertexStrings=new Set;while(problemList[_0x27f5[17]]<problemsToGenerate&&attempt<MAX_ATTEMPTS){let type=selectedType===_0x27f5[31]?(Math.random()<0.5?_0x27f5[19]:_0x27f5[21]):selectedType;const newProblem=generateRandomProblem(type);if(newProblem&&newProblem[_0x27f5[34]][_0x27f5[17]]>=2){const vertexString=JSON[_0x27f5[35]](newProblem[_0x27f5[34]][_0x27f5[27]](_0x2774xd6=>`${_0x2774xd6[_0x27f5[14]]},${_0x2774xd6.y}`)[_0x27f5[28]]());if(!generatedVertexStrings[_0x27f5[29]](vertexString)){problemList[_0x27f5[22]](newProblem);generatedVertexStrings[_0x27f5[13]](vertexString)}}attempt++}if(gameMode===_0x27f5[30]){totalProblems=problemList[_0x27f5[17]]}}if(problemList[_0x27f5[17]]===0){alert('문제\x20생성에\x20실패했습니다.\x20다른\x20설정으로\x20다시\x20시도해\x20주세요.');_0x27f5[36][_0x27f5[37]]();return}showPage('problem-page');if(gameMode==='timeAttack')startTimer();loadProblem()}function loadProblem(){const isTimed=gameMode===_0x27f5[38];if(!isTimed&&currentProblem>=totalProblems&&totalProblems>0){showFinalResult();return}if(isTimed&&currentProblem>=problemList[_0x27f5[17]]&&!timerInterval){showFinalResult();return}const timerDisplay=document[_0x27f5[0]]('timer-display');const counterDisplay=document[_0x27f5[0]]('problem-counter-display');if(isTimed){counterDisplay[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];timerDisplay[_0x27f5[7]][_0x27f5[8]]=_0x27f5[6]}else{counterDisplay[_0x27f5[7]][_0x27f5[8]]=_0x27f5[6];timerDisplay[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];counterDisplay[_0x27f5[10]]='남은\x20문제\x20'+(totalProblems-(currentProblem+1))+'개'}const currentP=problemList[currentProblem];if(!currentP){console[_0x27f5[39]]("Problem\x20could\x20not\x20be\x20loaded.",{currentProblem:currentProblem,problemList:problemList});showFinalResult();return}const pType=currentP.type===_0x27f5[19]?'선대칭':'점대칭';let problemNumText=`${currentProblem+1}번째\x20문제\x20(${pType})`;const pTypeText=currentP.type===_0x27f5[19]?'선대칭도형':'점대칭도형';let instructionText=`아래\x20도형은\x20${pTypeText}입니다.\x20나머지\x20부분을\x20완성해\x20주세요.`;if(window[_0x27f5[40]]._0x286591<480){problemNumText=`${currentProblem+1}번째\x20문제<br>(${pType})`;instructionText=`아래\x20도형은\x20${pTypeText}입니다.<br>나머지\x20부분을\x20완성해\x20주세요.`}document[_0x27f5[0]]('problem-number')[_0x27f5[10]]=problemNumText;document[_0x27f5[0]]('problem-instruction')[_0x27f5[10]]=instructionText;document[_0x27f5[0]]('check-answer-btn')[_0x27f5[7]][_0x27f5[8]]='block';document[_0x27f5[0]]('next-problem-btn')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];closePopup();problemVertices=currentP[_0x27f5[34]];problemLines=currentP.initialLines;tempLineStart=null;hoveredLine=null;setCanvasMode('vertex');redrawCanvas()}function clearCanvas(_0x2774xec){if(_0x2774xec){userVertices=[];userLines=[];tempLineStart=null;hoveredLine=null}redrawCanvas();setCanvasMode('vertex');closePopup();document[_0x27f5[0]]('check-answer-btn')[_0x27f5[7]][_0x27f5[8]]='block';document[_0x27f5[0]]('next-problem-btn')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}function renderProblemVertices(){document[_0x27f5[2]]('.problem-dot')[_0x27f5[4]](_0x2774xee=>_0x2774xee[_0x27f5[1]]());problemVertices[_0x27f5[4]](_0x2774xf0=>{const _0x2774xf1=document[_0x27f5[41]]('div');_0x2774xf1[_0x27f5[42]]='problem-dot';_0x2774xf1[_0x27f5[7]][_0x27f5[43]]=`${(_0x2774xf0[_0x27f5[14]]/GRID_COUNT)*100}%`;_0x2774xf1[_0x27f5[7]].top=`${(_0x2774xf0.y/GRID_COUNT)*100}%`;canvasWrapper[_0x27f5[44]](_0x2774xf1)})}function drawGrid(){ctx.strokeStyle=_0x27f5[45];ctx.lineWidth=0.5;ctx.setLineDash([1,4]);for(let x=0;x<=canvas[_0x27f5[3]];x+=GRID_SIZE){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas[_0x27f5[46]]);ctx.stroke()}for(let y=0;y<=canvas[_0x27f5[46]];y+=GRID_SIZE){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas[_0x27f5[3]],y);ctx.stroke()}ctx.setLineDash([]);if(problemList[_0x27f5[17]]>currentProblem&&problemList[currentProblem]){const currentP=problemList[currentProblem];ctx.strokeStyle=_0x27f5[47];ctx.lineWidth=2;if(currentP.type===_0x27f5[19]){if(currentP.isSlantedAxis){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(canvas[_0x27f5[3]],canvas[_0x27f5[46]]);ctx.stroke()}else if(currentP.axisDirection===_0x27f5[18]){const centerX=canvas[_0x27f5[3]]/2;ctx.beginPath();ctx.moveTo(centerX,0);ctx.lineTo(centerX,canvas[_0x27f5[46]]);ctx.stroke()}else if(currentP.axisDirection===_0x27f5[20]){const centerY=canvas[_0x27f5[46]]/2;ctx.beginPath();ctx.moveTo(0,centerY);ctx.lineTo(canvas[_0x27f5[3]],centerY);ctx.stroke()}}else if(currentP.type===_0x27f5[21]){const centerX=canvas[_0x27f5[3]]/2;const centerY=canvas[_0x27f5[46]]/2;ctx.beginPath();ctx.arc(centerX,centerY,5,0,Math.PI*2);ctx.fillStyle=_0x27f5[47];ctx.fill()}}}function drawLines(_0x2774xfa,_0x2774xfb){ctx.strokeStyle=_0x2774xfb;ctx.lineWidth=3;_0x2774xfa[_0x27f5[4]](_0x2774xfc=>{ctx.beginPath();ctx.moveTo(_0x2774xfc[_0x27f5[15]][_0x27f5[14]]*GRID_SIZE,_0x2774xfc[_0x27f5[15]].y*GRID_SIZE);ctx.lineTo(_0x2774xfc.p2[_0x27f5[14]]*GRID_SIZE,_0x2774xfc.p2.y*GRID_SIZE);ctx.stroke()})}function redrawCanvas(){ctx.clearRect(0,0,canvas[_0x27f5[3]],canvas[_0x27f5[46]]);drawGrid();drawLines(problemLines,_0x27f5[48]);drawLines(userLines,_0x27f5[49]);if(hoveredLine){ctx.save();ctx.strokeStyle=_0x27f5[50];ctx.lineWidth=8;ctx.shadowColor=_0x27f5[51];ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(hoveredLine[_0x27f5[15]][_0x27f5[14]]*GRID_SIZE,hoveredLine[_0x27f5[15]].y*GRID_SIZE);ctx.lineTo(hoveredLine.p2[_0x27f5[14]]*GRID_SIZE,hoveredLine.p2.y*GRID_SIZE);ctx.stroke();ctx.restore()}renderProblemVertices();if(canvasMode==='line'){renderPointsForLineMode()}else{renderUserVertices()}}function renderPointsForLineMode(){document[_0x27f5[2]]('.user-dot,.line-dot,.selected-line-dot')[_0x27f5[4]](_0x2774x104=>_0x2774x104[_0x27f5[1]]());const allPoints=[...problemVertices,...userVertices][_0x27f5[24]]((_0x2774x106,i,self)=>i===self[_0x27f5[23]]((_0x2774x109)=>isSamePoint(_0x2774x109,_0x2774x106)));allPoints[_0x27f5[4]](_0x2774x106=>{const _0x2774x10a=document[_0x27f5[41]]('div');_0x2774x10a[_0x27f5[42]]=(tempLineStart&&isSamePoint(_0x2774x106,tempLineStart))?'selected-line-dot':'line-dot';_0x2774x10a[_0x27f5[7]][_0x27f5[43]]=`${(_0x2774x106[_0x27f5[14]]/GRID_COUNT)*100}%`;_0x2774x10a[_0x27f5[7]].top=`${(_0x2774x106.y/GRID_COUNT)*100}%`;canvasWrapper[_0x27f5[44]](_0x2774x10a)})}function renderUserVertices(){document[_0x27f5[2]]('.user-dot,.line-dot,.selected-line-dot')[_0x27f5[4]](_0x2774x10d=>_0x2774x10d[_0x27f5[1]]());userVertices[_0x27f5[4]](_0x2774x10f=>{const _0x2774x110=document[_0x27f5[41]]('div');_0x2774x110[_0x27f5[42]]='user-dot';_0x2774x110[_0x27f5[7]][_0x27f5[43]]=`${(_0x2774x10f[_0x27f5[14]]/GRID_COUNT)*100}%`;_0x2774x110[_0x27f5[7]].top=`${(_0x2774x10f.y/GRID_COUNT)*100}%`;canvasWrapper[_0x27f5[44]](_0x2774x110)})}function isVertexOnProblemBoundary(_0x2774x112){return problemVertices[_0x27f5[16]](_0x2774x113=>isSamePoint(_0x2774x113,_0x2774x112))}function showPopup(_0x2774x115,_0x2774x116,isCorrect){const _0x2774x118=document[_0x27f5[0]]('result-popup-overlay');const _0x2774x119=document[_0x27f5[0]]('popup-main-message');const _0x2774x11a=document[_0x27f5[0]]('popup-detail-message');const _0x2774x11b=document[_0x27f5[0]]('popup-next-btn');if(isCorrect){_0x2774x119[_0x27f5[10]]=_0x2774x115;_0x2774x119[_0x27f5[11]][_0x27f5[13]]('correct');_0x2774x11a[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];_0x2774x11b[_0x27f5[7]][_0x27f5[8]]='block'}else{_0x2774x119[_0x27f5[10]]=`${_0x2774x115}<br><span\x20style="font-size:\x2080%;">${_0x2774x116}</span>`;_0x2774x119[_0x27f5[11]][_0x27f5[13]]('incorrect');_0x2774x11a[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];_0x2774x11b[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}_0x2774x118[_0x27f5[7]][_0x27f5[8]]='flex'}function closePopup(){document[_0x27f5[0]]('result-popup-overlay')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}function checkAnswer(){const currentP=problemList[currentProblem];if(!currentP)return!1;const problemType=currentP.type;let verticesAreCorrect=checkVerticesSymmetry(problemType),isLinesCorrect=!1;if(verticesAreCorrect){if(problemType===_0x27f5[19])isLinesCorrect=checkLineSymmetryLines(currentP);else if(problemType===_0x27f5[21])isLinesCorrect=checkPointSymmetryLines(currentP)}if(verticesAreCorrect&&isLinesCorrect){if(score[_0x27f5[49]][_0x27f5[17]]===currentProblem){score[_0x27f5[49]][_0x27f5[22]](currentProblemAttempts)}showPopup('정답입니다🎉','',!0);saveGameState();document[_0x27f5[0]]('check-answer-btn')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];document[_0x27f5[0]]('next-problem-btn')[_0x27f5[7]][_0x27f5[8]]='block';return!0}else{let detailMessage;if(!verticesAreCorrect)detailMessage='꼭짓점의\x20위치나\x20개수가\x20잘못되었어요.';else if(!isLinesCorrect)detailMessage='도형이\x20대칭을\x20이루지\x20않거나\x20빠뜨린\x20선분이\x20있어요.';else detailMessage='꼭짓점이나\x20선분\x20연결에\x20오류가\x20있어\x20대칭도형이\x20완성되지\x20않았습니다.';currentProblemAttempts++;saveGameState();showPopup('다시\x20생각해\x20볼까요?',detailMessage,!1);document[_0x27f5[0]]('check-answer-btn')[_0x27f5[7]][_0x27f5[8]]='block';document[_0x27f5[0]]('next-problem-btn')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];return!1}}function checkVerticesSymmetry(_0x2774x126){const currentP=problemList[currentProblem];const isSlantedAxis=currentP.type===_0x27f5[19]&&currentP.isSlantedAxis;const allProblemAndUserVerticesSet=new Map;[...problemVertices,...userVertices][_0x27f5[4]](_0x2774x129=>{const key=`${Math.round(_0x2774x129[_0x27f5[14]])},${Math.round(_0x2774x129.y)}`;if(!allProblemAndUserVerticesSet[_0x27f5[29]](key))allProblemAndUserVerticesSet[_0x27f5[13]](key,{x:Math.round(_0x2774x129[_0x27f5[14]]),y:Math.round(_0x2774x129.y)})});const finalVertices=Array[_0x27f5[41]].from(allProblemAndUserVerticesSet.values());if(_0x2774x126===_0x27f5[19]){let boundaryVerticesCount;if(isSlantedAxis)boundaryVerticesCount=finalVertices[_0x27f5[24]](_0x2774x12e=>_0x2774x12e[_0x27f5[14]]===_0x2774x12e.y)[_0x27f5[17]];else if(currentP.axisDirection===_0x27f5[18])boundaryVerticesCount=finalVertices[_0x27f5[24]](_0x2774x12e=>_0x2774x12e[_0x27f5[14]]===HALF_COUNT)[_0x27f5[17]];else if(currentP.axisDirection===_0x27f5[20])boundaryVerticesCount=finalVertices[_0x27f5[24]](_0x2774x12e=>_0x2774x12e.y===HALF_COUNT)[_0x27f5[17]];if((finalVertices[_0x27f5[17]]-boundaryVerticesCount)%2!==0)return!1}let symmetricPairs=new Map;for(const _0x2774x130 of finalVertices){const key=`${_0x2774x130[_0x27f5[14]]},${_0x2774x130.y}`;if(symmetricPairs[_0x27f5[29]](key))continue;const symmetricV=calculateSymmetricPoint(_0x2774x130,_0x2774x126,isSlantedAxis,currentP.axisDirection);if(isSamePoint(_0x2774x130,symmetricV)){symmetricPairs[_0x27f5[13]](key,!0);continue}if(!finalVertices[_0x27f5[16]](_0x2774x133=>isSamePoint(_0x2774x133,symmetricV)))return!1;symmetricPairs[_0x27f5[13]](key,!0);symmetricPairs[_0x27f5[13]](`${symmetricV[_0x27f5[14]]},${symmetricV.y}`,!0)}return!0}function checkLineSymmetryLines(_0x2774x135){const correctSymmetricLines=_0x2774x135.initialLines[_0x27f5[27]](_0x2774x137=>({p1:calculateSymmetricPoint(_0x2774x137[_0x27f5[15]],_0x27f5[19],_0x2774x135.isSlantedAxis,_0x2774x135.axisDirection),p2:calculateSymmetricPoint(_0x2774x137.p2,_0x27f5[19],_0x2774x135.isSlantedAxis,_0x2774x135.axisDirection)}));if(userLines[_0x27f5[17]]!==correctSymmetricLines[_0x27f5[17]])return!1;for(const _0x2774x138 of userLines)if(!correctSymmetricLines[_0x27f5[16]](_0x2774x13a=>isSameLine(_0x2774x138,_0x2774x13a)))return!1;return!0}function checkPointSymmetryLines(_0x2774x13c){const allDrawnLines=[...problemLines,...userLines],correctLines=_0x2774x13c.allLines;if(allDrawnLines[_0x27f5[17]]!==correctLines[_0x27f5[17]])return!1;const correctLinesCopy=[...correctLines];for(const drawnLine of allDrawnLines){const matchIndex=correctLinesCopy[_0x27f5[23]](_0x2774x141=>isSameLine(drawnLine,_0x2774x141));if(matchIndex===-1)return!1;correctLinesCopy.splice(matchIndex,1)}return correctLinesCopy[_0x27f5[17]]===0}function findClosestValidLinePoint(_0x2774x143){const allTargetVertices=[...problemVertices,...userVertices];if(problemList[_0x27f5[17]]>currentProblem&&problemList[currentProblem].type===_0x27f5[21])allTargetVertices[_0x27f5[22]](CENTER_POINT);let closestPoint=null,minDistSq=Infinity;for(const p of allTargetVertices){const dist=distSq(_0x2774x143,p);if(dist<minDistSq){minDistSq=dist;closestPoint=p}}return closestPoint}function setCanvasMode(_0x2774x146){canvasMode=_0x2774x146;const vertexBtn=document[_0x27f5[0]]('mode-vertex'),lineBtn=document[_0x27f5[0]]('mode-line');vertexBtn[_0x27f5[11]][_0x27f5[12]]('mode-btn-active');lineBtn[_0x27f5[11]][_0x27f5[12]]('mode-btn-active');const canStartLineDrawing=userVertices[_0x27f5[17]]>=1||problemVertices[_0x27f5[17]]>1;if(_0x2774x146==='vertex'){vertexBtn[_0x27f5[11]][_0x27f5[13]]('mode-btn-active');tempLineStart=null}else{lineBtn[_0x27f5[11]][_0x27f5[13]]('mode-btn-active');vertexBtn[_0x27f5[40]]=_0x27f5[12];}document[_0x27f5[0]]('mode-line')[_0x27f5[40]]=!canStartLineDrawing;redrawCanvas()}function showQrPopup(){document[_0x27f5[0]]('qr-popup-overlay')[_0x27f5[7]][_0x27f5[8]]='flex'}function closeQrPopup(){document[_0x27f5[0]]('qr-popup-overlay')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}function showHofPopup(){const _0x2774x14c=document[_0x27f5[0]]('hof-message');const _0x2774x14d=document[_0x27f5[2]]('.hof-input-group');const _0x2774x14e=document[_0x27f5[2]]('#hof-table-classic\x20tbody');const _0x2774x14f=document[_0x27f5[2]]('#hof-table-timeattack\x20tbody');if(hasSubmittedScore){_0x2774x14d[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];_0x2774x14c[_0x27f5[10]]='이번\x20학습\x20기록은\x20이미\x20등록되었습니다.';_0x2774x14c[_0x27f5[7]].color='blue'}else{_0x2774x14d[_0x27f5[7]][_0x27f5[8]]='block';_0x2774x14c[_0x27f5[10]]='';document[_0x27f5[0]]('hof-initial')[_0x27f5[14]]='';document[_0x27f5[0]]('hof-submit-btn')[_0x27f5[40]]=_0x27f5[12];}_0x2774x14e[_0x27f5[10]]='<tr><td\x20colspan="3">불러오는\x20중...</td></tr>';_0x2774x14f[_0x27f5[10]]='<tr><td\x20colspan="3">불러오는\x20중...</td></tr>';document[_0x27f5[0]]('hof-popup-overlay')[_0x27f5[7]][_0x27f5[8]]='flex';fetch(webAppUrl)[_0x27f5[4]](_0x2774x151=>_0x2774x151.json())[_0x27f5[4]](_0x2774x153=>{populateHofTable(_0x2774x14e,_0x2774x153[_0x27f5[30]]||[],'클래식');populateHofTable(_0x2774x14f,_0x2774x153.timeAttack||[],'타임어택')})[_0x27f5[52]](_0x2774x155=>{_0x2774x14e[_0x27f5[10]]='<tr><td\x20colspan="3">기록을\x20불러오는\x20데\x20실패했습니다.</td></tr>';_0x2774x14f[_0x27f5[10]]='<tr><td\x20colspan="3">기록을\x20불러오는\x20데\x20실패했습니다.</td></tr>';console[_0x27f5[39]]('Error\x20fetching\x20leaderboard:',_0x2774x155)})}function populateHofTable(_0x2774x157,_0x2774x158,_0x2774x159){_0x2774x157[_0x27f5[10]]='';if(!_0x2774x158||_0x2774x158[_0x27f5[17]]===0){_0x2774x157[_0x27f5[10]]=`<tr><td\x20colspan="3">아직\x20등록된\x20${_0x2774x159}\x20기록이\x20없습니다.</td></tr>`}else{_0x2774x158[_0x27f5[4]](_0x2774x15b=>{let _0x2774x15c='';if(_0x2774x15b.rank===1)_0x2774x15c='style="color:\x20#d4af37;\x20font-weight:\x20bold;\x20text-shadow:\x200\x200\x204px\x20#fff,\x200\x200\x206px\x20#ff0;"';if(_0x2774x15b.rank===2)_0x2774x15c='style="color:\x20#c0c0c0;\x20font-weight:\x20bold;\x20text-shadow:\x200\x200\x203px\x20#fff;"';if(_0x2774x15b.rank===3)_0x2774x15c='style="color:\x20#cd7f32;\x20font-weight:\x20bold;\x20text-shadow:\x200\x200\x203px\x20#fff;"';const _0x2774x15d=`<tr><td>${_0x2774x15b.rank}</td><td\x20${_0x2774x15c}>${_0x2774x15b.initial}\x20${_0x2774x15b.rank===1?'🥇':_0x2774x15b.rank===2?'🥈':_0x2774x15b.rank===3?'🥉':''}</td><td>${_0x2774x15b.score}</td></tr>`;_0x2774x157[_0x27f5[10]]+=_0x2774x15d})}}function closeHofPopup(){document[_0x27f5[0]]('hof-popup-overlay')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9]}function saveGameState(){if(document[_0x27f5[0]]('problem-page')[_0x27f5[7]][_0x27f5[8]]==='block'&&problemList[_0x27f5[17]]===0){return}const gameState={problemList:problemList,currentProblem:currentProblem,score:score,userVertices:userVertices,userLines:userLines,canvasMode:canvasMode,selectedType:selectedType,selectedDifficulty:selectedDifficulty,totalProblems:totalProblems,currentProblemAttempts:currentProblemAttempts,finalScoreValue:finalScoreValue,hasSubmittedScore:hasSubmittedScore,gameMode:gameMode,timeLimitInMinutes:timeLimitInMinutes,remainingTime:remainingTime};localStorage[_0x27f5[53]](_0x27f5[54],JSON[_0x27f5[35]](gameState))}function loadGameState(){const _0x2774x163=localStorage[_0x27f5[55]]('quizState');if(!_0x2774x163)return'none';const savedState=JSON.parse(_0x2774x163);if(!savedState||!savedState[_0x27f5[56]]||!savedState[_0x27f5[57]]||!savedState[_0x27f5[58]]){return'none'}const isClassicInProgress=savedState[_0x27f5[58]]===_0x27f5[30]&&savedState[_0x27f5[59]]>0&&savedState[_0x27f5[60]]<savedState[_0x27f5[59]];const isTimeAttackInProgress=savedState[_0x27f5[58]]===_0x27f5[38]&&savedState[_0x27f5[61]]>0;if(isClassicInProgress||isTimeAttackInProgress){problemList=savedState[_0x27f5[56]];currentProblem=savedState[_0x27f5[60]];score=savedState[_0x27f5[57]];userVertices=savedState.userVertices||[];userLines=savedState.userLines||[];canvasMode=savedState.canvasMode;selectedType=savedState.selectedType;selectedDifficulty=savedState.selectedDifficulty;totalProblems=savedState[_0x27f5[59]];currentProblemAttempts=savedState.currentProblemAttempts;finalScoreValue=savedState.finalScoreValue;hasSubmittedScore=savedState.hasSubmittedScore;gameMode=savedState[_0x27f5[58]];timeLimitInMinutes=savedState.timeLimitInMinutes;remainingTime=savedState[_0x27f5[61]];if(gameMode===_0x27f5[38]&&remainingTime>0){startTimer(!0)}return'in-progress'}const isFinished=savedState[_0x27f5[57]][_0x27f5[62]][_0x27f5[17]]>0||(savedState[_0x27f5[58]]===_0x27f5[38]&&savedState[_0x27f5[61]]<=0);if(isFinished){Object[_0x27f5[63]](window,savedState);return'finished'}return'none'}function clearGameState(){localStorage[_0x27f5[64]]('quizState')}function submitScore(){const _0x2774x17b=document[_0x27f5[0]]('hof-initial'),initial=_0x2774x17b[_0x27f5[14]],_0x2774x17d=document[_0x27f5[0]]('hof-submit-btn'),_0x2774x17e=document[_0x27f5[0]]('hof-message');if(!/^[A-Z]{3}$/[_0x27f5[16]](initial)){_0x2774x17e[_0x27f5[10]]='이니셜은\x20영어\x20대문자\x203글자로\x20입력해주세요.';_0x2774x17e[_0x27f5[7]].color='red';return}_0x2774x17d[_0x27f5[40]]=!0;_0x2774x17e[_0x27f5[10]]='등록\x20중...';_0x2774x17e[_0x27f5[7]].color=_0x27f5[45];const data={initial:initial,score:finalScoreValue,problems:problemList[_0x27f5[17]],accuracy:finalAccuracyValue,difficulty:selectedDifficulty,type:selectedType,mode:gameMode};fetch(webAppUrl,{method:'POST',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON[_0x27f5[35]](data)})[_0x27f5[4]](_0x2774x181=>_0x2774x181.json())[_0x27f5[4]](_0x2774x183=>{if(_0x2774x183.result==='success'){hasSubmittedScore=!0;saveGameState();_0x2774x17e[_0x27f5[10]]='성공적으로\x20등록되었습니다!';_0x2774x17e[_0x27f5[7]].color=_0x27f5[65];document[_0x27f5[2]]('.hof-input-group')[_0x27f5[7]][_0x27f5[8]]=_0x27f5[9];setTimeout(showHofPopup,1500)}else throw new Error(_0x2774x183.message||'알\x20수\x20없는\x20오류')})[_0x27f5[52]](_0x2774x185=>{_0x2774x17e[_0x27f5[10]]='등록에\x20실패했습니다.\x20다시\x20시도해주세요.';_0x2774x17e[_0x27f5[7]].color='red';_0x2774x17d[_0x27f5[40]]=!1;console[_0x27f5[39]]('Error\x20submitting\x20score:',_0x2774x185)})}function startTimer(isResuming=!1){stopTimer();if(!isResuming)remainingTime=timeLimitInMinutes*60;const timerDisplay=document[_0x27f5[0]]('timer-display');timerDisplay[_0x27f5[7]][_0x27f5[8]]='block';updateTimerDisplay();timerInterval=setInterval(()=>{remainingTime--;updateTimerDisplay();if(remainingTime<=0){stopTimer();showFinalResult()}},1000)}function stopTimer(){clearInterval(timerInterval);timerInterval=null}function updateTimerDisplay(){const timerDisplay=document[_0x27f5[0]]('timer-display');if(remainingTime<0)remainingTime=0;const minutes=Math.floor(remainingTime/60);const seconds=remainingTime%60;timerDisplay[_0x27f5[10]]=`${minutes}:${seconds.toString().padStart(2,'0')}`;timerDisplay[_0x27f5[11]][_0x27f5[66]]('time-warning',remainingTime<=60&&remainingTime>0)}window[_0x27f5[67]]=()=>{try{setupGrid();const gameState=loadGameState();if(gameState===_0x27f5[68]){showFinalResult()}else if(gameState==='in-progress'){showPage('problem-page');loadProblem()}else{resetGame();showPage('mode-selection-page')}initializeSetupListeners();document[_0x27f5[0]]('classic-mode-btn')[_0x27f5[29]]('click',()=>selectGameMode('classic'));document[_0x27f5[0]]('time-attack-mode-btn')[_0x27f5[29]]('click',()=>selectGameMode('timeAttack'));document[_0x27f5[0]]('back-to-mode-select-btn')[_0x27f5[29]]('click',()=>window[_0x27f5[26]](()=>_0x27f5[69]){if(_0x27f5[70]('진행\x20상황이\x20사라집니다.\x20정말로\x20첫\x20페이지로\x20돌아갈까요?')){resetGame();showPage('mode-selection-page')}}));canvas[_0x27f5[29]]('mousemove',handleCanvasMouseMove);canvas[_0x27f5[29]]('mouseleave',()=>window[_0x27f5[26]](_0x2774x191=>{if(hoveredLine){hoveredLine=null;redrawCanvas()}}));canvas[_0x27f5[29]]('click',_0x2774x193=>{if(document[_0x27f5[0]]('check-answer-btn')[_0x27f5[7]][_0x27f5[8]]===_0x27f5[9])return;if(hoveredLine){userLines=userLines[_0x27f5[24]](_0x2774x194=>!isSameLine(_0x2774x194,hoveredLine));hoveredLine=null;handleCanvasMouseMove(_0x2774x193);redrawCanvas();saveGameState();return}const rect=canvas.getBoundingClientRect();const mouseXRatio=(_0x2774x193.clientX-rect.left)/rect.width,mouseYRatio=(_0x2774x193.clientY-rect.top)/rect.height;const canvasX=mouseXRatio*canvas[_0x27f5[3]],canvasY=mouseYRatio*canvas[_0x27f5[46]],mousePoint={x:canvasX/GRID_SIZE,y:canvasY/GRID_SIZE};if(mousePoint[_0x27f5[14]]<0||mousePoint[_0x27f5[14]]>GRID_COUNT||mousePoint.y<0||mousePoint.y>GRID_COUNT)return;const clickedGridPoint={x:Math.round(mousePoint[_0x27f5[14]]),y:Math.round(mousePoint.y)};if(canvasMode==='vertex'){if(isVertexOnProblemBoundary(clickedGridPoint))return;const existingIndex=userVertices[_0x27f5[23]](_0x2774x19a=>isSamePoint(_0x2774x19a,clickedGridPoint));if(existingIndex>-1){userVertices.splice(existingIndex,1);userLines=userLines[_0x27f5[24]](_0x2774x19c=>!(isSamePoint(_0x2774x19c[_0x27f5[15]],clickedGridPoint)||isSamePoint(_0x2774x19c.p2,clickedGridPoint)))}else{userVertices[_0x27f5[22]](clickedGridPoint)}redrawCanvas();saveGameState()}else if(canvasMode==='line'){const targetPoint=findClosestValidLinePoint(clickedGridPoint);if(!targetPoint)return;if(!tempLineStart){tempLineStart=targetPoint}else{if(!isSamePoint(tempLineStart,targetPoint)){const newLine={p1:tempLineStart,p2:targetPoint};if(!isLineExists(newLine))userLines[_0x27f5[22]](newLine);else userLines=userLines[_0x27f5[24]](_0x2774x1a4=>!isSameLine(_0x2774x1a4,newLine))}tempLineStart=null}redrawCanvas();saveGameState()}}[_0x27f5[40]]=_0x27f5[12];const _0x2774x1a5=document[_0x27f5[0]]('check-answer-btn');const _0x2774x1a6=_0x2774x1a5[_0x27f5[2]]('.progress-bar');let pressTimer=null;let isPressing=!1;const PRESS_AND_HOLD_DURATION=400;const startPress=window[_0x27f5[26]](_0x2774x1a8=>{if(_0x2774x1a8.type===_0x27f5[71]&&_0x2774x1a8.button!==0)return;_0x2774x1a8[_0x27f5[72]]();if(isPressing)return;isPressing=!0;_0x2774x1a6[_0x27f5[7]][_0x27f5[73]]=`transform\x20${PRESS_AND_HOLD_DURATION/1000}s\x20linear`;_0x2774x1a6[_0x27f5[7]][_0x27f5[74]]=_0x27f5[75];pressTimer=setTimeout(()=>{if(!isPressing)return;const _0x2774x1a9=checkAnswer();if(!_0x2774x1a9){cancelPress()}},PRESS_AND_HOLD_DURATION)});const cancelPress=window[_0x27f5[26]](_0x2774x1ab=>{if(!isPressing)return;isPressing=!1;clearTimeout(pressTimer);pressTimer=null;_0x2774x1a6[_0x27f5[7]][_0x27f5[73]]=_0x27f5[76];_0x2774x1a6[_0x27f5[7]][_0x27f5[74]]=_0x27f5[77]});_0x2774x1a5[_0x27f5[29]]('mousedown',startPress);_0x2774x1a5[_0x27f5[29]]('touchstart',startPress,{_0x27f5[78]:!1});_0x2774x1a5[_0x27f5[29]]('mouseup',cancelPress);_0x2774x1a5[_0x27f5[29]]('mouseleave',cancelPress);_0x2774x1a5[_0x27f5[29]]('touchend',cancelPress)}catch(_0x2774x1ae){console[_0x27f5[39]]('오류가\x20발생하여\x20앱을\x20초기화합니다:',_0x2774x1ae);clearGameState();try{resetGame();showPage('mode-selection-page');initializeSetupListeners();document[_0x27f5[0]]('classic-mode-btn')[_0x27f5[29]]('click',()=>selectGameMode('classic'));document[_0x27f5[0]]('time-attack-mode-btn')[_0x27f5[29]]('click',()=>selectGameMode('timeAttack'))}catch(_0x2774x1af){console[_0x27f5[39]]('복구\x20중\x20추가\x20오류\x20발생:',_0x2774x1af);alert('치명적인\x20오류가\x20발생하여\x20페이지를\x20새로고침합니다.');_0x27f5[36][_0x27f5[37]]()}}};
+    const webAppUrl = 'https://soft-wood-cf8e.bbglara.workers.dev/';
+    
+    const timeOptions = [3, 5, 7];
+    let selectedType = 'line', totalProblems = 5, currentProblem = 0, canvasMode = 'vertex', score = { results: [] }, currentProblemAttempts = 0, selectedDifficulty = '1', finalAccuracyValue = 0, finalScoreValue = 0, hasSubmittedScore = false, isExitingIntentionally = false, gameMode = 'classic', timeLimitInMinutes = 3, remainingTime = 0, timerInterval = null;
+    const canvas = document.getElementById('grid-canvas'), ctx = canvas.getContext('2d'), canvasWrapper = document.querySelector('.canvas-wrapper');
+    let GRID_SIZE, GRID_COUNT, HALF_COUNT, CENTER_POINT, MIN_COORD, MAX_COORD;
+    const COLLINEARITY_THRESHOLD = 1.0, MIN_ANGLE_COSINE = Math.cos(30 * Math.PI / 180), MAX_ANGLE_COSINE = Math.cos(150 * Math.PI / 180), MIN_SLOPE_DIFF = 2.0, MIN_DIST = 2;
+    let problemVertices = [], problemLines = [], userVertices = [], userLines = [], tempLineStart = null, hoveredLine = null, problemList = [];
+
+    function setupGrid() {
+        GRID_COUNT = 16;
+        MIN_COORD = 2;
+        MAX_COORD = 14;
+        GRID_SIZE = canvas.width / GRID_COUNT;
+        HALF_COUNT = GRID_COUNT / 2;
+        CENTER_POINT = { x: HALF_COUNT, y: HALF_COUNT };
+    }
+
+    const allPages = ['mode-selection-page', 'setup-page', 'problem-page', 'final-result-page'];
+    function showPage(pageIdToShow) {
+        allPages.forEach(pageId => {
+            const page = document.getElementById(pageId);
+            if (page) {
+                const displayStyle = (pageId === 'mode-selection-page' || pageId === 'setup-page') ? 'flex' : 'block';
+                page.style.display = (pageId === pageIdToShow) ? displayStyle : 'none';
+            }
+        });
+        const qrBtn = document.getElementById('qr-code-btn');
+        if (qrBtn) {
+            qrBtn.style.display = (pageIdToShow === 'mode-selection-page' || pageIdToShow === 'setup-page') ? 'block' : 'none';
+        }
+    }
+    
+    function resetGame() {
+        stopTimer();
+        clearGameState();
+        isExitingIntentionally = false;
+        
+        selectedType = 'line'; 
+        totalProblems = 5; 
+        currentProblem = 0; 
+        canvasMode = 'vertex'; 
+        score = { results: [] }; 
+        currentProblemAttempts = 0; 
+        selectedDifficulty = '1'; 
+        hasSubmittedScore = false; 
+        gameMode = 'classic'; 
+        timeLimitInMinutes = 3; 
+        remainingTime = 0; 
+        problemList = []; 
+        userVertices = []; 
+        userLines = [];
+        
+        document.getElementById('problem-quantity').textContent = '5';
+        document.getElementById('time-limit-display').textContent = '3분';
+        document.getElementById('timer-display').style.display = 'none';
+        document.getElementById('problem-counter-display').style.display = 'none';
+
+        document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
+        document.querySelector('#type-select button[data-type="line"]').classList.add('selected');
+
+        document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected'));
+        document.querySelector('#difficulty-select button[data-difficulty="1"]').classList.add('selected');
+        
+        setupGrid();
+        
+        document.getElementById('classic-settings').style.display = 'block';
+        document.getElementById('time-attack-settings').style.display = 'none';
+        updateSettingsOverlay();
+    }
+
+    function isSamePoint(p1, p2) { if (!p1 || !p2) return false; return p1.x === p2.x && p1.y === p2.y; }
+    function isSameLine(l1, l2) { if (!l1 || !l2) return false; const p11 = l1.p1, p12 = l1.p2, p21 = l2.p1, p22 = l2.p2; return (isSamePoint(p11, p21) && isSamePoint(p12, p22)) || (isSamePoint(p11, p22) && isSamePoint(p12, p21)); }
+    function isLineExists(newLine) { return userLines.some(existingLine => isSameLine(existingLine, newLine)); }
+
+    function getRandomInt(min, max) { min = Math.ceil(min); max = Math.floor(max); return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function isTooClose(newV, vertices, minDist = MIN_DIST) { const minDistSq = minDist ** 2; for (const v of vertices) { const distSq = (newV.x - v.x) ** 2 + (newV.y - v.y) ** 2; if (distSq < minDistSq) return true; } return false; }
+    function isTooLinear(p1, p2, p3) { const crossProduct = (p2.y - p1.y) * (p3.x - p2.x) - (p3.y - p2.y) * (p2.x - p1.x); return Math.abs(crossProduct) < COLLINEARITY_THRESHOLD; }
+    function isTooSharpAngle(p1, p2, p3) { const v1x = p1.x - p2.x, v1y = p1.y - p2.y, v2x = p3.x - p2.x, v2y = p3.y - p2.y, dotProduct = v1x * v2x + v1y * v2y, mag1 = Math.sqrt(v1x * v1x + v1y * v1y), mag2 = Math.sqrt(v2x * v2x + v2y * v2y); if (mag1 === 0 || mag2 === 0) return true; const cosine = dotProduct / (mag1 * mag2); return cosine > MIN_ANGLE_COSINE || cosine < MAX_ANGLE_COSINE; }
+    function isTooWeakSlope(p1, p2) { const dx = Math.abs(p2.x - p1.x), dy = Math.abs(p2.y - p1.y); return (dx <= MIN_SLOPE_DIFF || dy <= MIN_SLOPE_DIFF) || (dx > 0 && dy > 0 && Math.abs(dy / dx) < 1); }
+    function isProblemTooLinear(vertices, newV) { if (vertices.length < 2) return false; const p1 = vertices[vertices.length - 2], p2 = vertices[vertices.length - 1]; for (let i = 0; i < vertices.length - 1; i++) if (isTooLinear(vertices[i], p2, newV)) return true; return isTooLinear(p1, p2, newV); }
+    function isProblemTooSharp(vertices, newV) { if (vertices.length < 2) return false; const p1 = vertices[vertices.length - 2], p2 = vertices[vertices.length - 1]; const isAxisPoint = (p) => p.x === HALF_COUNT || p.y === HALF_COUNT || (p.x === p.y); if (isAxisPoint(p1) && isAxisPoint(p2) && isAxisPoint(newV)) return false; for(let i=1; i<vertices.length; i++) if(isTooSharpAngle(vertices[i-1], vertices[i], newV)) return true; return isTooSharpAngle(p1, p2, newV); }
+    function distSq(p1, p2) { return (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2; }
+    function calculateSymmetricPoint(v, type, isSlantedAxis = false, axisDirection = 'vertical') { let symX, symY; const C = HALF_COUNT; if (type === 'line') { if (isSlantedAxis) { symX = v.y; symY = v.x; } else if (axisDirection === 'horizontal') { symX = v.x; symY = 2 * C - v.y; } else { symX = 2 * C - v.x; symY = v.y; } } else if (type === 'point') { symX = 2 * C - v.x; symY = 2 * C - v.y; } else return v; return { x: Math.round(symX), y: Math.round(symY) }; }
+    function createSequentialLines(vertices, close = false) { const lines = []; if (vertices.length < 2) return lines; const count = vertices.length; for (let i = 0; i < count; i++) { const p1 = vertices[i], p2 = vertices[(i + 1) % count]; if (!close && i === count - 1) break; lines.push({ p1, p2 }); } return lines; }
+    function findPointSymmetricBoundary(points) { if (points.length < 3) return points; const C = CENTER_POINT, centerPoint = points.find(p => isSamePoint(p, C)), nonCenterPoints = points.filter(p => !isSamePoint(p, C)); nonCenterPoints.sort((a, b) => Math.atan2(a.y - C.y, a.x - C.x) - Math.atan2(b.y - C.y, b.x - C.x)); let sortedPoints = []; if (centerPoint) sortedPoints.push(centerPoint); sortedPoints = sortedPoints.concat(nonCenterPoints); return sortedPoints.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v))); }
+    function sortSlantedAxisVertices(vertices) { const axisPoints = vertices.filter(v => v.x === v.y).sort((a, b) => a.y - b.y), nonAxisPoints = vertices.filter(v => v.x !== v.y), p1 = axisPoints[0], p2 = axisPoints[1], belowAxis = nonAxisPoints.filter(p => p.y < p.x), aboveAxis = nonAxisPoints.filter(p => p.y > p.x); belowAxis.sort((a,b) => Math.atan2(a.y - p1.y, a.x - p1.x) - Math.atan2(b.y - p1.y, b.x - p1.x)); aboveAxis.sort((a,b) => Math.atan2(b.y - p2.y, b.x - p2.x) - Math.atan2(a.y - p2.y, a.x - p2.x)); return [p1, ...belowAxis, p2, ...aboveAxis]; }
+    
+    function generateRandomProblem(type, forceVertices = null) {
+        const MAX_ATTEMPTS_PER_POINT = 100;
+
+        if (type === 'line') {
+            let nVertices, minCoord, maxCoord;
+            let isSlantedAxis = false;
+            let axisDirection = 'vertical';
+            
+            const difficulty = (selectedDifficulty === 'practice') ? '1' : selectedDifficulty;
+
+            if (forceVertices) {
+                 nVertices = forceVertices;
+                 minCoord = MIN_COORD;
+                 maxCoord = MAX_COORD;
+                 isSlantedAxis = false;
+                 axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+            } else if (difficulty == 2) {
+                isSlantedAxis = Math.random() < 0.5;
+                if (isSlantedAxis) {
+                    nVertices = getRandomInt(3, 4);
+                    minCoord = MIN_COORD;
+                    maxCoord = MAX_COORD;
+                    axisDirection = 'slanted';
+                } else {
+                    nVertices = getRandomInt(5, 6);
+                    minCoord = MIN_COORD - 1;
+                    maxCoord = MAX_COORD + 1;
+                    axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+                }
+            } else {
+                isSlantedAxis = false;
+                nVertices = 4;
+                minCoord = MIN_COORD;
+                maxCoord = MAX_COORD;
+                axisDirection = Math.random() < 0.5 ? 'vertical' : 'horizontal';
+            }
+            
+            if (isSlantedAxis) {
+                const axisMidPoint = { x: HALF_COUNT, y: HALF_COUNT };
+                const axisLength = getRandomInt(Math.floor(GRID_COUNT * 0.15), Math.floor(GRID_COUNT * 0.35));
+                const p1 = {x: axisMidPoint.x - axisLength, y: axisMidPoint.y - axisLength};
+                const p2 = {x: axisMidPoint.x + axisLength, y: axisMidPoint.y + axisLength};
+                
+                let tempVertices = [p1];
+
+                for (let i = 0; i < nVertices - 2; i++) {
+                    let newV, success = false, attemptCount = 0;
+                    while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                        let x = getRandomInt(minCoord, maxCoord);
+                        let y = getRandomInt(minCoord, x - 1);
+                        newV = { x: x, y: y };
+
+                        let isValid = true;
+                        if (tempVertices.length >= 2) {
+                            if(isTooSharpAngle(tempVertices[tempVertices.length-2], tempVertices[tempVertices.length-1], newV)) {
+                                isValid = false;
+                            }
+                        }
+                        if (tempVertices.length > 0) {
+                            let symV = calculateSymmetricPoint(newV, 'line', true);
+                            if (isTooSharpAngle(tempVertices[tempVertices.length - 1], newV, symV)) {
+                                isValid = false;
+                            }
+                        }
+                        
+                        if (isValid && !isTooClose(newV, tempVertices) && !isProblemTooLinear(tempVertices, newV)) {
+                            tempVertices.push(newV);
+                            success = true;
+                        }
+                        attemptCount++;
+                    }
+                    if (!success) return null;
+                }
+                tempVertices.push(p2);
+                
+                let allVertices = [...tempVertices];
+                if (allVertices.length < 3) return null;
+                
+                if (isTooLinear(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0]) || isTooSharpAngle(allVertices[allVertices.length-2], allVertices[allVertices.length-1], allVertices[0])) {
+                    return null;
+                }
+
+                let allVerticesSorted = sortSlantedAxisVertices(allVertices);
+                
+                if (allVerticesSorted.length >= 3) {
+                    for (let i = 0; i < allVerticesSorted.length - 2; i++) {
+                        if (isTooLinear(allVerticesSorted[i], allVerticesSorted[i+1], allVerticesSorted[i+2])) {
+                            return null;
+                        }
+                    }
+                }
+                
+                const allLines = createSequentialLines(allVerticesSorted, false);
+                const initialLines = allLines.filter(line => ((line.p1.x + line.p2.x)/2) > ((line.p1.y + line.p2.y)/2));
+                
+                let initialVertices = initialLines.reduce((acc, line) => {
+                    if (!acc.some(v => isSamePoint(v, line.p1))) acc.push(line.p1);
+                    if (!acc.some(v => isSamePoint(v, line.p2))) acc.push(line.p2);
+                    return acc;
+                }, []);
+                
+                if(initialVertices.filter(v => v.x === v.y).length < 2) {
+                    return null;
+                }
+                
+                return {
+                    type: 'line', isSlantedAxis: true, axisDirection: 'slanted',
+                    initialVertices, initialLines, allVertices: allVerticesSorted, allLines
+                };
+
+            } else { // Not slanted
+                let initialVertices;
+                if (axisDirection === 'vertical') {
+                    const axisPoint1 = { x: HALF_COUNT, y: getRandomInt(minCoord, HALF_COUNT - 2) };
+                    const axisPoint2 = { x: HALF_COUNT, y: getRandomInt(HALF_COUNT + 2, maxCoord) };
+                    let nonAxisPoints = [];
+                    for (let i = 0; i < nVertices - 2; i++) {
+                        let newV, success = false, attemptCount = 0;
+                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                            newV = { x: getRandomInt(minCoord, HALF_COUNT - 1), y: getRandomInt(axisPoint1.y, axisPoint2.y) };
+                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            if (nonAxisPoints.length > 0 && isTooWeakSlope(nonAxisPoints[nonAxisPoints.length - 1], newV)) {
+                                isValid = false;
+                            }
+                            if (isValid) {
+                                nonAxisPoints.push(newV);
+                                success = true;
+                            }
+                            attemptCount++;
+                        }
+                        if (!success) return null;
+                    }
+                    nonAxisPoints.sort((a, b) => a.y - b.y);
+                    initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
+                } else { // horizontal
+                    const axisPoint1 = { x: getRandomInt(minCoord, HALF_COUNT - 2), y: HALF_COUNT };
+                    const axisPoint2 = { x: getRandomInt(HALF_COUNT + 2, maxCoord), y: HALF_COUNT };
+                    let nonAxisPoints = [];
+                    for (let i = 0; i < nVertices - 2; i++) {
+                        let newV, success = false, attemptCount = 0;
+                        while (!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                            newV = { x: getRandomInt(axisPoint1.x, axisPoint2.x), y: getRandomInt(minCoord, HALF_COUNT - 1) };
+                            let isValid = !isTooClose(newV, [...nonAxisPoints, axisPoint1, axisPoint2]);
+                            if (nonAxisPoints.length > 0 && isTooWeakSlope(nonAxisPoints[nonAxisPoints.length - 1], newV)) {
+                                isValid = false;
+                            }
+                            if (isValid) {
+                                nonAxisPoints.push(newV);
+                                success = true;
+                            }
+                            attemptCount++;
+                        }
+                        if (!success) return null;
+                    }
+                    nonAxisPoints.sort((a, b) => a.x - b.x);
+                    initialVertices = [axisPoint1, ...nonAxisPoints, axisPoint2];
+                }
+                
+                if (initialVertices.length < 2) return null;
+                if (initialVertices.length >= 3) {
+                    for (let i = 0; i < initialVertices.length - 2; i++) {
+                        if (isTooLinear(initialVertices[i], initialVertices[i+1], initialVertices[i+2])) {
+                            return null;
+                        }
+                    }
+                }
+                
+                let allVertices = initialVertices.concat(initialVertices.map(v => calculateSymmetricPoint(v, 'line', false, axisDirection)).reverse());
+                allVertices = allVertices.filter((v, i, self) => i === self.findIndex((t) => isSamePoint(t, v)));
+                
+                return {
+                    type: 'line', isSlantedAxis: false, axisDirection,
+                    initialVertices, initialLines: createSequentialLines(initialVertices, false),
+                    allVertices, allLines: createSequentialLines(allVertices, true)
+                };
+            }
+        } else if (type === 'point') {
+            const difficulty = (selectedDifficulty === 'practice') ? '1' : selectedDifficulty;
+            const numPoints = forceVertices ? forceVertices : (difficulty == 1) ? 4 : getRandomInt(5, 6);
+            let initialPoints = [];
+            const isHorizontalAxis = Math.random() < 0.5;
+            let lineStart, lineEnd;
+
+            if(isHorizontalAxis) {
+                const y = CENTER_POINT.y;
+                const halfLength = getRandomInt(Math.floor(GRID_COUNT * 0.15), Math.floor(GRID_COUNT * 0.35));
+                lineStart = {x: CENTER_POINT.x - halfLength, y: y};
+                lineEnd = {x: CENTER_POINT.x + halfLength, y: y};
+            } else {
+                const x = CENTER_POINT.x;
+                const halfLength = getRandomInt(Math.floor(GRID_COUNT * 0.15), Math.floor(GRID_COUNT * 0.35));
+                lineStart = {x: x, y: CENTER_POINT.y - halfLength};
+                lineEnd = {x: x, y: CENTER_POINT.y + halfLength};
+            }
+            initialPoints.push(lineStart);
+            
+            let halfVertices = [];
+            for(let i = 0; i < numPoints - 2; i++) {
+                let newV, success = false, attemptCount = 0;
+                while(!success && attemptCount < MAX_ATTEMPTS_PER_POINT) {
+                    let x, y;
+                    if(isHorizontalAxis) {
+                        x = getRandomInt(MIN_COORD, MAX_COORD);
+                        y = getRandomInt(MIN_COORD, CENTER_POINT.y - 1);
+                    } else {
+                        x = getRandomInt(MIN_COORD, CENTER_POINT.x - 1);
+                        y = getRandomInt(MIN_COORD, MAX_COORD);
+                    }
+                    newV = {x: x, y: y};
+                    
+                    if(!isTooClose(newV, [...initialPoints, ...halfVertices])) {
+                        halfVertices.push(newV);
+                        success = true;
+                    }
+                    attemptCount++;
+                }
+                if(!success) return null;
+            }
+            halfVertices.sort((a, b) => Math.atan2(a.y - CENTER_POINT.y, a.x - CENTER_POINT.x) - Math.atan2(b.y - CENTER_POINT.y, b.x - CENTER_POINT.x));
+            initialPoints = initialPoints.concat(halfVertices);
+            initialPoints.push(lineEnd);
+
+            let allVertices = [];
+            let processed = new Set();
+            initialPoints.forEach(p => {
+                const key = `${p.x},${p.y}`;
+                if (!processed.has(key)) {
+                    allVertices.push(p);
+                    processed.add(key);
+                    const symV = calculateSymmetricPoint(p, 'point');
+                    const symKey = `${symV.x},${symV.y}`;
+                    if (!processed.has(symKey)) {
+                        allVertices.push(symV);
+                        processed.add(symKey);
+                    }
+                }
+            });
+
+            allVertices = findPointSymmetricBoundary(allVertices);
+
+            if (allVertices.length >= 3) {
+                for (let i = 0; i < allVertices.length; i++) {
+                    const len = allVertices.length;
+                    const p1 = allVertices[(i - 1 + len) % len];
+                    const p2 = allVertices[i];
+                    const p3 = allVertices[(i + 1) % len];
+                    if (isTooLinear(p1, p2, p3) || isTooSharpAngle(p1, p2, p3)) {
+                        return null;
+                    }
+                }
+            }
+            
+            const allLines = createSequentialLines(allVertices, true);
+            const initialLines = [];
+            const initialSet = new Set(initialPoints.map(p => `${p.x},${p.y}`));
+            allLines.forEach(line => {
+                if(initialSet.has(`${line.p1.x},${line.p1.y}`) && initialSet.has(`${line.p2.x},${line.p2.y}`)) {
+                    initialLines.push(line);
+                }
+            });
+            
+            return {
+                type: 'point', initialVertices: initialPoints, initialLines, allVertices, allLines
+            };
+        }
+        return null;
+    }
+    
+    function initializeSetupListeners() {
+        document.querySelectorAll('#type-select button').forEach(button => {
+            button.addEventListener('click', handleTypeSelect);
+        });
+        document.querySelectorAll('#difficulty-select button').forEach(button => {
+            button.addEventListener('click', handleDifficultySelect);
+        });
+        document.getElementById('quantity-minus').addEventListener('click', () => changeQuantity(-5));
+        document.getElementById('quantity-plus').addEventListener('click', () => changeQuantity(5));
+        document.getElementById('time-minus').addEventListener('click', () => changeTimeLimit(-1));
+        document.getElementById('time-plus').addEventListener('click', () => changeTimeLimit(1));
+    }
+
+function updateSettingsOverlay() {
+    const overlay = document.getElementById('settings-overlay');
+    const message = document.getElementById('overlay-message');
+    const isPractice = selectedDifficulty === 'practice';
+
+    if (isPractice) {
+        overlay.style.display = 'flex';
+        if (gameMode === 'classic') {
+            message.innerHTML = '문제 개수는<br>3개로 고정됩니다.';
+        } else { // timeAttack
+            message.innerHTML = '시간은 2분으로<br>고정됩니다.';
+        }
+    } else {
+        overlay.style.display = 'none';
+    }
+}
+
+    function selectGameMode(mode) {
+        gameMode = mode;
+        const classicSettings = document.getElementById('classic-settings');
+        const timeAttackSettings = document.getElementById('time-attack-settings');
+
+        if (gameMode === 'classic') {
+            classicSettings.style.display = 'block';
+            timeAttackSettings.style.display = 'none';
+        } else { // timeAttack
+            classicSettings.style.display = 'none';
+            timeAttackSettings.style.display = 'block';
+        }
+        updateSettingsOverlay();
+        showPage('setup-page');
+    }
+
+    function changeTimeLimit(direction) {
+        const display = document.getElementById('time-limit-display');
+        const currentIndex = timeOptions.indexOf(timeLimitInMinutes);
+        let nextIndex = currentIndex + direction;
+
+        if (nextIndex < 0) {
+            nextIndex = timeOptions.length - 1;
+        } else if (nextIndex >= timeOptions.length) {
+            nextIndex = 0;
+        }
+
+        timeLimitInMinutes = timeOptions[nextIndex];
+        display.textContent = timeLimitInMinutes + '분';
+    }
+
+    function nextProblem() {
+        closePopup();
+        currentProblem++;
+        
+        currentProblemAttempts = 0;
+        userVertices = [];
+        userLines = [];
+
+        if (gameMode === 'timeAttack') {
+            if (timerInterval) { // End of game is handled by timer
+                let newProblem = null;
+                let attempt = 0;
+                const MAX_ATTEMPTS_NEXT = 100;
+                while (!newProblem && attempt < MAX_ATTEMPTS_NEXT) {
+                    let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
+                    newProblem = generateRandomProblem(type);
+                    attempt++;
+                }
+                if (newProblem) {
+                    problemList.push(newProblem);
+                } else {
+                    // Could not generate new problem, end game
+                    stopTimer();
+                    showFinalResult();
+                    return;
+                }
+            } else {
+                // Timer already stopped, just show results
+                showFinalResult();
+                return;
+            }
+        }
+        
+        if (gameMode === 'classic' && currentProblem >= totalProblems) {
+            showFinalResult();
+            return;
+        }
+
+        loadProblem();
+        saveGameState();
+    }
+
+
+    function handleTypeSelect(event) {
+        document.querySelectorAll('#type-select button').forEach(b => b.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        selectedType = event.currentTarget.getAttribute('data-type');
+    }
+    
+    function handleDifficultySelect(event) {
+        document.querySelectorAll('#difficulty-select button').forEach(b => b.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        selectedDifficulty = event.currentTarget.getAttribute('data-difficulty');
+        updateSettingsOverlay();
+    }
+
+    function changeQuantity(delta) {
+        const current = parseInt(document.getElementById('problem-quantity').textContent);
+        let newQuantity = current + delta;
+        if (newQuantity < 5) newQuantity = 5;
+        if (newQuantity > 50) newQuantity = 50;
+        document.getElementById('problem-quantity').textContent = newQuantity;
+        totalProblems = newQuantity;
+    }
+
+    function generateProblemWithRetry(type, forceVertices = null) {
+        let newProblem = null;
+        let attempt = 0;
+        const MAX_ATTEMPTS = 100;
+        while (!newProblem && attempt < MAX_ATTEMPTS) {
+            newProblem = generateRandomProblem(type, forceVertices);
+            attempt++;
+        }
+        return newProblem;
+    }
+
+function startQuiz() {
+    // 1. Clear all previous game state to prevent carryover issues.
+    currentProblem = 0;
+    score = { results: [] };
+    currentProblemAttempts = 0;
+    userVertices = [];
+    userLines = [];
+    tempLineStart = null;
+    hoveredLine = null;
+    problemList = [];
+    hasSubmittedScore = false;
+
+    // 2. Set quiz parameters based on mode and difficulty.
+    if (selectedDifficulty === 'practice') {
+        if (gameMode === 'timeAttack') {
+            timeLimitInMinutes = 2; // Fixed time limit for practice mode
+        }
+        totalProblems = 3; // Fixed number of problems for practice mode
+        
+        // Generate a specific set of practice problems
+        if (selectedType === 'line') {
+            problemList.push(generateProblemWithRetry('line', 3));
+            problemList.push(generateProblemWithRetry('line', 4));
+            problemList.push(generateProblemWithRetry('line', 5));
+        } else if (selectedType === 'point') {
+            problemList.push(generateProblemWithRetry('point', 4));
+            problemList.push(generateProblemWithRetry('point', 4));
+            problemList.push(generateProblemWithRetry('point', 4));
+        } else { // both
+            problemList.push(generateProblemWithRetry('line', 3));
+            problemList.push(generateProblemWithRetry('line', 4));
+            problemList.push(generateRandomProblem('point', 4));
+        }
+        problemList = problemList.filter(p => p !== null);
+        totalProblems = problemList.length; // Finalize total problems based on successful generation
+
+    } else { // Normal Mode
+        let problemsToGenerate = (gameMode === 'classic') ? totalProblems : 1;
+        let attempt = 0;
+        const MAX_ATTEMPTS = problemsToGenerate * 20;
+        let generatedVertexStrings = new Set();
+        
+        // Generate problems dynamically
+        while (problemList.length < problemsToGenerate && attempt < MAX_ATTEMPTS) {
+            let type = (selectedType === 'both') ? (Math.random() < 0.5 ? 'line' : 'point') : selectedType;
+            const newProblem = generateRandomProblem(type);
+            if (newProblem && newProblem.initialVertices.length >= 2) {
+                const vertexString = JSON.stringify(newProblem.initialVertices.map(v => `${v.x},${v.y}`).sort());
+                if (!generatedVertexStrings.has(vertexString)) {
+                    problemList.push(newProblem);
+                    generatedVertexStrings.add(vertexString);
+                }
+            }
+            attempt++;
+        }
+        if (gameMode === 'classic') {
+            totalProblems = problemList.length; // Adjust totalProblems to the actual number generated
+        }
+    }
+
+    // 3. Handle problem generation failure.
+    if (problemList.length === 0) {
+        alert('문제 생성에 실패했습니다. 다른 설정으로 다시 시도해 주세요.');
+        location.reload();
+        return;
+    }
+    
+    // 4. Start the quiz.
+    showPage('problem-page');
+    if (gameMode === 'timeAttack') startTimer();
+    loadProblem();
+}
+    
+    function loadProblem() {
+        const isTimed = gameMode === 'timeAttack';
+        
+        if (!isTimed && currentProblem >= totalProblems && totalProblems > 0) {
+            showFinalResult();
+            return;
+        }
+        
+        if (isTimed && currentProblem >= problemList.length && !timerInterval) {
+            showFinalResult();
+            return;
+        }
+        
+        const timerDisplay = document.getElementById('timer-display');
+        const counterDisplay = document.getElementById('problem-counter-display');
+
+        if (isTimed) {
+            counterDisplay.style.display = 'none';
+            timerDisplay.style.display = 'block';
+        } else { // Classic
+            counterDisplay.style.display = 'block';
+            timerDisplay.style.display = 'none';
+            counterDisplay.textContent = '남은 문제 ' + (totalProblems - (currentProblem + 1)) + '개';
+        }
+
+        const currentP = problemList[currentProblem];
+        if(!currentP) { // Failsafe for empty problem
+            console.error("Problem could not be loaded.", { currentProblem, problemList });
+            showFinalResult();
+            return;
+        }
+
+        const pType = currentP.type === 'line' ? '선대칭' : '점대칭';
+        
+        let problemNumText = `${currentProblem + 1}번째 문제 (${pType})`;
+        const pTypeText = currentP.type === 'line' ? '선대칭도형' : '점대칭도형';
+        let instructionText = `아래 도형은 ${pTypeText}입니다. 나머지 부분을 완성해 주세요.`;
+
+        if (window.innerWidth < 480) {
+            problemNumText = `${currentProblem + 1}번째 문제<br>(${pType})`;
+            instructionText = `아래 도형은 ${pTypeText}입니다.<br>나머지 부분을 완성해 주세요.`;
+        }
+        document.getElementById('problem-number').innerHTML = problemNumText;
+        document.getElementById('problem-instruction').innerHTML = instructionText;
+        
+        document.getElementById('check-answer-btn').style.display = 'block';
+        document.getElementById('next-problem-btn').style.display = 'none';
+        
+        closePopup();
+        
+        problemVertices = currentP.initialVertices;
+        problemLines = currentP.initialLines;
+        tempLineStart = null;
+        hoveredLine = null;
+        
+        setCanvasMode('vertex');
+        
+        redrawCanvas();
+    }
+    
+    function clearCanvas(clearUserDrawing) {
+        if (clearUserDrawing) {
+            userVertices = [];
+            userLines = [];
+            tempLineStart = null;
+            hoveredLine = null;
+        }
+        
+        redrawCanvas();
+        setCanvasMode('vertex');
+        closePopup();
+        
+        document.getElementById('check-answer-btn').style.display = 'block';
+        document.getElementById('next-problem-btn').style.display = 'none';
+    }
+    
+    function renderProblemVertices() {
+        document.querySelectorAll('.problem-dot').forEach(dot => dot.remove());
+        problemVertices.forEach((v) => {
+            const dot = document.createElement('div');
+            dot.className = 'problem-dot';
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+            canvasWrapper.appendChild(dot);
+        });
+    }
+
+    function drawGrid() {
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 0.5;
+        
+        ctx.setLineDash([1, 4]);
+        
+        for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+        
+        ctx.setLineDash([]);
+
+        if (problemList.length > currentProblem && problemList[currentProblem]) {
+            const currentP = problemList[currentProblem];
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 2;
+            if (currentP.type === 'line') {
+                if (currentP.isSlantedAxis) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(canvas.width, canvas.height);
+                    ctx.stroke();
+                } else if (currentP.axisDirection === 'vertical') {
+                    const centerX = canvas.width / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, 0);
+                    ctx.lineTo(centerX, canvas.height);
+                    ctx.stroke();
+                } else if (currentP.axisDirection === 'horizontal') {
+                    const centerY = canvas.height / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, centerY);
+                    ctx.lineTo(canvas.width, centerY);
+                    ctx.stroke();
+                }
+            } else if (currentP.type === 'point') {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ff0000';
+                ctx.fill();
+            }
+        }
+    }
+
+    function drawLines(lines, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        lines.forEach(line => {
+            ctx.beginPath();
+            ctx.moveTo(line.p1.x * GRID_SIZE, line.p1.y * GRID_SIZE);
+            ctx.lineTo(line.p2.x * GRID_SIZE, line.p2.y * GRID_SIZE);
+            ctx.stroke();
+        });
+    }
+
+    function redrawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+
+        drawLines(problemLines, '#007bff');
+        drawLines(userLines, '#28a745');
+        
+        if (hoveredLine) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(234, 153, 153, 0.5)';
+            ctx.lineWidth = 8;
+            ctx.shadowColor = 'rgba(234, 153, 153, 0.7)';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(hoveredLine.p1.x * GRID_SIZE, hoveredLine.p1.y * GRID_SIZE);
+            ctx.lineTo(hoveredLine.p2.x * GRID_SIZE, hoveredLine.p2.y * GRID_SIZE);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        renderProblemVertices();
+
+        if (canvasMode === 'line') {
+            renderPointsForLineMode();
+        } else {
+            renderUserVertices();
+        }
+    }
+
+    function renderPointsForLineMode() {
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+
+        const allPoints = [...problemVertices, ...userVertices].filter((v, i, self) => i === self.findIndex(t => isSamePoint(t, v)));
+        
+        allPoints.forEach((v) => {
+            const dot = document.createElement('div');
+            dot.className = (tempLineStart && isSamePoint(v, tempLineStart)) ? 'selected-line-dot' : 'line-dot';
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+            canvasWrapper.appendChild(dot);
+        });
+    }
+
+    function renderUserVertices() {
+        document.querySelectorAll('.user-dot, .line-dot, .selected-line-dot').forEach(dot => dot.remove());
+
+        userVertices.forEach((v) => {
+            const dot = document.createElement('div');
+            dot.className = 'user-dot';
+            dot.style.left = `${(v.x / GRID_COUNT) * 100}%`;
+            dot.style.top = `${(v.y / GRID_COUNT) * 100}%`;
+            canvasWrapper.appendChild(dot);
+        });
+    }
+
+    function isVertexOnProblemBoundary(v) {
+        return problemVertices.some(pv => isSamePoint(pv, v));
+    }
+    
+    function showPopup(mainMessage, detailMessage, isCorrect) {
+        const popupOverlay = document.getElementById('result-popup-overlay');
+        const popupMainMessage = document.getElementById('popup-main-message');
+        const popupDetailMessage = document.getElementById('popup-detail-message');
+        const popupNextBtn = document.getElementById('popup-next-btn');
+
+        if (isCorrect) {
+            popupMainMessage.innerHTML = mainMessage;
+            popupMainMessage.className = 'correct';
+            popupDetailMessage.style.display = 'none';
+            popupNextBtn.style.display = 'block';
+        } else {
+            popupMainMessage.innerHTML = `${mainMessage}<br><span style="font-size: 80%;">${detailMessage}</span>`;
+            popupMainMessage.className = 'incorrect';
+            popupDetailMessage.style.display = 'none';
+            popupNextBtn.style.display = 'none';
+        }
+        
+        popupOverlay.style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('result-popup-overlay').style.display = 'none';
+    }
+    
+    function checkAnswer() {
+        const currentP = problemList[currentProblem];
+        if (!currentP) return false;
+        const problemType = currentP.type;
+        let verticesAreCorrect = checkVerticesSymmetry(problemType), isLinesCorrect = false;
+        if (verticesAreCorrect) {
+            if (problemType === 'line') isLinesCorrect = checkLineSymmetryLines(currentP);
+            else if (problemType === 'point') isLinesCorrect = checkPointSymmetryLines(currentP);
+        }
+        if (verticesAreCorrect && isLinesCorrect) {
+            if (score.results.length === currentProblem) {
+                score.results.push(currentProblemAttempts);
+            }
+            showPopup('정답입니다🎉', '', true);
+            saveGameState();
+            document.getElementById('check-answer-btn').style.display = 'none';
+            document.getElementById('next-problem-btn').style.display = 'block';
+            return true;
+        } else {
+            let detailMessage;
+            if (!verticesAreCorrect) detailMessage = '꼭짓점의 위치나 개수가 잘못되었어요.';
+            else if (!isLinesCorrect) detailMessage = '도형이 대칭을 이루지 않거나 빠뜨린 선분이 있어요.';
+            else detailMessage = '꼭짓점이나 선분 연결에 오류가 있어 대칭도형이 완성되지 않았습니다.';
+            currentProblemAttempts++;
+            saveGameState();
+            showPopup('다시 생각해 볼까요?', detailMessage, false);
+            document.getElementById('check-answer-btn').style.display = 'block';
+            document.getElementById('next-problem-btn').style.display = 'none';
+            return false;
+        }
+    }
+
+    function checkVerticesSymmetry(problemType) { const currentP = problemList[currentProblem]; const isSlantedAxis = (currentP.type === 'line' && currentP.isSlantedAxis); const allProblemAndUserVerticesSet = new Map(); [...problemVertices, ...userVertices].forEach(v => { const key = `${Math.round(v.x)},${Math.round(v.y)}`; if (!allProblemAndUserVerticesSet.has(key)) allProblemAndUserVerticesSet.set(key, { x: Math.round(v.x), y: Math.round(v.y) }); }); const finalVertices = Array.from(allProblemAndUserVerticesSet.values()); if (problemType === 'line') { let boundaryVerticesCount; if (isSlantedAxis) boundaryVerticesCount = finalVertices.filter(v => v.x === v.y).length; else if (currentP.axisDirection === 'vertical') boundaryVerticesCount = finalVertices.filter(v => v.x === HALF_COUNT).length; else if (currentP.axisDirection === 'horizontal') boundaryVerticesCount = finalVertices.filter(v => v.y === HALF_COUNT).length; if ((finalVertices.length - boundaryVerticesCount) % 2 !== 0) return false; } let symmetricPairs = new Map(); for (const v of finalVertices) { const key = `${v.x},${v.y}`; if (symmetricPairs.has(key)) continue; const symmetricV = calculateSymmetricPoint(v, problemType, isSlantedAxis, currentP.axisDirection); if (isSamePoint(v, symmetricV)) { symmetricPairs.set(key, true); continue; } if (!finalVertices.some(av => isSamePoint(av, symmetricV))) return false; symmetricPairs.set(key, true); symmetricPairs.set(`${symmetricV.x},${symmetricV.y}`, true); } return true; }
+    function checkLineSymmetryLines(currentP) { const correctSymmetricLines = currentP.initialLines.map(line => ({ p1: calculateSymmetricPoint(line.p1, 'line', currentP.isSlantedAxis, currentP.axisDirection), p2: calculateSymmetricPoint(line.p2, 'line', currentP.isSlantedAxis, currentP.axisDirection) })); if (userLines.length !== correctSymmetricLines.length) return false; for (const userLine of userLines) if (!correctSymmetricLines.some(correctLine => isSameLine(userLine, correctLine))) return false; return true; }
+    function checkPointSymmetryLines(currentP) { const allDrawnLines = [...problemLines, ...userLines], correctLines = currentP.allLines; if (allDrawnLines.length !== correctLines.length) return false; const correctLinesCopy = [...correctLines]; for (const drawnLine of allDrawnLines) { const matchIndex = correctLinesCopy.findIndex(correctLine => isSameLine(drawnLine, correctLine)); if (matchIndex === -1) return false; correctLinesCopy.splice(matchIndex, 1); } return correctLinesCopy.length === 0; }
+    function findClosestValidLinePoint(v) { const allTargetVertices = [...problemVertices, ...userVertices]; if (problemList.length > currentProblem && problemList[currentProblem].type === 'point') allTargetVertices.push(CENTER_POINT); let closestPoint = null, minDistSq = Infinity; for (const p of allTargetVertices) { const dist = distSq(v, p); if (dist < minDistSq) { minDistSq = dist; closestPoint = p; } } return closestPoint; }
+    function setCanvasMode(mode) { canvasMode = mode; const vertexBtn = document.getElementById('mode-vertex'), lineBtn = document.getElementById('mode-line'); vertexBtn.classList.remove('mode-btn-active'); lineBtn.classList.remove('mode-btn-active'); const canStartLineDrawing = userVertices.length >= 1 || problemVertices.length > 1; if (mode === 'vertex') { vertexBtn.classList.add('mode-btn-active'); tempLineStart = null; } else { lineBtn.classList.add('mode-btn-active'); vertexBtn.disabled = false; } document.getElementById('mode-line').disabled = !canStartLineDrawing; redrawCanvas(); }
+    
+    function getTargetTimeForProblem(problem) {
+        const isDiff2 = selectedDifficulty == 2;
+        if (problem.type === 'line') {
+            return isDiff2 ? 20 : 10;
+        } else { // point
+            return isDiff2 ? 90 : 60;
+        }
+    }
+
+    function showFinalResult() {
+        if (gameMode === 'timeAttack') {
+            stopTimer();
+        }
+        if (gameMode === 'timeAttack' && selectedDifficulty !== 'practice') {
+              totalProblems = score.results.length;
+        }
+
+        saveGameState();
+        showPage('final-result-page');
+
+        // 정확도와 최종 점수 계산 로직
+        let correctCount = 0;
+        let retriedCount = 0;
+        let totalWeightedScore = 0;
+        score.results.forEach(attempts => {
+            if (attempts === 0) {
+                correctCount++;
+                totalWeightedScore += 1.0;
+            } else {
+                retriedCount++;
+                totalWeightedScore += Math.max(0, 1.0 - attempts * 0.4);
+            }
+        });
+        
+        const total = score.results.length; 
+        const accuracy = total > 0 ? parseFloat(((totalWeightedScore / total) * 100).toFixed(1)) : 0;
+        finalAccuracyValue = accuracy;
+        
+        let finalScore = 0;
+        
+        const isPractice = selectedDifficulty === 'practice';
+
+        document.getElementById('final-result-title').textContent = isPractice ? '연습 완료' : '학습 완료';
+        const scoreDisplay = document.querySelector('.score-display');
+        const hofButton = document.getElementById('show-hof-btn');
+
+        if(isPractice) {
+            scoreDisplay.style.display = 'none';
+            hofButton.style.display = 'none';
+        } else {
+            scoreDisplay.style.display = 'block';
+            hofButton.style.display = 'block';
+        }
+
+        if (gameMode === 'timeAttack' && !isPractice) {
+            const totalProblemsSolved = total;
+            document.getElementById('time-attack-avg-time').style.display = 'block';
+
+            if (totalProblemsSolved === 0) {
+                finalScore = 0;
+                document.getElementById('avg-time-display').textContent = 'N/A';
+            } else {
+                const totalTimeSpent = (timeLimitInMinutes * 60) - remainingTime;
+                const averageTimePerProblem = totalProblemsSolved > 0 ? totalTimeSpent / totalProblemsSolved : 0;
+                
+                let totalTargetTime = 0;
+                for (let i = 0; i < totalProblemsSolved; i++) {
+                    const problem = problemList[i];
+                    if (problem.type === 'point') {
+                         if (selectedDifficulty == 2) {
+                             totalTargetTime += 90;
+                         } else {
+                             totalTargetTime += 60;
+                         }
+                    } else { // 'line' 또는 'both'
+                        if (selectedDifficulty == 2) {
+                             totalTargetTime += 20;
+                        } else {
+                             totalTargetTime += 10;
+                        }
+                    }
+                }
+                const averageTargetTime = totalProblemsSolved > 0 ? totalTargetTime / totalProblemsSolved : 0;
+                
+                const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
+                
+                const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1.2;
+                finalScore = Math.round(speedRatio * (accuracy / 100) * 5000 * difficultyMultiplier);
+                
+                document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
+            }
+        } else { // Classic Mode or Practice
+            document.getElementById('time-attack-avg-time').style.display = 'none';
+             if (!isPractice) {
+                 let typeMultiplier = 1.0;
+                 if (selectedType === 'point') typeMultiplier = 1.1;
+                 else if (selectedType === 'both') typeMultiplier = 1.05;
+                 const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
+                 finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
+             }
+        }
+        finalScoreValue = finalScore;
+        document.getElementById('correct-count').textContent = correctCount;
+        document.getElementById('retried-count').textContent = retriedCount;
+        document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+        if (!isPractice) {
+            document.getElementById('final-score').textContent = finalScore;
+        }
+    }
+
+    function handleCanvasMouseMove(event) { if (document.getElementById('check-answer-btn').style.display === 'none') { if (hoveredLine) { hoveredLine = null; canvas.style.cursor = 'default'; redrawCanvas(); } return; } const rect = canvas.getBoundingClientRect(); const mouseXRatio = (event.clientX - rect.left) / rect.width, mouseYRatio = (event.clientY - rect.top) / rect.height; const canvasX = mouseXRatio * canvas.width, canvasY = mouseYRatio * canvas.height, mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE }; let bestLine = null, minDistSq = 0.25; for (const line of userLines) { const p1 = line.p1, p2 = line.p2, lineLengthSq = distSq(p1, p2); if (lineLengthSq === 0) continue; let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq; if (t > 0.2 && t < 0.8) { const closestPointOnLine = { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) }; const distanceSq = distSq(mousePoint, closestPointOnLine); if (distanceSq < minDistSq) { minDistSq = distanceSq; bestLine = line; } } } if (!isSameLine(hoveredLine, bestLine)) { hoveredLine = bestLine; redrawCanvas(); } if (hoveredLine) canvas.style.cursor = 'pointer'; else if (canvasMode === 'line') canvas.style.cursor = 'pointer'; else canvas.style.cursor = 'crosshair'; }
+    function showQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'flex'; }
+    function closeQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'none'; }
+    
+    function showHofPopup() {
+        const messageEl = document.getElementById('hof-message');
+        const inputGroup = document.querySelector('.hof-input-group');
+        const classicTbody = document.querySelector('#hof-table-classic tbody');
+        const timeAttackTbody = document.querySelector('#hof-table-timeattack tbody');
+
+        if (hasSubmittedScore) {
+            inputGroup.style.display = 'none';
+            messageEl.textContent = '이번 학습 기록은 이미 등록되었습니다.';
+            messageEl.style.color = 'blue';
+        } else {
+            inputGroup.style.display = 'block';
+            messageEl.textContent = '';
+            document.getElementById('hof-initial').value = '';
+            document.getElementById('hof-submit-btn').disabled = false;
+        }
+
+        classicTbody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
+        timeAttackTbody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
+        document.getElementById('hof-popup-overlay').style.display = 'flex';
+        
+        fetch(webAppUrl)
+            .then(response => response.json())
+            .then(data => {
+                populateHofTable(classicTbody, data.classic || [], '클래식');
+                populateHofTable(timeAttackTbody, data.timeAttack || [], '타임어택');
+            })
+            .catch(error => {
+                classicTbody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
+                timeAttackTbody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
+                console.error('Error fetching leaderboard:', error);
+            });
+    }
+
+    function populateHofTable(tbody, data, modeName) {
+        tbody.innerHTML = '';
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3">아직 등록된 ${modeName} 기록이 없습니다.</td></tr>`;
+        } else {
+            data.forEach(item => {
+                let initialStyle = '';
+                if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"';
+                if (item.rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
+                if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 3px #fff;"';
+                const row = `<tr><td>${item.rank}</td><td ${initialStyle}>${item.initial} ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : ''}</td><td>${item.score}</td></tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+    }
+
+    function closeHofPopup() { document.getElementById('hof-popup-overlay').style.display = 'none'; }
+    
+    function saveGameState() {
+        if (document.getElementById('problem-page').style.display === 'block' && problemList.length === 0) {
+            return;
+        }
+        const gameState = { problemList, currentProblem, score, userVertices, userLines, canvasMode, selectedType, selectedDifficulty, totalProblems, currentProblemAttempts, finalScoreValue, hasSubmittedScore, gameMode, timeLimitInMinutes, remainingTime };
+        localStorage.setItem('quizState', JSON.stringify(gameState));
+    }
+    
+    function loadGameState() {
+        const savedStateString = localStorage.getItem('quizState');
+        if (!savedStateString) return 'none';
+
+        const savedState = JSON.parse(savedStateString);
+        if (!savedState || !savedState.problemList || !savedState.score || !savedState.gameMode) {
+            return 'none';
+        }
+        
+        const isClassicInProgress = savedState.gameMode === 'classic' &&
+                                   savedState.totalProblems > 0 &&
+                                   savedState.currentProblem < savedState.totalProblems;
+
+        const isTimeAttackInProgress = savedState.gameMode === 'timeAttack' &&
+                                           savedState.remainingTime > 0;
+
+        if (isClassicInProgress || isTimeAttackInProgress) {
+            problemList = savedState.problemList;
+            currentProblem = savedState.currentProblem;
+            score = savedState.score;
+            canvasMode = savedState.canvasMode;
+            selectedType = savedState.selectedType;
+            selectedDifficulty = savedState.selectedDifficulty;
+            totalProblems = savedState.totalProblems;
+            currentProblemAttempts = savedState.currentProblemAttempts;
+            finalScoreValue = savedState.finalScoreValue;
+            hasSubmittedScore = savedState.hasSubmittedScore;
+            gameMode = savedState.gameMode;
+            timeLimitInMinutes = savedState.timeLimitInMinutes;
+            remainingTime = savedState.remainingTime;
+            userVertices = savedState.userVertices || [];
+            userLines = savedState.userLines || [];
+
+            if (gameMode === 'timeAttack' && remainingTime > 0) {
+                startTimer(true);
+            }
+            return 'in-progress';
+        }
+
+        const isFinished = savedState.score.results.length > 0 || 
+                           (savedState.gameMode === 'timeAttack' && savedState.remainingTime <= 0);
+
+        if (isFinished) {
+            Object.assign(window, savedState); 
+            return 'finished';
+        }
+        
+        return 'none';
+    }
+
+    function clearGameState() { localStorage.removeItem('quizState'); }
+    
+    function submitScore() { 
+        const initialInput = document.getElementById('hof-initial'), 
+              initial = initialInput.value, 
+              submitBtn = document.getElementById('hof-submit-btn'), 
+              messageEl = document.getElementById('hof-message');
+        if (!/^[A-Z]{3}$/.test(initial)) { 
+            messageEl.textContent = '이니셜은 영어 대문자 3글자로 입력해주세요.'; 
+            messageEl.style.color = 'red'; 
+            return; 
+        } 
+        submitBtn.disabled = true; 
+        messageEl.textContent = '등록 중...'; 
+        messageEl.style.color = '#333'; 
+        const data = { 
+            initial, 
+            score: finalScoreValue, 
+            problems: problemList.length, 
+            accuracy: finalAccuracyValue, 
+            difficulty: selectedDifficulty, 
+            type: selectedType, 
+            mode: gameMode
+        }; 
+        fetch(webAppUrl, { 
+            method: 'POST', 
+            cache: 'no-cache', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(data) 
+        }).then(response => response.json()).then(result => { 
+            if (result.result === 'success') { 
+                hasSubmittedScore = true; 
+                saveGameState(); 
+                messageEl.textContent = '성공적으로 등록되었습니다!'; 
+                messageEl.style.color = '#4B8134'; 
+                document.querySelector('.hof-input-group').style.display = 'none'; 
+                setTimeout(showHofPopup, 1500); 
+            } else throw new Error(result.message || '알 수 없는 오류'); 
+        }).catch(error => { 
+            messageEl.textContent = '등록에 실패했습니다. 다시 시도해주세요.'; 
+            messageEl.style.color = 'red'; 
+            submitBtn.disabled = false; 
+            console.error('Error submitting score:', error); 
+        }); 
+    }
+    
+    function startTimer(isResuming = false) { stopTimer(); if (!isResuming) remainingTime = timeLimitInMinutes * 60; const timerDisplay = document.getElementById('timer-display'); timerDisplay.style.display = 'block'; updateTimerDisplay(); timerInterval = setInterval(() => { remainingTime--; updateTimerDisplay(); if (remainingTime <= 0) { stopTimer(); showFinalResult(); } }, 1000); }
+    function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+    
+    function updateTimerDisplay() {
+        const timerDisplay = document.getElementById('timer-display');
+        if (remainingTime < 0) remainingTime = 0;
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        timerDisplay.classList.toggle('time-warning', remainingTime <= 60 && remainingTime > 0);
+    }
+
+    window.onload = () => {
+        try {
+            setupGrid();
+            const gameState = loadGameState();
+            
+            if (gameState === 'finished') {
+                showFinalResult();
+            } else if (gameState === 'in-progress') {
+                showPage('problem-page');
+                loadProblem();
+            } else {
+                resetGame();
+                showPage('mode-selection-page');
+            }
+
+            initializeSetupListeners();
+            document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
+            document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
+            document.getElementById('back-to-mode-select-btn').addEventListener('click', () => {
+                if (confirm('진행 상황이 사라집니다. 정말로 첫 페이지로 돌아갈까요?')) {
+                    resetGame();
+                    showPage('mode-selection-page');
+                }
+            });
+            
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+            canvas.addEventListener('mouseleave', () => { if (hoveredLine) { hoveredLine = null; redrawCanvas(); } });
+
+            canvas.addEventListener('click', (event) => {
+                if (document.getElementById('check-answer-btn').style.display === 'none') return;
+                if (hoveredLine) { userLines = userLines.filter(line => !isSameLine(line, hoveredLine)); hoveredLine = null; handleCanvasMouseMove(event); redrawCanvas(); saveGameState(); return; }
+                const rect = canvas.getBoundingClientRect(); const mouseXRatio = (event.clientX - rect.left) / rect.width; const mouseYRatio = (event.clientY - rect.top) / rect.height; const gridX = Math.round(mouseXRatio * canvas.width / GRID_SIZE); const gridY = Math.round(mouseYRatio * canvas.height / GRID_SIZE); if (gridX < 0 || gridX > GRID_COUNT || gridY < 0 || gridY > GRID_COUNT) return; const clickedGridPoint = { x: gridX, y: gridY };
+                if (canvasMode === 'vertex') {
+                    if (isVertexOnProblemBoundary(clickedGridPoint)) return;
+                    const existingIndex = userVertices.findIndex(v => isSamePoint(v, clickedGridPoint));
+                    if (existingIndex > -1) { userVertices.splice(existingIndex, 1); userLines = userLines.filter(line => !(isSamePoint(line.p1, clickedGridPoint) || isSamePoint(line.p2, clickedGridPoint))); } else { userVertices.push(clickedGridPoint); }
+                    redrawCanvas();
+                    saveGameState();
+                } else if (canvasMode === 'line') {
+                    const targetPoint = findClosestValidLinePoint(clickedGridPoint); if (!targetPoint) return;
+                    if (!tempLineStart) { tempLineStart = targetPoint; } else {
+                        if (!isSamePoint(tempLineStart, targetPoint)) { const newLine = { p1: tempLineStart, p2: targetPoint }; if (!isLineExists(newLine)) userLines.push(newLine); else userLines = userLines.filter(existingLine => !isSameLine(existingLine, newLine)); }
+                        tempLineStart = null;
+                    }
+                    redrawCanvas();
+                    saveGameState();
+                }
+            });
+
+            document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            document.getElementById('next-problem-btn').addEventListener('click', nextProblem);
+            document.getElementById('clear-canvas-btn').addEventListener('click', () => { document.getElementById('confirm-clear-popup-overlay').style.display = 'flex'; });
+            
+            document.querySelector('#problem-page .home-button').addEventListener('click', () => {
+                if (confirm('진행 상황이 사라집니다. 정말로 첫 페이지로 돌아갈까요?')) {
+                    resetGame();
+                    showPage('mode-selection-page');
+                }
+            });
+            
+            document.getElementById('qr-code-btn').addEventListener('click', showQrPopup);
+            document.getElementById('show-hof-btn').addEventListener('click', showHofPopup);
+            document.getElementById('hof-submit-btn').addEventListener('click', submitScore);
+            document.getElementById('confirm-clear-yes-btn').addEventListener('click', () => { clearCanvas(true); saveGameState(); document.getElementById('confirm-clear-popup-overlay').style.display = 'none'; });
+            document.getElementById('confirm-clear-no-btn').addEventListener('click', () => { document.getElementById('confirm-clear-popup-overlay').style.display = 'none'; });
+            
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                resetGame();
+                showPage('mode-selection-page');
+            });
+            
+            const saveOnExit = () => { if (isExitingIntentionally) return; if (document.getElementById('problem-page').style.display === 'block') saveGameState(); };
+            window.addEventListener('pagehide', saveOnExit);
+            window.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveOnExit(); });
+
+            const checkAnswerBtn = document.getElementById('check-answer-btn');
+            const progressBar = checkAnswerBtn.querySelector('.progress-bar');
+            let pressTimer = null;
+            let isPressing = false;
+            const PRESS_AND_HOLD_DURATION = 400;
+
+            const startPress = (event) => {
+                if (event.type === 'mousedown' && event.button !== 0) return;
+                event.preventDefault();
+                if (isPressing) return;
+
+                isPressing = true;
+                progressBar.style.transition = `transform ${PRESS_AND_HOLD_DURATION / 1000}s linear`;
+                progressBar.style.transform = 'translateX(0%)';
+
+                pressTimer = setTimeout(() => {
+                    if (!isPressing) return;
+                    const isCorrect = checkAnswer();
+                    if (!isCorrect) {
+                        cancelPress();
+                    }
+                }, PRESS_AND_HOLD_DURATION);
+            };
+
+            const cancelPress = () => {
+                if (!isPressing) return;
+                isPressing = false;
+                clearTimeout(pressTimer);
+                pressTimer = null;
+                
+                progressBar.style.transition = 'transform 0.2s ease-out';
+                progressBar.style.transform = 'translateX(-100%)';
+            };
+
+            checkAnswerBtn.addEventListener('mousedown', startPress);
+            checkAnswerBtn.addEventListener('touchstart', startPress, { passive: false });
+            checkAnswerBtn.addEventListener('mouseup', cancelPress);
+            checkAnswerBtn.addEventListener('mouseleave', cancelPress);
+            checkAnswerBtn.addEventListener('touchend', cancelPress);
+        } catch (error) {
+            console.error("오류가 발생하여 앱을 초기화합니다:", error);
+            
+            clearGameState(); 
+            // location.reload() might be too aggressive, let's try resetting state and UI first
+            try {
+                resetGame();
+                showPage('mode-selection-page');
+                initializeSetupListeners();
+                document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
+                document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
+            } catch (recoveryError) {
+                console.error("복구 중 추가 오류 발생:", recoveryError);
+                alert("치명적인 오류가 발생하여 페이지를 새로고침합니다.");
+                location.reload();
+            }
+        }
+    };
 </script>
 
 </body>
