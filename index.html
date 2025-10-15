@@ -2068,11 +2068,11 @@ function startQuiz() {
         timerDisplay.classList.toggle('time-warning', remainingTime <= 60 && remainingTime > 0);
     }
 
-    window.onload = () => {
+        window.onload = () => {
         try {
             setupGrid();
             const gameState = loadGameState();
-            
+
             if (gameState === 'finished') {
                 score = { results: [] };
                 showFinalResult();
@@ -2080,6 +2080,9 @@ function startQuiz() {
                 showPage('problem-page');
                 loadProblem();
             } else {
+                // ⭐ 이 부분이 수정되었습니다. ⭐
+                // 페이지 로드 시 무조건 첫 페이지를 보여주고,
+                // 설정값을 초기화합니다.
                 resetGame();
                 showPage('mode-selection-page');
             }
@@ -2192,12 +2195,12 @@ function startQuiz() {
                 resetGame();
                 showPage('mode-selection-page');
                 initializeSetupListeners();
-                 document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
-                 document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
+                document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
+                document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
             } catch (recoveryError) {
-                 console.error("복구 중 추가 오류 발생:", recoveryError);
-                 alert("치명적인 오류가 발생하여 페이지를 새로고침합니다.");
-                 location.reload();
+                console.error("복구 중 추가 오류 발생:", recoveryError);
+                alert("치명적인 오류가 발생하여 페이지를 새로고침합니다.");
+                location.reload();
             }
         }
     };
