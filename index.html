@@ -1857,16 +1857,22 @@ function startQuiz() {
                 const totalTimeSpent = (timeLimitInMinutes * 60) - remainingTime;
                 const averageTimePerProblem = totalProblemsSolved > 0 ? totalTimeSpent / totalProblemsSolved : 0;
                 
-                // --- ⭐ 이 부분부터 수정되었습니다. ⭐ ---
+// --- ⭐ 이 부분이 최종적으로 수정된 부분입니다. ⭐ ---
                 let totalTargetTime = 0;
                 for (let i = 0; i < totalProblemsSolved; i++) {
                     const problem = problemList[i];
-                    // 문제 유형에 따라 목표 시간을 다르게 설정합니다.
-                    // 점대칭 (point)는 선대칭 (line)보다 점수 보정을 더 크게 받습니다.
                     if (problem.type === 'point') {
-                        totalTargetTime += 60; // 점대칭 목표 시간: 60초
+                         if (selectedDifficulty == 2) {
+                             totalTargetTime += 90; // 점대칭 난이도 2 목표 시간: 90초 (대폭 상향!)
+                         } else {
+                             totalTargetTime += 60; // 점대칭 난이도 1 목표 시간: 60초
+                         }
                     } else { // 'line' 또는 'both'
-                        totalTargetTime += 30; // 선대칭 목표 시간: 30초
+                        if (selectedDifficulty == 2) {
+                             totalTargetTime += 20; // 선대칭 난이도 2 목표 시간: 20초 (수정 반영)
+                        } else {
+                             totalTargetTime += 10; // 선대칭 난이도 1 목표 시간: 10초
+                        }
                     }
                 }
                 const averageTargetTime = totalProblemsSolved > 0 ? totalTargetTime / totalProblemsSolved : 0;
@@ -1874,28 +1880,21 @@ function startQuiz() {
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
                 
                 // 난이도에 따라 점수 가중치를 부여합니다.
-                const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1.2; // 난이도 1, 2 보정
+                const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1.2;
                 finalScore = Math.round(speedRatio * (accuracy / 100) * 5000 * difficultyMultiplier);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
-        } else { // Classic Mode or Practice
+        } else {
             document.getElementById('time-attack-avg-time').style.display = 'none';
              if (!isPractice) {
                  let typeMultiplier = 1.0;
                  if (selectedType === 'point') typeMultiplier = 1.1;
                  else if (selectedType === 'both') typeMultiplier = 1.05;
+                 const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1;
                  finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
              }
         }
-        finalScoreValue = finalScore;
-        document.getElementById('correct-count').textContent = correctCount;
-        document.getElementById('retried-count').textContent = retriedCount;
-        document.getElementById('final-accuracy').textContent = `${accuracy}%`;
-        if (!isPractice) {
-            document.getElementById('final-score').textContent = finalScore;
-        }
-    }
 
     function handleCanvasMouseMove(event) { if (document.getElementById('check-answer-btn').style.display === 'none') { if (hoveredLine) { hoveredLine = null; canvas.style.cursor = 'default'; redrawCanvas(); } return; } const rect = canvas.getBoundingClientRect(); const mouseXRatio = (event.clientX - rect.left) / rect.width, mouseYRatio = (event.clientY - rect.top) / rect.height; const canvasX = mouseXRatio * canvas.width, canvasY = mouseYRatio * canvas.height, mousePoint = { x: canvasX / GRID_SIZE, y: canvasY / GRID_SIZE }; let bestLine = null, minDistSq = 0.25; for (const line of userLines) { const p1 = line.p1, p2 = line.p2, lineLengthSq = distSq(p1, p2); if (lineLengthSq === 0) continue; let t = ((mousePoint.x - p1.x) * (p2.x - p1.x) + (mousePoint.y - p1.y) * (p2.y - p1.y)) / lineLengthSq; if (t > 0.2 && t < 0.8) { const closestPointOnLine = { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) }; const distanceSq = distSq(mousePoint, closestPointOnLine); if (distanceSq < minDistSq) { minDistSq = distanceSq; bestLine = line; } } } if (!isSameLine(hoveredLine, bestLine)) { hoveredLine = bestLine; redrawCanvas(); } if (hoveredLine) canvas.style.cursor = 'pointer'; else if (canvasMode === 'line') canvas.style.cursor = 'pointer'; else canvas.style.cursor = 'crosshair'; }
     function showQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'flex'; }
