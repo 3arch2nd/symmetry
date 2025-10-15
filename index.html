@@ -1857,25 +1857,35 @@ function startQuiz() {
                 const totalTimeSpent = (timeLimitInMinutes * 60) - remainingTime;
                 const averageTimePerProblem = totalProblemsSolved > 0 ? totalTimeSpent / totalProblemsSolved : 0;
                 
+                // --- ⭐ 이 부분부터 수정되었습니다. ⭐ ---
                 let totalTargetTime = 0;
                 for (let i = 0; i < totalProblemsSolved; i++) {
-                    totalTargetTime += getTargetTimeForProblem(problemList[i]);
+                    const problem = problemList[i];
+                    // 문제 유형에 따라 목표 시간을 다르게 설정합니다.
+                    // 점대칭 (point)는 선대칭 (line)보다 점수 보정을 더 크게 받습니다.
+                    if (problem.type === 'point') {
+                        totalTargetTime += 60; // 점대칭 목표 시간: 60초
+                    } else { // 'line' 또는 'both'
+                        totalTargetTime += 30; // 선대칭 목표 시간: 30초
+                    }
                 }
                 const averageTargetTime = totalProblemsSolved > 0 ? totalTargetTime / totalProblemsSolved : 0;
                 
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
-        
-                finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
+                
+                // 난이도에 따라 점수 가중치를 부여합니다.
+                const difficultyMultiplier = (selectedDifficulty == 2) ? 1.5 : 1.2; // 난이도 1, 2 보정
+                finalScore = Math.round(speedRatio * (accuracy / 100) * 5000 * difficultyMultiplier);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
             }
         } else { // Classic Mode or Practice
             document.getElementById('time-attack-avg-time').style.display = 'none';
              if (!isPractice) {
-                let typeMultiplier = 1.0;
-                if (selectedType === 'point') typeMultiplier = 1.1;
-                else if (selectedType === 'both') typeMultiplier = 1.05;
-                finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
+                 let typeMultiplier = 1.0;
+                 if (selectedType === 'point') typeMultiplier = 1.1;
+                 else if (selectedType === 'both') typeMultiplier = 1.05;
+                 finalScore = Math.round((total * accuracy) * difficultyMultiplier * typeMultiplier);
              }
         }
         finalScoreValue = finalScore;
