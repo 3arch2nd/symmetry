@@ -1811,7 +1811,7 @@ function startQuiz() {
         saveGameState();
         showPage('final-result-page');
 
-        // 정확도와 최종 점수 계산 로직 수정
+        // 정확도와 최종 점수 계산 로직
         let correctCount = 0;
         let retriedCount = 0;
         let totalWeightedScore = 0;
@@ -1855,7 +1855,6 @@ function startQuiz() {
                 document.getElementById('avg-time-display').textContent = 'N/A';
             } else {
                 const totalTimeSpent = (timeLimitInMinutes * 60) - remainingTime;
-                // ⭐⭐⭐ 수정된 부분: 0으로 나누기 방지
                 const averageTimePerProblem = totalProblemsSolved > 0 ? totalTimeSpent / totalProblemsSolved : 0;
                 
                 let totalTargetTime = 0;
@@ -1864,10 +1863,8 @@ function startQuiz() {
                 }
                 const averageTargetTime = totalProblemsSolved > 0 ? totalTargetTime / totalProblemsSolved : 0;
                 
-                // ⭐⭐⭐ 수정된 부분: 0으로 나누기 방지
                 const speedRatio = averageTimePerProblem > 0 ? averageTargetTime / averageTimePerProblem : 0;
         
-                // ⭐⭐⭐ 수정된 부분: 최종 점수 계산식
                 finalScore = Math.round(speedRatio * (accuracy / 100) * 5000);
                 
                 document.getElementById('avg-time-display').textContent = averageTimePerProblem.toFixed(1);
