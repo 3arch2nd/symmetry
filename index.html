@@ -113,11 +113,10 @@ button:hover {
 }
 .mode-buttons button {
     padding: 20px 30px;
-    font-size: 20px; /* [수정] PC 기본 폰트 크기 증가 */
+    font-size: 20px;
     width: 100%;
     max-width: 250px;
 }
-
 #classic-mode-btn {
     background-color: #ffc107;
     color: #333;
@@ -134,8 +133,6 @@ button:hover {
 #time-attack-mode-btn:hover {
     background-color: #cc4125;
 }
-
-
 .mode-option {
     display: flex;
     flex-direction: column;
@@ -148,7 +145,6 @@ button:hover {
     color: #6c757d;
     line-height: 1.5;
 }
-
 #setup-page {
     display: flex;
     flex-direction: column;
@@ -398,7 +394,7 @@ button:hover {
 }
 #problem-counter-display {
     width: 120px;
-    font-size: 1em; /* 글자 크기를 1.2em에서 1em으로 줄였습니다. */
+    font-size: 1em;
     font-weight: bold;
     text-align: right;
     padding-right: 10px;
@@ -435,15 +431,12 @@ button:hover {
 #check-answer-btn:hover {
     background-color: #f0f0f0;
 }
-
 #check-answer-btn, #next-problem-btn {
     min-width: 180px;
 }
-
 #next-problem-btn {
     border: 2px solid transparent;
 }
-
 #check-answer-btn .progress-bar {
     position: absolute;
     top: 0;
@@ -457,7 +450,6 @@ button:hover {
     position: relative;
     z-index: 1;
 }
-
 #check-answer-container {
     display: flex;
     flex-direction: column;
@@ -469,7 +461,6 @@ button:hover {
     margin-top: 8px;
     transition: color 0.3s ease;
 }
-
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -638,7 +629,6 @@ button:hover {
 #hof-table-classic th, #hof-table-classic td,
 #hof-table-timeattack th, #hof-table-timeattack td { padding: 8px; border-bottom: 1px solid #eee; }
 #hof-table-classic th, #hof-table-timeattack th { background-color: #f8f9fa; }
-
 .confirm-clear-popup p {
     font-size: 1.1em;
     margin-bottom: 25px;
@@ -662,45 +652,35 @@ button:hover {
     background-color: #cc4125;
 }
 .mobile-title, .mobile-home { display: none; }
-
-
-/* 💻📱 반응형 웹 디자인 (모바일 최적화) 📱💻 */
 @media (max-width: 768px) {
     .main-layout { flex-direction: column; }
-    
-    .left-panel { 
-        flex-direction: row; 
+    .left-panel {
+        flex-direction: row;
         gap: 10px;
         margin-top: 0;
     }
-
-    .right-panel { 
-        width: 100%; 
-        margin-top: 20px; 
+    .right-panel {
+        width: 100%;
+        margin-top: 20px;
     }
-    
     .option-buttons { flex-direction: column; }
     .problem-footer { justify-content: center; }
     .final-result-layout { flex-direction: column; }
     .result-left { border-right: none; border-bottom: 1px solid #ddd; width: 100%; }
     .hof-columns { flex-direction: column; }
 }
-
 @media (max-width: 480px) {
     .container {
         padding: 15px;
     }
-    
     h1 { font-size: 1.6em; }
     h2 { font-size: 1.2em; }
     small { font-size: 16px; line-height: 1.4; }
-
-    #mode-selection-page h1, 
+    #mode-selection-page h1,
     #setup-page h1 {
         padding-top: 30px;
         margin-bottom: 10px;
     }
-
     #mode-selection-page {
         gap: 10px;
     }
@@ -715,14 +695,12 @@ button:hover {
         font-size: 1.3em;
         line-height: 1.3;
     }
-    /* [추가] 모바일에서만 '모드' 글자가 줄바꿈되도록 합니다. */
     .mode-buttons button span {
         display: block;
     }
     .mode-description {
         font-size: 14px;
     }
-
     .desktop-title { display: none; }
     .mobile-title { display: inline; }
     .desktop-home { display: none; }
@@ -895,7 +873,7 @@ button:hover {
 <div id="qr-popup-overlay" class="popup-overlay" style="display: none;">
     <div class="popup-qr popup-box">
         <button class="close-btn" onclick="closeQrPopup()">&times;</button>
-        <img src="https://i.imgur.com/g4yS8yx.png" alt="QR Code">
+        <img src="https://i.imgur.com/XT0OsoI.png" alt="QR Code">
     </div>
 </div>
 
@@ -903,6 +881,9 @@ button:hover {
     <div class="popup-hof popup-box">
         <button class="close-btn" onclick="closeHofPopup()">&times;</button>
         <h3>🏆 명예의 전당🏆</h3>
+        <small id="hof-reset-message" style="display: none; color: #888; margin-top: -10px; margin-bottom: 10px;">
+            순위는 자정마다 초기화됩니다.
+        </small>
         <div class="hof-input-group">
             <input type="text" id="hof-initial" placeholder="AAA" maxlength="3" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '')">
             <button id="hof-submit-btn" class="primary-btn">등록</button>
@@ -944,7 +925,6 @@ button:hover {
         </div>
     </div>
 </div>
-
 <div id="confirm-clear-popup-overlay" class="popup-overlay" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
     <div class="popup-box confirm-clear-popup">
         <p>표시한 점과 선분을 모두 지웁니다. <br> 계속할까요?</p>
@@ -956,8 +936,9 @@ button:hover {
 </div>
 
 <script>
-    const webAppUrl = 'https://soft-wood-cf8e.bbglara.workers.dev/';
-    
+    const webAppUrl = 'https://patient-thunder-7347.bbglara.workers.dev/';
+    const blockedWords = ['SEX', 'FUK', 'ASS', 'FUX', 'WTF']; 
+
     const timeOptions = [3, 5, 7];
     let selectedType = 'line', totalProblems = 5, currentProblem = 0, canvasMode = 'vertex', score = { results: [] }, currentProblemAttempts = 0, selectedDifficulty = '1', finalAccuracyValue = 0, finalScoreValue = 0, hasSubmittedScore = false, isExitingIntentionally = false, gameMode = 'classic', timeLimitInMinutes = 3, remainingTime = 0, timerInterval = null;
     const canvas = document.getElementById('grid-canvas'), ctx = canvas.getContext('2d'), canvasWrapper = document.querySelector('.canvas-wrapper');
@@ -1905,55 +1886,96 @@ function startQuiz() {
     function showQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'flex'; }
     function closeQrPopup() { document.getElementById('qr-popup-overlay').style.display = 'none'; }
     
-    function showHofPopup() {
-        const messageEl = document.getElementById('hof-message');
-        const inputGroup = document.querySelector('.hof-input-group');
-        const classicTbody = document.querySelector('#hof-table-classic tbody');
-        const timeAttackTbody = document.querySelector('#hof-table-timeattack tbody');
+// showHofPopup 함수 수정
+function showHofPopup() {
+    const messageEl = document.getElementById('hof-message');
+    const inputGroup = document.querySelector('.hof-input-group');
+    const classicTbody = document.querySelector('#hof-table-classic tbody');
+    const timeAttackTbody = document.querySelector('#hof-table-timeattack tbody');
+    
+    document.getElementById('hof-reset-message').style.display = 'block';
 
-        if (hasSubmittedScore) {
-            inputGroup.style.display = 'none';
-            messageEl.textContent = '이번 학습 기록은 이미 등록되었습니다.';
-            messageEl.style.color = 'blue';
-        } else {
-            inputGroup.style.display = 'block';
-            messageEl.textContent = '';
-            document.getElementById('hof-initial').value = '';
-            document.getElementById('hof-submit-btn').disabled = false;
+    if (hasSubmittedScore) {
+        inputGroup.style.display = 'none';
+        messageEl.textContent = '이번 학습 기록은 이미 등록되었습니다.';
+        messageEl.style.color = 'blue';
+    } else {
+        inputGroup.style.display = 'block';
+        messageEl.textContent = '';
+        document.getElementById('hof-initial').value = '';
+        document.getElementById('hof-submit-btn').disabled = false;
+    }
+
+    classicTbody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
+    timeAttackTbody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
+    document.getElementById('hof-popup-overlay').style.display = 'flex';
+    
+    fetch(webAppUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Apps Script에서 분리된 데이터를 바로 사용합니다.
+            const classicTopScorer = data.classicTopScorer;
+            const timeAttackTopScorer = data.timeAttackTopScorer;
+            
+            populateHofTable(classicTbody, data.classic || [], '클래식', classicTopScorer);
+            populateHofTable(timeAttackTbody, data.timeAttack || [], '타임어택', timeAttackTopScorer);
+        })
+        .catch(error => {
+            classicTbody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
+            timeAttackTbody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
+            console.error('Error fetching leaderboard:', error);
+        });
+}
+
+// populateHofTable 함수 수정
+function populateHofTable(tbody, data, modeName, topScorer) {
+    tbody.innerHTML = '';
+
+    // 최고 득점자 행을 가장 먼저 추가합니다.
+    if (topScorer) {
+        const topScorerRow = `<tr style="font-weight: bold; color: #4b8134;">
+                                  <td>⭐</td>
+                                  <td>${topScorer.initial} 🏆</td>
+                                  <td>${topScorer.score}</td>
+                              </tr>`;
+        tbody.innerHTML += topScorerRow;
+    }
+    
+    if (!data || data.length === 0) {
+        tbody.innerHTML += `<tr><td colspan="3">아직 등록된 ${modeName} 기록이 없습니다.</td></tr>`;
+        return;
+    }
+    
+    // 최고 득점자 데이터를 순위 목록에서 제거합니다.
+    const filteredData = data.filter(item => !(topScorer && item.score === topScorer.score && item.initial === topScorer.initial));
+
+    let rank = 1;
+    let rankOffset = 0;
+    let prevScore = null;
+
+    filteredData.forEach((item, index) => {
+        if (prevScore !== null && item.score < prevScore) {
+            rank += rankOffset + 1;
+            rankOffset = 0;
+        } else if (prevScore !== null && item.score === prevScore) {
+            rankOffset++;
         }
-
-        classicTbody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
-        timeAttackTbody.innerHTML = '<tr><td colspan="3">불러오는 중...</td></tr>';
-        document.getElementById('hof-popup-overlay').style.display = 'flex';
         
-        fetch(webAppUrl)
-            .then(response => response.json())
-            .then(data => {
-                populateHofTable(classicTbody, data.classic || [], '클래식');
-                populateHofTable(timeAttackTbody, data.timeAttack || [], '타임어택');
-            })
-            .catch(error => {
-                classicTbody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
-                timeAttackTbody.innerHTML = '<tr><td colspan="3">기록을 불러오는 데 실패했습니다.</td></tr>';
-                console.error('Error fetching leaderboard:', error);
-            });
-    }
-
-    function populateHofTable(tbody, data, modeName) {
-        tbody.innerHTML = '';
-        if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3">아직 등록된 ${modeName} 기록이 없습니다.</td></tr>`;
-        } else {
-            data.forEach(item => {
-                let initialStyle = '';
-                if (item.rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"';
-                if (item.rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
-                if (item.rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 3px #fff;"';
-                const row = `<tr><td>${item.rank}</td><td ${initialStyle}>${item.initial} ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : ''}</td><td>${item.score}</td></tr>`;
-                tbody.innerHTML += row;
-            });
+        prevScore = item.score;
+        
+        if (rank > 20) {
+            return;
         }
-    }
+
+        let initialStyle = '';
+        if (rank === 1) initialStyle = 'style="color: #d4af37; font-weight: bold; text-shadow: 0 0 4px #fff, 0 0 6px #ff0;"';
+        if (rank === 2) initialStyle = 'style="color: #c0c0c0; font-weight: bold; text-shadow: 0 0 3px #fff;"';
+        if (rank === 3) initialStyle = 'style="color: #cd7f32; font-weight: bold; text-shadow: 0 0 3px #fff;"';
+        
+        const row = `<tr><td>${rank}</td><td ${initialStyle}>${item.initial} ${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : ''}</td><td>${item.score}</td></tr>`;
+        tbody.innerHTML += row;
+    });
+}
 
     function closeHofPopup() { document.getElementById('hof-popup-overlay').style.display = 'none'; }
     
@@ -1966,100 +1988,119 @@ function startQuiz() {
     }
     
     function loadGameState() {
-        const savedStateString = localStorage.getItem('quizState');
-        if (!savedStateString) return 'none';
+    const savedStateString = localStorage.getItem('quizState');
+    if (!savedStateString) return 'none';
 
-        const savedState = JSON.parse(savedStateString);
-        if (!savedState || !savedState.problemList || !savedState.score || !savedState.gameMode) {
-            return 'none';
-        }
-        
-        const isClassicInProgress = savedState.gameMode === 'classic' &&
-                                   savedState.totalProblems > 0 &&
-                                   savedState.currentProblem < savedState.totalProblems;
-
-        const isTimeAttackInProgress = savedState.gameMode === 'timeAttack' &&
-                                           savedState.remainingTime > 0;
-
-        if (isClassicInProgress || isTimeAttackInProgress) {
-            problemList = savedState.problemList;
-            currentProblem = savedState.currentProblem;
-            score = savedState.score;
-            canvasMode = savedState.canvasMode;
-            selectedType = savedState.selectedType;
-            selectedDifficulty = savedState.selectedDifficulty;
-            totalProblems = savedState.totalProblems;
-            currentProblemAttempts = savedState.currentProblemAttempts;
-            finalScoreValue = savedState.finalScoreValue;
-            hasSubmittedScore = savedState.hasSubmittedScore;
-            gameMode = savedState.gameMode;
-            timeLimitInMinutes = savedState.timeLimitInMinutes;
-            remainingTime = savedState.remainingTime;
-            userVertices = savedState.userVertices || [];
-            userLines = savedState.userLines || [];
-
-            if (gameMode === 'timeAttack' && remainingTime > 0) {
-                startTimer(true);
-            }
-            return 'in-progress';
-        }
-
-        const isFinished = savedState.score.results.length > 0 || 
-                           (savedState.gameMode === 'timeAttack' && savedState.remainingTime <= 0);
-
-        if (isFinished) {
-            Object.assign(window, savedState); 
-            return 'finished';
-        }
-        
+    const savedState = JSON.parse(savedStateString);
+    if (!savedState || !savedState.problemList || !savedState.score || !savedState.gameMode) {
         return 'none';
     }
-
-    function clearGameState() { localStorage.removeItem('quizState'); }
     
-    function submitScore() { 
-        const initialInput = document.getElementById('hof-initial'), 
-              initial = initialInput.value, 
-              submitBtn = document.getElementById('hof-submit-btn'), 
-              messageEl = document.getElementById('hof-message');
-        if (!/^[A-Z]{3}$/.test(initial)) { 
-            messageEl.textContent = '이니셜은 영어 대문자 3글자로 입력해주세요.'; 
-            messageEl.style.color = 'red'; 
-            return; 
-        } 
-        submitBtn.disabled = true; 
-        messageEl.textContent = '등록 중...'; 
-        messageEl.style.color = '#333'; 
-        const data = { 
-            initial, 
-            score: finalScoreValue, 
-            problems: problemList.length, 
-            accuracy: finalAccuracyValue, 
-            difficulty: selectedDifficulty, 
-            type: selectedType, 
-            mode: gameMode
-        }; 
-        fetch(webAppUrl, { 
-            method: 'POST', 
-            cache: 'no-cache', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(data) 
-        }).then(response => response.json()).then(result => { 
-            if (result.result === 'success') { 
-                hasSubmittedScore = true; 
-                saveGameState(); 
-                messageEl.textContent = '성공적으로 등록되었습니다!'; 
-                messageEl.style.color = '#4B8134'; 
-                document.querySelector('.hof-input-group').style.display = 'none'; 
-                setTimeout(showHofPopup, 1500); 
-            } else throw new Error(result.message || '알 수 없는 오류'); 
-        }).catch(error => { 
-            messageEl.textContent = '등록에 실패했습니다. 다시 시도해주세요.'; 
-            messageEl.style.color = 'red'; 
-            submitBtn.disabled = false; 
-            console.error('Error submitting score:', error); 
-        }); 
+    const isClassicInProgress = savedState.gameMode === 'classic' &&
+                                savedState.totalProblems > 0 &&
+                                savedState.currentProblem < savedState.totalProblems;
+
+    const isTimeAttackInProgress = savedState.gameMode === 'timeAttack' &&
+                                     savedState.remainingTime > 0;
+
+    if (isClassicInProgress || isTimeAttackInProgress) {
+        problemList = savedState.problemList;
+        currentProblem = savedState.currentProblem;
+        score = savedState.score;
+        canvasMode = savedState.canvasMode;
+        selectedType = savedState.selectedType;
+        selectedDifficulty = savedState.selectedDifficulty;
+        totalProblems = savedState.totalProblems;
+        currentProblemAttempts = savedState.currentProblemAttempts;
+        finalScoreValue = savedState.finalScoreValue;
+        hasSubmittedScore = savedState.hasSubmittedScore;
+        gameMode = savedState.gameMode;
+        timeLimitInMinutes = savedState.timeLimitInMinutes;
+        remainingTime = savedState.remainingTime;
+        userVertices = savedState.userVertices || [];
+        userLines = savedState.userLines || [];
+
+        if (gameMode === 'timeAttack' && remainingTime > 0) {
+            startTimer(true);
+        }
+        return 'in-progress';
     }
+
+    const isFinished = savedState.score.results.length > 0 || 
+                       (savedState.gameMode === 'timeAttack' && savedState.remainingTime <= 0);
+
+    const hasValidScore = savedState.finalScoreValue > 0 || savedState.score.results.length > 0;
+    
+    if (isFinished && hasValidScore) { 
+        Object.assign(window, savedState); 
+        return 'finished';
+    }
+    
+    // 불완전한 상태는 삭제하여 다음 접속 시 메인 페이지로 이동하도록 유도합니다.
+    clearGameState(); 
+    return 'none';
+}
+
+function clearGameState() { localStorage.removeItem('quizState'); }
+    
+   // submitScore 함수에 필터링 로직 추가
+function submitScore() {
+    const initialInput = document.getElementById('hof-initial');
+    const initial = initialInput.value;
+    const submitBtn = document.getElementById('hof-submit-btn');
+    const messageEl = document.getElementById('hof-message');
+    
+    // 이니셜이 3글자 대문자인지 확인
+    if (!/^[A-Z]{3}$/.test(initial)) {
+        messageEl.textContent = '이니셜은 영어 대문자 3글자로 입력해주세요.';
+        messageEl.style.color = 'red';
+        return;
+    }
+    
+    // 불쾌감을 주는 단어 필터링
+    if (blockedWords.includes(initial)) {
+        messageEl.textContent = '타인에게 불쾌감을 주는 단어는 사용할 수 없습니다.';
+        messageEl.style.color = 'red';
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    messageEl.textContent = '등록 중...';
+    messageEl.style.color = '#333';
+    
+    const data = {
+        action: 'submitScore',
+        initial,
+        score: finalScoreValue,
+        problems: problemList.length,
+        accuracy: finalAccuracyValue,
+        difficulty: selectedDifficulty,
+        type: selectedType,
+        mode: gameMode
+    };
+    
+    fetch(webAppUrl, {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(response => response.json()).then(result => {
+        if (result.result === 'success') {
+            hasSubmittedScore = true;
+            saveGameState();
+            messageEl.textContent = '성공적으로 등록되었습니다!';
+            messageEl.style.color = '#4B8134';
+            document.querySelector('.hof-input-group').style.display = 'none';
+            setTimeout(showHofPopup, 1500);
+        } else throw new Error(result.message || '알 수 없는 오류');
+    }).catch(error => {
+        messageEl.textContent = '등록에 실패했습니다. 다시 시도해주세요.';
+        messageEl.style.color = 'red';
+        submitBtn.disabled = false;
+        console.error('Error submitting score:', error);
+    });
+}
+
     
     function startTimer(isResuming = false) { stopTimer(); if (!isResuming) remainingTime = timeLimitInMinutes * 60; const timerDisplay = document.getElementById('timer-display'); timerDisplay.style.display = 'block'; updateTimerDisplay(); timerInterval = setInterval(() => { remainingTime--; updateTimerDisplay(); if (remainingTime <= 0) { stopTimer(); showFinalResult(); } }, 1000); }
     function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
@@ -2074,19 +2115,22 @@ function startQuiz() {
     }
 
     window.onload = () => {
-        try {
-            setupGrid();
-            const gameState = loadGameState();
-            
-            if (gameState === 'finished') {
-                showFinalResult();
-            } else if (gameState === 'in-progress') {
-                showPage('problem-page');
-                loadProblem();
-            } else {
-                resetGame();
-                showPage('mode-selection-page');
-            }
+    try {
+        setupGrid();
+        const gameState = loadGameState(); 
+        
+        if (gameState === 'finished') {
+            showFinalResult();
+            // [추가] 결과 페이지를 띄운 직후, 저장된 상태를 삭제합니다. (다음 접속 시 메인으로)
+            clearGameState(); 
+        } else if (gameState === 'in-progress') {
+            showPage('problem-page');
+            loadProblem();
+        } else {
+            // 'none' 상태는 무조건 초기화하고 메인 페이지로!
+            resetGame();
+            showPage('mode-selection-page');
+        }
 
             initializeSetupListeners();
             document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
@@ -2188,23 +2232,22 @@ function startQuiz() {
             checkAnswerBtn.addEventListener('mouseleave', cancelPress);
             checkAnswerBtn.addEventListener('touchend', cancelPress);
         } catch (error) {
-            console.error("오류가 발생하여 앱을 초기화합니다:", error);
-            
-            clearGameState(); 
-            // location.reload() might be too aggressive, let's try resetting state and UI first
-            try {
-                resetGame();
-                showPage('mode-selection-page');
-                initializeSetupListeners();
-                document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
-                document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
-            } catch (recoveryError) {
-                console.error("복구 중 추가 오류 발생:", recoveryError);
-                alert("치명적인 오류가 발생하여 페이지를 새로고침합니다.");
-                location.reload();
-            }
+        console.error("오류가 발생하여 앱을 초기화합니다:", error);
+        
+        clearGameState(); 
+        try {
+            resetGame();
+            showPage('mode-selection-page');
+            initializeSetupListeners();
+            document.getElementById('classic-mode-btn').addEventListener('click', () => selectGameMode('classic'));
+            document.getElementById('time-attack-mode-btn').addEventListener('click', () => selectGameMode('timeAttack'));
+        } catch (recoveryError) {
+            console.error("복구 중 추가 오류 발생:", recoveryError);
+            alert("치명적인 오류가 발생하여 페이지를 새로고침합니다.");
+            location.reload();
         }
-    };
+    }
+};
 </script>
 
 </body>
